@@ -1,0 +1,20 @@
+{
+  "name": "netlify-ki-match",
+  "version": "1.0.0",
+  "description": "Netlify Function for AI matching",
+  "main": "index.js",
+  "dependencies": {
+    "querystring": "^0.2.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "netlify",
+    "serverless",
+    "lambda"
+  ],
+  "author": "",
+  "license": "ISC"
+}
