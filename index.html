@@ -23,8 +23,10 @@
         <p>Beantworte unsere psychografischen Fragen. Unsere KI analysiert deine wahren Bedürfnisse und liefert dein perfektes Reisematch.</p>
     </header>
 
-    <form name="ki_match" method="POST" data-netlify="true" data-netlify-lambda="match" action="/success">
-    <input type="hidden" name="form-name" value="ki_match" />
+  <form name="ki_match" method="POST" data-netlify="true" data-netlify-lambda="match" action="/success">
+
+<form name="ki_match" method="POST" action="/.netlify/functions/match">
+    </form>
     
     </form>
         <label for="q_sehnsucht">1. Was stresst dich im Alltag, und was möchtest du im Urlaub unbedingt **zurücklassen**?</label>
