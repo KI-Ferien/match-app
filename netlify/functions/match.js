@@ -92,10 +92,12 @@ JSON-SCHEMA: { "tensions_score": Zahl, "keywords": [String, String, String], "kl
         
         // Erfolgsantwort (200 OK)
         return {
-            statusCode: 200, 
-            body: JSON.stringify({ 
-                message: "Analyse erfolgreich durchgeführt und Ergebnis geloggt.",
-                result: matchingResult 
+            statusCode: 302, // 302 ist der HTTP-Code für "Temporär verschoben" (Redirect)
+    headers: {
+        "Location": "/success" // Leitet den Browser zur Success-Seite weiter
+    },
+    body: "Redirecting..." // Optionaler Body
+};
             })
         };
 
