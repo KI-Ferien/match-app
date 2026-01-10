@@ -23,18 +23,22 @@ exports.handler = async (event) => {
         data = qs.parse(body);
         
         // Wir holen die notwendigen Felder aus den Formular-Daten
-        const beruf = data.beruf || 'nicht angegeben';
-        const faehigkeiten = data.faehigkeiten || 'keine';
-        const projektziele = data.projektziele || 'nicht angegeben';
-        
-        // Den Prompt für die KI erstellen
-        const prompt = `Du bist ein erfahrener Karriereberater. Bewerte basierend auf der folgenden Rolle und den Anforderungen, wie gut die Fähigkeiten der Bewerberin/des Bewerbers zum Projekt passen. Gib eine kurze, klare Empfehlung in maximal 50 Wörtern.
-        
-        Projektrolle/Ziel: ${projektziele}
-        Berufserfahrung: ${beruf}
-        Fähigkeiten: ${faehigkeiten}
-        
-        Empfehlung:`;
+        const sehnsucht = data.q_sehnsucht || 'zurücklassen (nicht angegeben)';
+const activity = data.q_activity || '3'; // Wert von 1-5
+const social = data.q_social || '3';     // Wert von 1-5
+const adjektive = data.q_adjektive || 'keine';
+const email = data.email || 'unbekannt';
+
+// Den Prompt für die KI erstellen (angepasst an das Thema Urlaub/Seele)
+const prompt = `Du bist ein psychologischer Reiseberater. Deine Aufgabe ist es, einen "Seelen-Urlaub" basierend auf den Antworten des Nutzers zu finden. Schlage **einen** konkreten Urlaubstyp (z.B. Wanderurlaub in den Alpen, Meditations-Retreat in Asien, Segeltörn in der Karibik) vor und begründe die Wahl kurz. Gib nur den Urlaubstyp und die Begründung in maximal 60 Wörtern aus.
+
+Nutzer-Input:
+- Alltag Stress: ${sehnsucht}
+- Aktivitätslevel (1=Ruhe, 5=Action): ${activity}
+- Soziales Level (1=Allein, 5=Gemeinschaft): ${social}
+- Gewünschte Gefühle: ${adjektive}
+
+Empfehlung:`;
 
         // 3. Aufruf der Mistral API
         const response = await fetch("https://api.mistral.ai/v1/chat/completions", {
