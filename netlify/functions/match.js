@@ -1,111 +1,96 @@
 // netlify/functions/match.js
-// Dies ist die Serverless Function, die durch das Formular in index.html ausgelöst wird.
 
-const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY; // Lädt den Key aus den Netlify Environment Variables
+// Importiert das qs-Paket, um Formular-Daten zu parsen, die von Netlify übergeben werden.
+const qs = require('querystring'); 
 
-exports.handler = async (event, context) => {
-    // 1. Sicherheit: Nur POST-Anfragen vom Formular akzeptieren
+// Die Mistral API-Schlüssel-Variable wird aus den Netlify Environment Variables geladen.
+const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY; 
+
+// Definition des Haupt-Handlers, den Netlify aufruft.
+exports.handler = async (event) => {
+    // 1. Sicherheit und Methode prüfen
     if (event.httpMethod !== "POST") {
-        return { statusCode: 405, body: "Methode nicht erlaubt (Erwarte POST)." };
+        console.log("Fehler: Nur POST-Anfragen sind erlaubt.");
+        return { statusCode: 405, body: "Method Not Allowed" };
     }
 
-    // 2. Sicherheit: API-Key prüfen
-    if (!MISTRAL_API_KEY) {
-        console.error("FEHLER: MISTRAL_API_KEY fehlt in den Umgebungsvariablen.");
-        return { statusCode: 500, body: JSON.stringify({ error: "Interner Fehler: API-Schlüssel fehlt." }) };
-    }
+    // 2. Daten parsen
+    const body = event.body;
+    let data;
 
     try {
-        // Netlify Forms senden die Daten im Body als URL-encoded,
-        // aber wenn die Function als Lambda Trigger verwendet wird,
-        // kommt der Body oft als JSON-Objekt an (Payload-Struktur).
+        // Daten von Netlify Forms sind oft URL-Encoded (x-www-form-urlencoded)
+        data = qs.parse(body);
         
-        // Versuche, die Daten zu parsen, egal wie sie kommen
-        let data;
-        try {
-             // Wenn das Formular den Lambda-Trigger verwendet, kommt der Body meist als JSON
-             const parsedBody = JSON.parse(event.body);
-             // Wir verwenden die Felder im 'data' Teil des Payload
-             data = parsedBody.payload.data; 
-        } catch (e) {
-             // Fallback für den Fall, dass es sich um einen reinen URL-Encoded Body handelt
-             console.log("Fehler beim Parsen der Payload, versuche URL-encoded parsing...");
-             const qs = require('querystring');
-             data = qs.parse(event.body);
-        }
-
-        // Destrukturierung der Formularfelder
-        const { q_sehnsucht, q_activity, q_social, q_adjektive, email } = data;
-
-        // --- PROMPT DESIGN: Anweisung an die KI ---
-        const llmPrompt = `
-Sie sind ein psychografischer Reiseanalyst und Ihr Ziel ist es, den perfekten Seelen-Urlaub zu finden.
-
-NUTZERDATEN:
-- Sehnsucht (Was zurücklassen): "${q_sehnsucht}"
-- Wunsch-Adjektive: "${q_adjektive}"
-- Aktivität (1=Ruhe, 5=Action): ${q_activity}
-- Sozial (1=Allein, 5=Gemeinschaft): ${q_social}
-
-ANALYSEN-ANWEISUNG:
-1. Erstellen Sie einen "Tensions-Score" (0-100), der angibt, wie dringend und tief die benötigte Erholung ist.
-2. Identifizieren Sie 3 thematische Keywords (z.B. 'Meer', 'Natur', 'Kultur'), die am besten zur Psyche passen.
-3. Empfehlen Sie EINE Reise-Klasse (z.B. 'Wellness-Retreat', 'Digital Detox Abenteuer', 'Städtereise mit Tiefgang').
-4. Schreiben Sie eine kurze, überzeugende 4-Zeilen-Beschreibung für den Nutzer, die die Empfehlung verkauft.
-
-Rückgabeformat: Geben Sie das Ergebnis **ausschließlich** als sauberes JSON-Objekt zurück.
-JSON-SCHEMA: { "tensions_score": Zahl, "keywords": [String, String, String], "klassen_empfehlung": String, "beschreibung": String }
-        `;
+        // Wir holen die notwendigen Felder aus den Formular-Daten
+        const beruf = data.beruf || 'nicht angegeben';
+        const faehigkeiten = data.faehigkeiten || 'keine';
+        const projektziele = data.projektziele || 'nicht angegeben';
         
-        // --- API-Aufruf an Mistral ---
-        const MISTRAL_ENDPOINT = "https://api.mistral.ai/v1/chat/completions";
+        // Den Prompt für die KI erstellen
+        const prompt = `Du bist ein erfahrener Karriereberater. Bewerte basierend auf der folgenden Rolle und den Anforderungen, wie gut die Fähigkeiten der Bewerberin/des Bewerbers zum Projekt passen. Gib eine kurze, klare Empfehlung in maximal 50 Wörtern.
         
-        const response = await fetch(MISTRAL_ENDPOINT, {
+        Projektrolle/Ziel: ${projektziele}
+        Berufserfahrung: ${beruf}
+        Fähigkeiten: ${faehigkeiten}
+        
+        Empfehlung:`;
+
+        // 3. Aufruf der Mistral API
+        const response = await fetch("https://api.mistral.ai/v1/chat/completions", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${MISTRAL_API_KEY}`
+                "Authorization": `Bearer ${MISTRAL_API_KEY}`,
             },
             body: JSON.stringify({
-                model: "mistral-large-latest",
-                messages: [{ role: "user", content: llmPrompt }],
-                response_format: { type: "json_object" }, // Erzwingt JSON-Ausgabe
-                temperature: 0.7 
-            })
+                model: "mistral-tiny", // Ein schnelles, kostengünstiges Modell
+                messages: [{ role: "user", content: prompt }],
+                temperature: 0.1, // Niedrige Temperatur für fokussierte Antworten
+            }),
         });
 
+        // 4. API-Antwort verarbeiten
         if (!response.ok) {
             const errorText = await response.text();
-            throw new Error(`Mistral API Fehler: ${response.status} - ${errorText}`);
+            console.error(`Mistral API Fehler: Status ${response.status} - ${errorText}`);
+            // Loggt den Fehler, leitet aber weiter, um den Nutzer nicht mit einer Fehlerseite zu konfrontieren
+            return {
+                statusCode: 302,
+                headers: { "Location": "/success" }, 
+                body: "Redirecting after API Error..."
+            };
         }
 
-        const mistralData = await response.json();
-        const llmResult = mistralData.choices[0].message.content;
+        const jsonResponse = await response.json();
+        const kiEmpfehlung = jsonResponse.choices[0].message.content.trim();
 
-        // Parsen des KI-JSON-Ergebnisses
-        const matchingResult = JSON.parse(llmResult);
-        
-        console.log("Mistral Ergebnis (KI-Response):", matchingResult);
-        console.log("E-Mail des Nutzers:", email);
-        
-        // Im realen Szenario: Hier würden wir die E-Mail senden.
-        
-        // Erfolgsantwort (200 OK)
-        return {
-            statusCode: 302, // 302 ist der HTTP-Code für "Temporär verschoben" (Redirect)
-    headers: {
-        "Location": "/success" // Leitet den Browser zur Success-Seite weiter
-    },
-    body: "Redirecting..." // Optionaler Body
-};
-            })
-        };
+        // 5. Ergebnisse loggen (für Ihr Debugging)
+        console.log("--- MISTRAL ERGEBNIS (KI-Response): ---");
+        console.log(`Beruf: ${beruf}`);
+        console.log(`Ziele: ${projektziele}`);
+        console.log(`KI-Empfehlung: ${kiEmpfehlung}`);
+        console.log("------------------------------------------");
+
+        // HIER würde der Code zum E-Mail-Versand eingefügt werden.
 
     } catch (error) {
-        console.error("Kritischer Funktionsfehler:", error.message);
-        return { 
-            statusCode: 500, 
-            body: JSON.stringify({ error: `KI-Analyse konnte nicht abgeschlossen werden: ${error.message}` }) 
+        console.error("Unerwarteter Fehler im Function Handler:", error);
+        // Leitet bei jedem internen Fehler weiter, anstatt eine 500er-Seite zu zeigen
+        return {
+            statusCode: 302,
+            headers: { "Location": "/success" }, 
+            body: "Redirecting after Internal Error..."
         };
     }
+
+    // 6. Erfolgreiche Weiterleitung des Nutzers
+    // Wichtig: Rückgabe eines 302 Redirects, um den Browser zur Success-Seite zu schicken.
+    return {
+        statusCode: 302,
+        headers: {
+            "Location": "/success", // Ziel-URL nach erfolgreicher Verarbeitung
+        },
+        body: "Success! Redirecting to /success"
+    };
 };
