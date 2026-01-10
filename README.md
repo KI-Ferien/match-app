@@ -78,7 +78,4 @@ Dieses Repository ist mit Netlify verbunden. Jede Zusammenführung (Merge) in de
 
 ## 🔒 5. Autor und Support
 
-Dieses Projekt wird verwaltet von **[Ihr Name oder Organisation]**.
-
-* Bei Fragen oder technischen Problemen wenden Sie sich bitte an: **[Ihre E-Mail/Support-Adresse]**
-* **Lizenz:** [Fügen Sie hier Ihre Lizenz ein, z.B. MIT]
+Dieses Projekt wird verwaltet von **Mikostro@web.de**.
