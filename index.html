@@ -8,33 +8,78 @@
 </head>
 <body>
 
-    <header>
-        <h1>Finde deinen Seelen-Urlaub 🧠</h1>
-        <p>Beantworte unsere psychografischen Fragen. Unsere KI analysiert deine wahren Bedürfnisse und liefert dein perfektes Reisematch.</p>
-    </header>
-
-    <form name="ki_match" method="POST" action="/.netlify/functions/match">
-
-        <label for="q_sehnsucht">1. Was stresst dich im Alltag, und was möchtest du im Urlaub unbedingt **zurücklassen**?</label>
-        <textarea name="q_sehnsucht" id="q_sehnsucht" rows="4" required placeholder="Bsp: 'Den Druck, ständig erreichbar zu sein'"></textarea>
-
-        <label for="q_activity">2. Wie aktiv soll dein Urlaub sein?</label>
-        <input type="range" name="q_activity" id="q_activity" min="1" max="5" value="3" required>
-        <div class="range-info"><span>1 = Nur Ruhe</span><span>5 = Volle Action</span></div>
-
-        <label for="q_social">3. Wie sozial soll dein Umfeld sein?</label>
-        <input type="range" name="q_social" id="q_social" min="1" max="5" value="3" required>
-        <div class="range-info"><span>1 = Komplett allein</span><span>5 = Große Gemeinschaft</span></div>
-
-        <label for="q_adjektive">4. Beschreibe das Gefühl, das der Urlaub auslösen soll, mit **drei Adjektiven**.</label>
-        <input type="text" name="q_adjektive" id="q_adjektive" required placeholder="Bsp: 'Entspannend, Inspiriend, Ursprünglich'">
+    <header class="hero-section">
+    <div class="container">
+        <img src="img/lotus.png" alt="KI-Ferien Logo" style="width: 40px; margin-bottom: 20px;"> 
         
-        <label for="email">5. Wohin sollen wir das Ergebnis des KI-Matchings senden?</label>
-        <input type="email" name="email" id="email" required placeholder="deine.adresse@email.de">
+        <h1>Finde deinen inneren Frieden.</h1>
+        <p class="subline">Die KI-Analyse für deinen Seelen-Urlaub.</p>
+        
+        <a href="#formular" class="cta-button">Zur KI-Analyse</a>
+    </div>
+</header>
 
-        <button type="submit">Jetzt Seelen-Urlaub finden & KI-Analyse starten</button>
-    
+    <div class="container" id="formular">
+    <form action="/.netlify/functions/match" method="POST">
+        
+        <div class="form-card">
+            <label for="q_sehnsucht">1. Welche Sehnsucht treibt dich an?</label>
+            <div class="range-info"><span>🧘‍♀️ Ruhe & Einkehr</span><span>🔥 Neues erleben</span></div>
+            <input type="range" id="q_sehnsucht" name="q_sehnsucht" min="1" max="5" value="3">
+        </div>
+        
+        <div class="form-card">
+            <label for="q_activity">2. Wie aktiv soll dein Urlaub sein?</label>
+            <div class="range-info"><span>🛋️ Faulenzen</span><span>🧗‍♂️ Abenteuer</span></div>
+            <input type="range" id="q_activity" name="q_activity" min="1" max="5" value="3">
+        </div>
+        <div class="form-card">
+        <label for="q_age">3. Wie alt fühlst Du Dich ?</label>
+        <input type="number" id="q_age" name="q_age" min="18" max="99" value="30" required>
+        </div>
+    <div class="form-card">
+    <label for="q_gender">4. Dein Geschlecht (Für geschlechterspezifische Empfehlungen).</label>
+    <div style="display: flex; justify-content: space-around; margin-top: 15px;">
+        <label style="font-weight: normal; margin-bottom: 0;">
+            <input type="radio" name="q_gender" value="male" required> Männlich
+        </label>
+        <label style="font-weight: normal; margin-bottom: 0;">
+            <input type="radio" name="q_gender" value="female"> Weiblich
+        </label>
+        <label style="font-weight: normal; margin-bottom: 0;">
+            <input type="radio" name="q_gender" value="other"> Divers
+        </label>
+    </div>
+</div>
+<div class="form-card">
+    <label for="q_zodiac">5. Dein Sternzeichen (Für die psychologische Analyse).</label>
+    <select id="q_zodiac" name="q_zodiac" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+        <option value="" disabled selected>--- Bitte wählen ---</option>
+        <option value="aries">Widder</option>
+        <option value="taurus">Stier</option>
+        <option value="gemini">Zwilling</option>
+        <option value="cancer">Krebs</option>
+        <option value="leo">Löwe</option>
+        <option value="virgo">Jungfrau</option>
+        <option value="libra">Waage</option>
+        <option value="scorpio">Skorpion</option>
+        <option value="sagittarius">Schütze</option>
+        <option value="capricorn">Steinbock</option>
+        <option value="aquarius">Wassermann</option>
+        <option value="pisces">Fische</option>
+    </select>
+</div>
+        <div class="form-card">
+            <label for="email">Deine beste E-Mail-Adresse (Hier erhältst du dein Ergebnis):</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        
+        <button type="submit" class="cta-button" style="width: 100%; margin-top: 30px;">
+            MEIN SEELEN-MATCH FINDEN
+        </button>
+
     </form>
+</div>
 
 </body>
 </html>
