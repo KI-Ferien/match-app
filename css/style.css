@@ -1,115 +1,140 @@
-/* --- Zen-Design: Globale Stile und Farben --- */
+/* --- Zen-Design: Globale Stile mit Fokus auf Größe & Klarheit --- */
 
-/* Google Font "Roboto" für saubere Lesbarkeit importieren */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
 
 :root {
-  /* Natürliche Töne und Akzente */
-  --color-sand: #f0ebe3; /* Hellbeige/Sand für den Hintergrund */
-  --color-safran: #e5904d; /* Warmes Orange/Safran für Akzente und Buttons */
-  --color-stone: #8a967f; /* Gedämpftes Grün/Grau */
-  --color-text-dark: #333333; /* Dunkler Text */
-  --color-card-bg: #ffffff; /* Weiße Karten */
+  --color-sand: #f0ebe3;
+  --color-safran: #e5904d;
+  --color-stone: #8a967f;
+  --color-text-dark: #333333;
+  --color-card-bg: #ffffff;
 }
 
-/* Hintergrund und Basis-Typografie */
 body {
     background-color: var(--color-sand);
     font-family: 'Roboto', sans-serif;
     color: var(--color-text-dark);
     margin: 0;
     line-height: 1.6;
+    /* GRÖSSERE SCHRIFT GLOBAL */
+    font-size: 19px; 
 }
 
-/* Container, um die Seite zu zentrieren */
 .container {
-    max-width: 1200px;
+    max-width: 1100px;
     margin: 0 auto;
     padding: 20px;
 }
 
-/* Button-Basis-Stil (Orange wie die Mönchsrobe) */
+/* --- HERO SEKTION (Vergrößert) --- */
+.hero-section {
+    background-color: #3f473c;
+    color: white;
+    padding: 120px 20px 100px 20px;
+    text-align: center;
+    border-bottom-left-radius: 50px; 
+    border-bottom-right-radius: 50px; 
+    margin-bottom: 60px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.hero-section h1 {
+    font-size: 3.8em; /* Massive Überschrift */
+    font-weight: 700;
+    margin: 0 0 20px 0;
+    letter-spacing: -1px;
+}
+
+.hero-section .subline {
+    font-size: 1.6em; /* Größere Subline */
+    margin-bottom: 45px;
+    font-weight: 300;
+    opacity: 0.95;
+}
+
+/* --- BUTTONS --- */
 .cta-button {
     background-color: var(--color-safran);
     color: white;
     border: none;
-    padding: 12px 25px;
-    border-radius: 8px;
+    padding: 20px 45px; /* Größerer Button */
+    border-radius: 15px;
     cursor: pointer;
     font-weight: bold;
+    font-size: 1.3em; /* Größere Button-Schrift */
     text-decoration: none;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
+    display: inline-block;
 }
 
 .cta-button:hover {
-    background-color: #d17c37; /* Etwas dunkler für Hover-Effekt */
+    background-color: #d17c37;
+    transform: scale(1.05);
 }
 
-/* Formular-Karten-Stil (heller Hintergrund) */
-.form-card {
-    background-color: var(--color-card-bg);
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* Leichter Schatten */
-    padding: 25px;
-    margin-bottom: 25px;
-}
-/* Hero Sektion: Mönch im Zen-Garten Look */
-.hero-section {
-    background-color: #3f473c; /* Dunkles Moosgrün/Dunkelgrau */
-    color: white;
-    padding: 100px 20px 80px 20px; /* Viel Platz (Luft) oben/unten */
-    text-align: center;
-    border-bottom-left-radius: 20px; /* Abgerundete Ecken unten */
-    border-bottom-right-radius: 20px; 
-    margin-bottom: 40px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-.hero-section h1 {
-    font-size: 2.8em;
-    font-weight: 700;
-    margin-top: 0;
-    margin-bottom: 10px;
-}
-
-.hero-section .subline {
-    font-size: 1.3em;
-    margin-bottom: 30px;
-    font-weight: 300;
-    opacity: 0.9;
-}
-/* Layout für die Karten (nebeneinander, wenn möglich) */
+/* --- KACHELN & FORMULAR --- */
 .form-card-grid {
     display: grid;
-    gap: 20px;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsives Grid */
-    margin-top: 30px;
+    gap: 40px; 
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
+    margin-top: 50px;
 }
 
-/* Anpassung der Inputs an den Stil */
+.form-card {
+    background-color: var(--color-card-bg);
+    border-radius: 25px;
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.06); 
+    padding: 40px;
+    border: 1px solid rgba(0,0,0,0.03);
+}
+
+.form-card label {
+    font-weight: 700;
+    margin-bottom: 20px;
+    display: block;
+    font-size: 1.3em; /* Größere Fragen-Überschriften */
+}
+
+/* --- ICONS & SLIDER --- */
+.range-info { 
+    display: flex; 
+    justify-content: space-between; 
+    font-size: 1.4em; /* ICONS VERGRÖSSERT */
+    margin-top: 10px; 
+}
+
+/* Die Icons/Emojis selbst nochmals betonen */
+.range-info span {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+input[type="range"] {
+    width: 100%;
+    margin: 25px 0;
+    accent-color: var(--color-safran);
+    height: 10px; /* Slider etwas dicker für bessere Haptik */
+}
+
+/* Input Felder & Select */
 input[type="text"], 
 input[type="email"], 
 input[type="number"], 
 select {
-    width: 95%; /* Wichtig: Behebt das 100%-Problem in Box-Modellen */
-    padding: 10px;
-    margin-top: 8px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
+    width: 100%;
+    padding: 15px;
+    margin-top: 15px;
+    border: 2px solid #eee;
+    border-radius: 12px;
+    font-size: 1.1em; /* Größere Eingabeschrift */
     box-sizing: border-box; 
 }
 
-/* Slider-Anzeige (Ruhe und Abenteuer Symbole) */
-.range-info { 
-    display: flex; 
-    justify-content: space-between; 
-    font-size: 0.9em; 
-    color: var(--color-stone); 
-    margin-top: 5px; 
-}
-
-/* Radio- und Checkbox-Labels stylen */
-.form-card label input[type="radio"],
-.form-card label input[type="checkbox"] {
-    margin-right: 8px;
+/* Gender Radio Buttons vergrößert */
+.gender-options {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+    font-size: 1.2em;
 }
