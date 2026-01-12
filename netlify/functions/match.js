@@ -28,6 +28,9 @@ const activity = data.q_activity || '3'; // Wert von 1-5
 const social = data.q_social || '3';     // Wert von 1-5
 const adjektive = data.q_adjektive || 'keine';
 const email = data.email || 'unbekannt';
+const age = data.q_age || 'nicht angegeben';
+const gender = data.q_gender || 'nicht angegeben';
+const zodiac = data.q_zodiac || 'nicht angegeben';
 
 // Den Prompt für die KI erstellen (angepasst an das Thema Urlaub/Seele)
 const prompt = `Du bist ein psychologischer Reiseberater. Deine Aufgabe ist es, einen "Seelen-Urlaub" basierend auf den Antworten des Nutzers zu finden. Schlage **einen** konkreten Urlaubstyp (z.B. Wanderurlaub in den Alpen, Meditations-Retreat in Asien, Segeltörn in der Karibik) vor und begründe die Wahl kurz. Gib nur den Urlaubstyp und die Begründung in maximal 60 Wörtern aus.
@@ -77,6 +80,18 @@ Empfehlung:`;
         console.log("------------------------------------------");
 
         // HIER würde der Code zum E-Mail-Versand eingefügt werden.
+        const textContent = `
+        ...
+        --- Neue Analyse von KI-Ferien.de ---
+        
+        Sehnsucht: ${sehnsucht}
+        Aktivität: ${activity}
+        Alter: ${age} 
+        Geschlecht: ${gender}
+        Sternzeichen: ${zodiac}
+        
+        ...
+    `;
 
     } catch (error) {
         console.error("Unerwarteter Fehler im Function Handler:", error);
