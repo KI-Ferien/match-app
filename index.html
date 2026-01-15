@@ -1,97 +1,101 @@
 <!DOCTYPE html>
 <html lang="de">
-    <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KI-Ferien.de | Deine Ferien Ziel KI </title>
+    <title>KI-Ferien.de | Deine Ferien Ziel KI</title>
     <link rel="stylesheet" href="css/style.css"> 
-        <img src="img/logo.png" alt="KI-Ferien Logo" class="main-logo">
-        <link rel="icon" type="image/png" href="img/logo.png">
+    <link rel="icon" type="image/png" href="img/logo.png">
 </head>
 <body>
 
     <header class="hero-section">
-    <div class="container">
-        <div class="logo-wrapper">
-            <img src="img/logo.png" alt="KI-Ferien Logo" class="brand-logo-top">
+        <div class="container">
+            <div class="logo-wrapper">
+                <img src="img/logo.png" alt="KI-Ferien Logo" class="brand-logo-top">
+            </div>
+            
+            <h1>Finde die richtigen Ferien.</h1>
+            <p class="subline">Die KI-Analyse für deinen Seelen-Urlaub.</p>
+            
+            <a href="#formular" class="cta-button">Zur KI-Analyse</a>
         </div>
-        
-        <h1>Finde die richtigen Ferien.</h1>
-        <p class="subline">Die KI-Analyse für deinen Seelen-Urlaub.</p>
-        
-        <a href="#formular" class="cta-button">Zur KI-Analyse</a>
-    </div>
-</header>
+    </header>
 
     <div class="container" id="formular">
-    <form action="/.netlify/functions/match" method="POST">
-        
-        <div class="form-card">
-            <label for="q_sehnsucht">1. Welche Sehnsucht treibt dich an?</label>
-            <div class="range-info"><span>🧘‍♀️ Ruhe & Einkehr</span><span>🔥 Neues erleben</span></div>
-            <input type="range" id="q_sehnsucht" name="q_sehnsucht" min="1" max="5" value="3">
-        </div>
-        
-        <div class="form-card">
-            <label for="q_activity">2. Wie aktiv soll dein Urlaub sein?</label>
-            <div class="range-info"><span>🛋️ Faulenzen</span><span>🧗‍♂️ Abenteuer</span></div>
-            <input type="range" id="q_activity" name="q_activity" min="1" max="5" value="3">
-        </div>
-        <div class="form-card">
-        <label for="q_age">3. Wie alt fühlst Du Dich ?</label>
-        <input type="number" id="q_age" name="q_age" min="18" max="99" value="30" required>
-        </div>
-    <div class="form-card">
-    <label for="q_gender">4. Dein Geschlecht (Für geschlechterspezifische Empfehlungen).</label>
-    <div style="display: flex; justify-content: space-around; margin-top: 15px;">
-        <label style="font-weight: normal; margin-bottom: 0;">
-            <input type="radio" name="q_gender" value="male" required> Männlich
-        </label>
-        <label style="font-weight: normal; margin-bottom: 0;">
-            <input type="radio" name="q_gender" value="female"> Weiblich
-        </label>
-        <label style="font-weight: normal; margin-bottom: 0;">
-            <input type="radio" name="q_gender" value="other"> Divers
-        </label>
-    </div>
-</div>
-<div class="form-card">
-    <label for="q_zodiac">5. Dein Sternzeichen (Für die psychologische Analyse).</label>
-    <select id="q_zodiac" name="q_zodiac" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
-        <option value="" disabled selected>--- Bitte wählen ---</option>
-        <option value="aries">Widder</option>
-        <option value="taurus">Stier</option>
-        <option value="gemini">Zwilling</option>
-        <option value="cancer">Krebs</option>
-        <option value="leo">Löwe</option>
-        <option value="virgo">Jungfrau</option>
-        <option value="libra">Waage</option>
-        <option value="scorpio">Skorpion</option>
-        <option value="sagittarius">Schütze</option>
-        <option value="capricorn">Steinbock</option>
-        <option value="aquarius">Wassermann</option>
-        <option value="pisces">Fische</option>
-    </select>
-</div>
-        <div class="form-card">
-            <label for="email">Deine E-Mail-Adresse (Hier erhältst du dein Ergebnis):</label>
-            <input type="email" id="email" name="email" required>
-        </div>
-        
-        <button type="submit" class="cta-button" style="width: 100%; margin-top: 30px;">
-            MEIN FERIEN ZIEL FINDEN
-        </button>
+        <form action="/.netlify/functions/match" method="POST">
+            
+            <div class="form-card">
+                <label for="q_sehnsucht">1. Welche Sehnsucht treibt dich an?</label>
+                <div class="range-info"><span>🧘‍♀️ Ruhe & Einkehr</span><span>🔥 Neues erleben</span></div>
+                <input type="range" id="q_sehnsucht" name="q_sehnsucht" min="1" max="5" value="3">
+            </div>
+            
+            <div class="form-card">
+                <label for="q_activity">2. Wie aktiv soll dein Urlaub sein?</label>
+                <div class="range-info"><span>🛋️ Faulenzen</span><span>🧗‍♂️ Abenteuer</span></div>
+                <input type="range" id="q_activity" name="q_activity" min="1" max="5" value="3">
+            </div>
 
-    </form>
-</div>
-<footer style="margin-top: 80px; padding: 40px 0; border-top: 1px solid rgba(0,0,0,0.05); text-align: center; color: var(--color-stone);">
-    <div class="container">
-        <p style="font-size: 0.9em; margin-bottom: 10px;">&copy; 2026 KI-Ferien – Dein Weg zur Ruhe.</p>
-        <nav>
-            <a href="legal.html" style="color: var(--color-stone); text-decoration: none; font-size: 0.85em; margin: 0 15px; opacity: 0.7;">Impressum</a>
-            <a href="legal.html" style="color: var(--color-stone); text-decoration: none; font-size: 0.85em; margin: 0 15px; opacity: 0.7;">Datenschutz</a>
-        </nav>
+            <div class="form-card">
+                <label for="q_age">3. Wie alt fühlst Du Dich?</label>
+                <input type="number" id="q_age" name="q_age" min="18" max="99" value="30" required>
+            </div>
+
+            <div class="form-card">
+                <label for="q_gender">4. Dein Geschlecht (Für geschlechterspezifische Empfehlungen).</label>
+                <div style="display: flex; justify-content: space-around; margin-top: 15px;">
+                    <label style="font-weight: normal; margin-bottom: 0;">
+                        <input type="radio" name="q_gender" value="male" required> Männlich
+                    </label>
+                    <label style="font-weight: normal; margin-bottom: 0;">
+                        <input type="radio" name="q_gender" value="female"> Weiblich
+                    </label>
+                    <label style="font-weight: normal; margin-bottom: 0;">
+                        <input type="radio" name="q_gender" value="other"> Divers
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <label for="q_zodiac">5. Dein Sternzeichen (Für die psychologische Analyse).</label>
+                <select id="q_zodiac" name="q_zodiac" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+                    <option value="" disabled selected>--- Bitte wählen ---</option>
+                    <option value="aries">Widder</option>
+                    <option value="taurus">Stier</option>
+                    <option value="gemini">Zwilling</option>
+                    <option value="cancer">Krebs</option>
+                    <option value="leo">Löwe</option>
+                    <option value="virgo">Jungfrau</option>
+                    <option value="libra">Waage</option>
+                    <option value="scorpio">Skorpion</option>
+                    <option value="sagittarius">Schütze</option>
+                    <option value="capricorn">Steinbock</option>
+                    <option value="aquarius">Wassermann</option>
+                    <option value="pisces">Fische</option>
+                </select>
+            </div>
+
+            <div class="form-card">
+                <label for="email">Deine E-Mail-Adresse (Hier erhältst du dein Ergebnis):</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <button type="submit" class="cta-button" style="width: 100%; margin-top: 30px;">
+                MEIN FERIEN ZIEL FINDEN
+            </button>
+
+        </form>
     </div>
-</footer>
+
+    <footer style="margin-top: 80px; padding: 40px 0; border-top: 1px solid rgba(0,0,0,0.05); text-align: center; color: var(--color-stone);">
+        <div class="container">
+            <p style="font-size: 0.9em; margin-bottom: 10px;">&copy; 2026 KI-Ferien – Dein Weg zur Ruhe.</p>
+            <nav>
+                <a href="legal.html" style="color: var(--color-stone); text-decoration: none; font-size: 0.85em; margin: 0 15px; opacity: 0.7;">Impressum</a>
+                <a href="legal.html" style="color: var(--color-stone); text-decoration: none; font-size: 0.85em; margin: 0 15px; opacity: 0.7;">Datenschutz</a>
+            </nav>
+        </div>
+    </footer>
 </body>
 </html>
