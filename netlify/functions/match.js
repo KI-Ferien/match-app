@@ -1,115 +1,59 @@
-// netlify/functions/match.js
-
-// Importiert das qs-Paket, um Formular-Daten zu parsen, die von Netlify übergeben werden.
-const qs = require('querystring'); 
-
-// Die Mistral API-Schlüssel-Variable wird aus den Netlify Environment Variables geladen.
-const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY; 
-
-// Definition des Haupt-Handlers, den Netlify aufruft.
 exports.handler = async (event) => {
-    // 1. Sicherheit und Methode prüfen
     if (event.httpMethod !== "POST") {
-        console.log("Fehler: Nur POST-Anfragen sind erlaubt.");
         return { statusCode: 405, body: "Method Not Allowed" };
     }
 
-    // 2. Daten parsen
-    const body = event.body;
-    let data;
-
     try {
-        // Daten von Netlify Forms sind oft URL-Encoded (x-www-form-urlencoded)
-        data = qs.parse(body);
+        const data = JSON.parse(event.body);
         
-        // Wir holen die notwendigen Felder aus den Formular-Daten
-        const sehnsucht = data.q_sehnsucht || 'zurücklassen (nicht angegeben)';
-const activity = data.q_activity || '3'; // Wert von 1-5
-const social = data.q_social || '3';     // Wert von 1-5
-const adjektive = data.q_adjektive || 'keine';
-const email = data.email || 'unbekannt';
-const age = data.q_age || 'nicht angegeben';
-const gender = data.q_gender || 'nicht angegeben';
-const zodiac = data.q_zodiac || 'nicht angegeben';
+        // Daten aus dem Formular extrahieren
+        const sehnsucht = data.q_sehnsucht || "Nicht angegeben";
+        const activity = data.q_activity || "Nicht angegeben";
+        const age = data.q_age || "Nicht angegeben";
+        const gender = data.q_gender || "Nicht angegeben";
+        const zodiac = data.q_zodiac || "Nicht angegeben";
+        const userEmail = data.email;
 
-// Den Prompt für die KI erstellen (angepasst an das Thema Urlaub/Seele)
-const prompt = `Du bist ein psychologischer Reiseberater. Deine Aufgabe ist es, einen "Seelen-Urlaub" basierend auf den Antworten des Nutzers zu finden. Schlage **einen** konkreten Urlaubstyp (z.B. Wanderurlaub in den Alpen, Meditations-Retreat in Asien, Segeltörn in der Karibik) vor und begründe die Wahl kurz. Gib nur den Urlaubstyp und die Begründung in maximal 60 Wörtern aus.
+        // E-Mail Inhalt vorbereiten
+        const emailHtml = `
+            <h1>Neue Ferien-Analyse für ${userEmail}</h1>
+            <p><strong>Sehnsucht (1-5):</strong> ${sehnsucht}</p>
+            <p><strong>Aktivität (1-5):</strong> ${activity}</p>
+            <p><strong>Alter:</strong> ${age}</p>
+            <p><strong>Geschlecht:</strong> ${gender}</p>
+            <p><strong>Sternzeichen:</strong> ${zodiac}</p>
+            <hr>
+            <p><em>Diese Anfrage wurde über ki-ferien.de gesendet.</em></p>
+        `;
 
-Nutzer-Input:
-- Alltag Stress: ${sehnsucht}
-- Aktivitätslevel (1=Ruhe, 5=Action): ${activity}
-- Soziales Level (1=Allein, 5=Gemeinschaft): ${social}
-- Gewünschte Gefühle: ${adjektive}
-
-Empfehlung:`;
-
-        // 3. Aufruf der Mistral API
-        const response = await fetch("https://api.mistral.ai/v1/chat/completions", {
+        // Versand via Resend API
+        const response = await fetch("https://api.resend.com/emails", {
             method: "POST",
             headers: {
+                "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${MISTRAL_API_KEY}`,
             },
             body: JSON.stringify({
-                model: "mistral-tiny", // Ein schnelles, kostengünstiges Modell
-                messages: [{ role: "user", content: prompt }],
-                temperature: 0.1, // Niedrige Temperatur für fokussierte Antworten
+                from: "KI-Ferien <onboarding@resend.dev>", // Später ändern auf info@ki-ferien.de
+                to: "deine-email@beispiel.de", // DEINE Email hier eintragen für die Benachrichtigung
+                subject: "Neue Seele-Match Analyse",
+                html: emailHtml,
             }),
         });
 
-        // 4. API-Antwort verarbeiten
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error(`Mistral API Fehler: Status ${response.status} - ${errorText}`);
-            // Loggt den Fehler, leitet aber weiter, um den Nutzer nicht mit einer Fehlerseite zu konfrontieren
+        if (response.ok) {
             return {
                 statusCode: 302,
-                headers: { "Location": "/success" }, 
-                body: "Redirecting after API Error..."
+                headers: { "Location": "/success.html" }, // Du brauchst eine success.html Seite
+                body: "Erfolg",
             };
+        } else {
+            const errorText = await response.text();
+            throw new Error(errorText);
         }
 
-        const jsonResponse = await response.json();
-        const kiEmpfehlung = jsonResponse.choices[0].message.content.trim();
-
-        // 5. Ergebnisse loggen (für Ihr Debugging)
-        console.log("--- MISTRAL ERGEBNIS (KI-Response): ---");
-        console.log(`Beruf: ${beruf}`);
-        console.log(`Ziele: ${projektziele}`);
-        console.log(`KI-Empfehlung: ${kiEmpfehlung}`);
-        console.log("------------------------------------------");
-
-        // HIER würde der Code zum E-Mail-Versand eingefügt werden.
-        const textContent = `
-        ...
-        --- Neue Analyse von KI-Ferien.de ---
-        
-        Sehnsucht: ${sehnsucht}
-        Aktivität: ${activity}
-        Alter: ${age} 
-        Geschlecht: ${gender}
-        Sternzeichen: ${zodiac}
-        
-        ...
-    `;
-
     } catch (error) {
-        console.error("Unerwarteter Fehler im Function Handler:", error);
-        // Leitet bei jedem internen Fehler weiter, anstatt eine 500er-Seite zu zeigen
-        return {
-            statusCode: 302,
-            headers: { "Location": "/success" }, 
-            body: "Redirecting after Internal Error..."
-        };
+        console.error("Fehler:", error);
+        return { statusCode: 500, body: "Fehler beim Senden: " + error.message };
     }
-
-    // 6. Erfolgreiche Weiterleitung des Nutzers
-    // Wichtig: Rückgabe eines 302 Redirects, um den Browser zur Success-Seite zu schicken.
-    return {
-        statusCode: 302,
-        headers: {
-            "Location": "/success", // Ziel-URL nach erfolgreicher Verarbeitung
-        },
-        body: "Success! Redirecting to /success"
-    };
 };
