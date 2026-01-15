@@ -1,10 +1,59 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
-    <title>Erfolg!</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse läuft - KI-Ferien</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .success-container {
+            text-align: center;
+            padding: 100px 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .lotus-icon {
+            font-size: 80px;
+            margin-bottom: 30px;
+            display: block;
+        }
+        .loading-bar {
+            width: 100%;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            margin: 30px 0;
+            overflow: hidden;
+        }
+        .loading-progress {
+            width: 60%;
+            height: 100%;
+            background: var(--color-safran);
+            border-radius: 2px;
+            animation: pulse 2s infinite ease-in-out;
+        }
+        @keyframes pulse {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(200%); }
+        }
+    </style>
 </head>
 <body>
-    <h1>Vielen Dank!</h1>
-    <p>Ihre Daten wurden zur KI-Analyse übermittelt. Sie erhalten das Ergebnis in Kürze per E-Mail.</p>
+
+    <div class="success-container">
+        <span class="lotus-icon">🪷</span>
+        <h1 style="color: var(--color-stone);">Deine Seele ist auf dem Weg...</h1>
+        <p>Vielen Dank! Deine Antworten werden gerade von unserer KI analysiert, um das perfekte Match für deine Ferien zu finden.</p>
+        
+        <div class="loading-bar">
+            <div class="loading-progress"></div>
+        </div>
+
+        <p style="font-style: italic; color: #888;">Wir senden dir die Ergebnisse in Kürze an deine E-Mail-Adresse.</p>
+        
+        <br><br>
+        <a href="/" class="cta-button" style="background-color: var(--color-stone);">Zurück zur Startseite</a>
+    </div>
+
 </body>
 </html>
