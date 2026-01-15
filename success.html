@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analyse läuft... | KI-Ferien</title>
+    <title>Dein Ferien-Ziel wird berechnet | KI-Ferien</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
         .success-wrapper {
@@ -16,28 +16,29 @@
             padding: 20px;
         }
         
-        /* Die pulsierende Lotusblüte */
-        .lotus-pulse {
-            font-size: 80px;
+        /* Das pulsierende Logo */
+        .logo-pulse {
+            width: 150px; /* Größe deines Logos auf der Bestätigungsseite */
+            height: auto;
             margin-bottom: 30px;
-            display: block;
-            animation: pulse 2.5s infinite ease-in-out;
+            border-radius: 50%;
+            animation: breathe 3s infinite ease-in-out;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.7; filter: drop-shadow(0 0 0px rgba(229, 144, 77, 0)); }
-            50% { transform: scale(1.15); opacity: 1; filter: drop-shadow(0 0 15px rgba(229, 144, 77, 0.4)); }
-            100% { transform: scale(1); opacity: 0.7; filter: drop-shadow(0 0 0px rgba(229, 144, 77, 0)); }
+        @keyframes breathe {
+            0% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.08); opacity: 1; filter: brightness(1.05); }
+            100% { transform: scale(1); opacity: 0.9; }
         }
 
         .loading-line {
-            width: 150px;
+            width: 120px;
             height: 2px;
             background: #eee;
             margin: 25px 0;
             position: relative;
             overflow: hidden;
-            border-radius: 2px;
         }
 
         .loading-line::after {
@@ -59,7 +60,7 @@
 
     <div class="container">
         <div class="success-wrapper">
-            <div class="lotus-pulse">🪷</div>
+            <img src="img/logo.png" alt="KI-Ferien Logo" class="logo-pulse">
             
             <h1 style="color: var(--color-stone); font-family: 'Georgia', serif; font-style: italic;">
                 Dein Ferien Ziel ist auf dem Weg...
