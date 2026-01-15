@@ -47,7 +47,7 @@ exports.handler = async (event) => {
             },
             body: JSON.stringify({
                 from: "KI-Analyse <info@ki-ferien.de>", // Jetzt mit deiner verifizierten Domain!
-                to: "DEINE_EIGENE_EMAIL@GMAIL.COM", // HIER DEINE EMAIL EINTRAGEN (wo die Ergebnisse landen sollen)
+                to: Mikostro@web.de, // HIER DEINE EMAIL EINTRAGEN (wo die Ergebnisse landen sollen)
                 subject: `Neue Analyse: ${sternzeichen} (${emailUser})`,
                 html: emailHtml,
             }),
