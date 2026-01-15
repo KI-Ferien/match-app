@@ -1,29 +1,41 @@
 exports.handler = async (event) => {
+    // Nur POST-Anfragen erlauben
     if (event.httpMethod !== "POST") {
-        return { statusCode: 405, body: "Method Not Allowed" };
+        return { 
+            statusCode: 405, 
+            body: JSON.stringify({ error: "Method Not Allowed" }) 
+        };
     }
 
     try {
-        const data = JSON.parse(event.body);
-        
-        // Daten aus dem Formular extrahieren
-        const sehnsucht = data.q_sehnsucht || "Nicht angegeben";
-        const activity = data.q_activity || "Nicht angegeben";
-        const age = data.q_age || "Nicht angegeben";
-        const gender = data.q_gender || "Nicht angegeben";
-        const zodiac = data.q_zodiac || "Nicht angegeben";
-        const userEmail = data.email;
+        // Die Daten kommen als URL-encoded Formular-Daten an
+        const params = new URLSearchParams(event.body);
+        const data = Object.fromEntries(params.entries());
 
-        // E-Mail Inhalt vorbereiten
+        // Daten extrahieren (Namen müssen mit den 'name'-Attributen in deinem HTML übereinstimmen)
+        const emailUser = data.email || "Keine E-Mail";
+        const sehnsucht = data.q_sehnsucht || "3";
+        const aktivitaet = data.q_activity || "3";
+        const alter = data.q_age || "Nicht angegeben";
+        const geschlecht = data.q_gender || "Nicht angegeben";
+        const sternzeichen = data.q_zodiac || "Nicht angegeben";
+
+        // E-Mail Inhalt für dich (Benachrichtigung)
         const emailHtml = `
-            <h1>Neue Ferien-Analyse für ${userEmail}</h1>
-            <p><strong>Sehnsucht (1-5):</strong> ${sehnsucht}</p>
-            <p><strong>Aktivität (1-5):</strong> ${activity}</p>
-            <p><strong>Alter:</strong> ${age}</p>
-            <p><strong>Geschlecht:</strong> ${gender}</p>
-            <p><strong>Sternzeichen:</strong> ${zodiac}</p>
-            <hr>
-            <p><em>Diese Anfrage wurde über ki-ferien.de gesendet.</em></p>
+            <div style="font-family: sans-serif; line-height: 1.5; color: #333;">
+                <h2 style="color: #e5904d;">Neue KI-Ferien Analyse</h2>
+                <p>Eine neue Seele sucht ihr Match!</p>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>User E-Mail:</strong></td><td style="padding: 8px; border-bottom: 1px solid #eee;">${emailUser}</td></tr>
+                    <tr><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Sehnsucht (1-5):</strong></td><td style="padding: 8px; border-bottom: 1px solid #eee;">${sehnsucht}</td></tr>
+                    <tr><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Aktivität (1-5):</strong></td><td style="padding: 8px; border-bottom: 1px solid #eee;">${aktivitaet}</td></tr>
+                    <tr><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Alter:</strong></td><td style="padding: 8px; border-bottom: 1px solid #eee;">${alter}</td></tr>
+                    <tr><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Geschlecht:</strong></td><td style="padding: 8px; border-bottom: 1px solid #eee;">${geschlecht}</td></tr>
+                    <tr><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Sternzeichen:</strong></td><td style="padding: 8px; border-bottom: 1px solid #eee;">${sternzeichen}</td></tr>
+                </table>
+                <br>
+                <p style="font-size: 0.9em; color: #888;">Gesendet von deiner Zen-Garten Website.</p>
+            </div>
         `;
 
         // Versand via Resend API
@@ -34,26 +46,31 @@ exports.handler = async (event) => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                from: "KI-Ferien <onboarding@resend.dev>", // Später ändern auf info@ki-ferien.de
-                to: "deine-email@beispiel.de", // DEINE Email hier eintragen für die Benachrichtigung
-                subject: "Neue Seele-Match Analyse",
+                from: "KI-Analyse <info@ki-ferien.de>", // Jetzt mit deiner verifizierten Domain!
+                to: "DEINE_EIGENE_EMAIL@GMAIL.COM", // HIER DEINE EMAIL EINTRAGEN (wo die Ergebnisse landen sollen)
+                subject: `Neue Analyse: ${sternzeichen} (${emailUser})`,
                 html: emailHtml,
             }),
         });
 
         if (response.ok) {
+            // Erfolg: Weiterleitung zur Bestätigungsseite
             return {
                 statusCode: 302,
-                headers: { "Location": "/success.html" }, // Du brauchst eine success.html Seite
-                body: "Erfolg",
+                headers: { "Location": "/success.html" },
+                body: "Redirecting...",
             };
         } else {
-            const errorText = await response.text();
-            throw new Error(errorText);
+            const errorData = await response.json();
+            console.error("Resend Error:", errorData);
+            throw new Error(JSON.stringify(errorData));
         }
 
     } catch (error) {
-        console.error("Fehler:", error);
-        return { statusCode: 500, body: "Fehler beim Senden: " + error.message };
+        console.error("Funktions-Fehler:", error);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: "Fehler beim Senden", details: error.message }),
+        };
     }
 };
