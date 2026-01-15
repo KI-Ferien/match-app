@@ -3,63 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Impressum & Datenschutz - KI-Ferien</title>
+    <title>Rechtliches | KI-Ferien</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
         .legal-content {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            margin-top: 50px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            padding: 60px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+            color: #444;
         }
-        h2 { color: var(--color-safran); margin-top: 30px; }
-        .back-link { display: inline-block; margin-bottom: 20px; text-decoration: none; color: var(--color-stone); font-weight: bold; }
+        .small-brand-logo {
+            width: 80px; /* Kleiner und dezenter für Rechtstexte */
+            height: auto;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+        h1, h2 { color: var(--color-stone); }
+        h2 { margin-top: 40px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="legal-content">
-            <a href="/" class="back-link">← Zurück zur Analyse</a>
-            
-            <h1>Rechtliche Informationen</h1>
-            <hr>
+    <div class="legal-content">
+        <a href="/">
+            <img src="img/logo.png" alt="KI-Ferien Logo" class="small-brand-logo">
+        </a>
+        
+        <h1>Rechtliche Informationen</h1>
+        <p>Hier findest du das Impressum und die Datenschutzbestimmungen für KI-Ferien.de.</p>
 
-            <section>
-                <h2>Impressum</h2>
-                <p><strong>Betreiber der Website:</strong><br>
-                Michael Strohmenger<br>
-                <br>
-                69509 Mörlenbach </p>
-                
-                <p><strong>Kontakt:</strong><br>
+        <section id="impressum">
+            <h2>Impressum</h2>
+            <p>
+                <strong>Betreiber:</strong><br>
+                [DEIN NAME]<br>
+                [DEINE STRASSE]<br>
+                [PLZ ORT]<br><br>
+                <strong>Kontakt:</strong><br>
                 E-Mail: info@ki-ferien.de<br>
-                </p>
+                Telefon: [DEINE NUMMER]
+            </p>
+        </section>
 
-                <p><strong>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV:</strong><br>
-               Michael Strohmenger, Anschrift wie oben.</p>
-            </section>
+        <section id="datenschutz">
+            <h2>Datenschutz</h2>
+            <p>
+                Wir nehmen den Schutz deiner Daten ernst. Die im Formular eingegebenen Daten (E-Mail, Sternzeichen, Alter, Geschlecht, Präferenzen) werden ausschließlich dazu verwendet, dir eine individuelle Analyse per E-Mail zuzusenden. 
+            </p>
+            <p>
+                Die Verarbeitung erfolgt über den Dienst <strong>Resend</strong> zum Versand der E-Mails und <strong>Netlify</strong> für das Hosting der Webseite. Eine darüber hinausgehende Speicherung oder Weitergabe an Dritte findet nicht statt.
+            </p>
+        </section>
 
-            <section>
-                <h2>Datenschutzerklärung</h2>
-                <p>Wir freuen uns über Ihr Interesse an unserer Website. Der Schutz Ihrer persönlichen Daten ist uns ein wichtiges Anliegen.</p>
-
-                <h3>1. Hosting durch Netlify</h3>
-                <p>Unsere Website wird bei Netlify (Netlify, Inc., 44 Montgomery Street, San Francisco, USA) gehostet. Beim Besuch der Website werden Log-Dateien (IP-Adresse, Browsertyp) erfasst. Die Datenübertragung ist durch Standardvertragsklauseln abgesichert.</p>
-
-                <h3>2. Datenerhebung im Formular (Resend)</h3>
-                <p>Wenn Sie unser Analyse-Formular nutzen, werden Ihre Angaben (E-Mail-Adresse und Präferenzen) zur Bearbeitung der Anfrage verarbeitet. Der Versand der Daten erfolgt über den Dienst <strong>Resend</strong> (Resend Labs Inc., San Francisco, USA). Dies erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO zur Durchführung vorvertraglicher Maßnahmen.</p>
-
-                <h3>3. Ihre Rechte</h3>
-                <p>Sie haben das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung Ihrer personenbezogenen Daten. Kontaktieren Sie uns dazu einfach unter info@ki-ferien.de.</p>
-            </section>
-        </div>
+        <footer style="margin-top: 60px;">
+            <a href="/" style="color: var(--color-stone); text-decoration: none; font-size: 0.9em;">&larr; Zurück zur Startseite</a>
+        </footer>
     </div>
-
-    <footer style="text-align: center; padding: 40px 0; color: var(--color-stone);">
-        &copy; 2026 KI-Ferien
-    </footer>
 
 </body>
 </html>
