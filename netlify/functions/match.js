@@ -21,7 +21,7 @@ exports.handler = async (event) => {
         const aktivitaet = data.q_activity || "3";
 
         // Die URL zu deinem Logo auf deiner neuen Domain
-        const logoUrl = "https://ki-ferien.netlify.app/img/logo.png"; 
+        const logoUrl = "https://ki-ferien.de/img/logo.png"; 
 
         // Das schicke E-Mail Design für den Nutzer
         const emailHtml = `
