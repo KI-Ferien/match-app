@@ -3,56 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analyse läuft - KI-Ferien</title>
+    <title>Analyse läuft... | KI-Ferien</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .success-container {
+        .success-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
             text-align: center;
-            padding: 100px 20px;
-            max-width: 600px;
-            margin: 0 auto;
+            padding: 20px;
         }
-        .lotus-icon {
+        
+        /* Die pulsierende Lotusblüte */
+        .lotus-pulse {
             font-size: 80px;
             margin-bottom: 30px;
             display: block;
+            animation: pulse 2.5s infinite ease-in-out;
         }
-        .loading-bar {
-            width: 100%;
-            height: 4px;
-            background: #e0e0e0;
-            border-radius: 2px;
-            margin: 30px 0;
-            overflow: hidden;
-        }
-        .loading-progress {
-            width: 60%;
-            height: 100%;
-            background: var(--color-safran);
-            border-radius: 2px;
-            animation: pulse 2s infinite ease-in-out;
-        }
+
         @keyframes pulse {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(200%); }
+            0% { transform: scale(1); opacity: 0.7; filter: drop-shadow(0 0 0px rgba(229, 144, 77, 0)); }
+            50% { transform: scale(1.15); opacity: 1; filter: drop-shadow(0 0 15px rgba(229, 144, 77, 0.4)); }
+            100% { transform: scale(1); opacity: 0.7; filter: drop-shadow(0 0 0px rgba(229, 144, 77, 0)); }
+        }
+
+        .loading-line {
+            width: 150px;
+            height: 2px;
+            background: #eee;
+            margin: 25px 0;
+            position: relative;
+            overflow: hidden;
+            border-radius: 2px;
+        }
+
+        .loading-line::after {
+            content: '';
+            position: absolute;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: #e5904d;
+            animation: flow 2s infinite linear;
+        }
+
+        @keyframes flow {
+            to { left: 100%; }
         }
     </style>
 </head>
 <body>
 
-    <div class="success-container">
-        <span class="lotus-icon">🪷</span>
-        <h1 style="color: var(--color-stone);">Deine Seele ist auf dem Weg...</h1>
-        <p>Vielen Dank! Deine Antworten werden gerade von unserer KI analysiert, um das perfekte Match für deine Ferien zu finden.</p>
-        
-        <div class="loading-bar">
-            <div class="loading-progress"></div>
+    <div class="container">
+        <div class="success-wrapper">
+            <div class="lotus-pulse">🪷</div>
+            
+            <h1 style="color: var(--color-stone); font-family: 'Georgia', serif; font-style: italic;">
+                Dein Ferien Ziel ist auf dem Weg...
+            </h1>
+            
+            <div class="loading-line"></div>
+            
+            <p style="max-width: 500px; line-height: 1.6;">
+                Vielen Dank. Unsere KI berechnet nun basierend auf deinen Angaben den idealen Ort für deine Auszeit.
+            </p>
+            
+            <p style="font-style: italic; color: #888; font-size: 0.9em; margin-top: 20px;">
+                Du erhältst dein persönliches Match in wenigen Augenblicken per E-Mail.
+            </p>
+            
+            <br><br>
+            <a href="/" style="color: var(--color-stone); text-decoration: none; font-size: 0.8em; letter-spacing: 1px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">
+                ZURÜCK ZUR STARTSEITE
+            </a>
         </div>
-
-        <p style="font-style: italic; color: #888;">Wir senden dir die Ergebnisse in Kürze an deine E-Mail-Adresse.</p>
-        
-        <br><br>
-        <a href="/" class="cta-button" style="background-color: var(--color-stone);">Zurück zur Startseite</a>
     </div>
 
 </body>
