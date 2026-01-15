@@ -138,3 +138,22 @@ select {
     margin-top: 20px;
     font-size: 1.2em;
 }
+/* Logo-Styling für die Startseite */
+.logo-wrapper {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.brand-logo-top {
+    width: 120px; /* Hier kannst du die Größe genau steuern (z.B. 100px oder 120px) */
+    height: auto;
+    border-radius: 50%; /* Macht es rund, falls es quadratisch ist */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    background-color: white; /* Verhindert das blaue Fragezeichen-Icon im Hintergrund */
+}
+
+/* Falls das Icon immer noch blau erscheint, erzwingen wir, dass es nicht als defektes Bild geladen wird */
+img:not([src]) {
+    visibility: hidden;
+}
