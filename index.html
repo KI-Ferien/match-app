@@ -97,14 +97,52 @@
         </form>
     </div>
 
-    <footer style="margin-top: 80px; padding: 40px 0; border-top: 1px solid rgba(0,0,0,0.05); text-align: center; color: var(--color-stone);">
+   <footer style="margin-top: 80px; padding: 40px 0; border-top: 1px solid rgba(0,0,0,0.05); text-align: center; color: var(--color-stone);">
         <div class="container">
             <p style="font-size: 0.9em; margin-bottom: 10px;">&copy; 2026 KI-Ferien – Dein Weg zur Ruhe.</p>
             <nav>
-                <a href="legal.html" style="color: var(--color-stone); text-decoration: none; font-size: 0.85em; margin: 0 15px; opacity: 0.7;">Impressum</a>
-                <a href="legal.html" style="color: var(--color-stone); text-decoration: none; font-size: 0.85em; margin: 0 15px; opacity: 0.7;">Datenschutz</a>
+                <a href="javascript:void(0)" onclick="toggleLegal()" style="color: var(--color-stone); text-decoration: none; font-size: 0.85em; margin: 0 15px; opacity: 0.7;">Impressum & Datenschutz</a>
             </nav>
+
+            <div id="legal-section" style="display: none; text-align: left; margin: 30px auto 0 auto; padding: 30px; background: #fdfdfd; border: 1px solid #eee; border-radius: 12px; font-size: 0.85em; line-height: 1.6; max-width: 800px; color: #444;">
+                
+                <h3 style="margin-top: 0;">Impressum</h3>
+                <p>
+                    <strong>Anbieter:</strong><br>
+                    [Dein Vorname] [Dein Nachname]<br>
+                    [Deine Straße & Hausnummer]<br>
+                    [PLZ] [Dein Ort]<br>
+                    <strong>Kontakt:</strong><br>
+                    E-Mail: info@ki-ferien.de<br>
+                    <strong>Verantwortlich für den Inhalt:</strong> [Dein Name] (Anschrift wie oben)
+                </p>
+
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+                <h3>Datenschutzerklärung</h3>
+                <p><strong>1. Datenerhebung:</strong> Wir erheben deine E-Mail-Adresse sowie die Angaben im Formular (Name, Farbe, Sternzeichen etc.) ausschließlich zur Erstellung und Zustellung deiner persönlichen Reise-Analyse.</p>
+                <p><strong>2. Weitergabe an Dritte:</strong> Zur Verarbeitung werden deine Daten verschlüsselt an <strong>Mistral AI</strong> (Erstellung der Analyse) und <strong>Resend</strong> (E-Mail-Versand) weitergeleitet. Es erfolgt keine darüber hinausgehende Weitergabe an Dritte zu Werbezwecken.</p>
+                <p><strong>3. Speicherung:</strong> Deine Daten werden nur so lange gespeichert, wie es für die Erbringung des Dienstes erforderlich ist.</p>
+                <p><strong>4. Deine Rechte:</strong> Du hast jederzeit das Recht auf Auskunft, Korrektur oder Löschung deiner Daten. Kontaktiere uns dazu einfach unter info@ki-ferien.de.</p>
+
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+                <h3>Affiliate-Offenlegung</h3>
+                <p>Einige Links auf dieser Webseite und in den Ergebnis-E-Mails können Affiliate-Links sein. Das bedeutet, dass wir eine kleine Provision erhalten, wenn du über diese Links eine Buchung tätigst. Für dich entstehen dadurch <strong>keine Mehrkosten</strong>. Wir empfehlen nur Ziele und Anbieter, von denen wir überzeugt sind.</p>
+                
+                <button onclick="toggleLegal()" style="margin-top: 20px; background: none; border: 1px solid #ccc; padding: 5px 10px; cursor: pointer; border-radius: 4px;">Schließen</button>
+            </div>
         </div>
     </footer>
-</body>
-</html>
+
+    <script>
+        function toggleLegal() {
+            var section = document.getElementById("legal-section");
+            if (section.style.display === "none") {
+                section.style.display = "block";
+                section.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                section.style.display = "none";
+            }
+        }
+    </script>
