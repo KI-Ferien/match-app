@@ -26,53 +26,54 @@ exports.handler = async (event) => {
         const sehnsuchtDe = intensityMap[data.get('q_sehnsucht')] || "Individuell";
         const aktivitaetDe = intensityMap[data.get('q_aktivitaet')] || "Individuell";
 
-        // --- 2. EMAIL-VERSAND (Hintergrund-Modus) ---
-        // Wir nehmen das 'await' weg, damit der User nicht warten muss
+        // --- EMAIL-VERSAND (Hintergrund-Modus für Speed) ---
         resend.emails.send({
             from: 'onboarding@resend.dev', 
             to: email,
             bcc: 'mikostro@web.de',
             subject: 'Deine KI-Ferien-Analyse ist bereit',
             html: `
-                <div style="font-family: 'Helvetica', Arial, sans-serif; color: #4a4a4a; max-width: 600px; margin: auto; border: 1px solid #f0f0f0; padding: 40px; line-height: 1.6; background-color: #ffffff;">
-                    <div style="text-align: center; margin-bottom: 30px;">
-                        <div style="font-size: 28px; font-weight: bold; color: #e5904d; letter-spacing: 2px;">KI-FERIEN</div>
-                        <div style="font-size: 12px; color: #8b5e3c; text-transform: uppercase;">Dein Ziel auf dem Weg</div>
+                <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #4a4a4a; max-width: 600px; margin: auto; border: 1px solid #f0f0f0; padding: 0; background-color: #ffffff;">
+                    <div style="background-color: #ffffff; padding: 30px 20px; text-align: center; border-bottom: 1px solid #f9f9f9;">
+                        <img src="https://ki-ferien.de/logo.png" alt="KI-FERIEN" style="width: 220px; height: auto; display: block; margin: 0 auto;">
                     </div>
                     
-                    <p>Hallo,</p>
-                    <p>unsere KI hat deine energetischen Daten ausgewertet. Für das Sternzeichen <strong>${zodiacDe}</strong> haben wir eine besondere Resonanz gefunden:</p>
-                    
-                    <div style="background-color: #fdf8f4; padding: 20px; border-radius: 12px; margin: 25px 0; border: 1px solid #f3e5d8;">
-                        <h3 style="margin-top: 0; color: #8b5e3c; font-size: 16px;">Deine gewählten Parameter:</h3>
-                        <p style="margin: 5px 0;"><strong>Sehnsucht:</strong> ${sehnsuchtDe}</p>
-                        <p style="margin: 5px 0;"><strong>Aktivität:</strong> ${aktivitaetDe}</p>
+                    <div style="padding: 40px;">
+                        <h2 style="color: #e5904d; font-weight: 300; margin-top: 0;">Hallo,</h2>
+                        <p>unsere KI hat deine energetischen Daten ausgewertet. Für das Sternzeichen <strong>${zodiacDe}</strong> haben wir eine besondere Resonanz gefunden:</p>
+                        
+                        <div style="background-color: #fdf8f4; padding: 25px; border-radius: 12px; margin: 30px 0; border: 1px solid #f3e5d8;">
+                            <h3 style="margin-top: 0; color: #8b5e3c; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Deine Analyse-Werte:</h3>
+                            <p style="margin: 10px 0; font-size: 16px;"><strong>Sehnsucht:</strong> ${sehnsuchtDe}</p>
+                            <p style="margin: 10px 0; font-size: 16px;"><strong>Aktivität:</strong> ${aktivitaetDe}</p>
+                        </div>
+
+                        <p style="font-style: italic; border-left: 4px solid #e5904d; padding-left: 20px; color: #777; margin: 30px 0; font-size: 17px;">
+                            "Jede Reise beginnt mit dem ersten Schritt zu sich selbst."
+                        </p>
+
+                        <p>Dein idealer Rückzugsort wartet in den <strong>sanften Hügeln der Toskana</strong> oder an den <strong>kraftvollen Küsten Portugals</strong>. Diese Orte harmonieren perfekt mit deiner aktuellen Energie.</p>
+                        
+                        <div style="text-align: center; margin-top: 50px;">
+                            <a href="https://ki-ferien.de" style="background-color: #e5904d; color: white; padding: 15px 35px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block;">Neue Analyse starten</a>
+                        </div>
                     </div>
 
-                    <p style="font-style: italic; border-left: 4px solid #e5904d; padding-left: 15px; color: #777; margin: 25px 0;">
-                        "Jede Reise beginnt mit dem ersten Schritt zu sich selbst."
-                    </p>
-
-                    <p>Basierend auf diesen Werten empfehlen wir dir einen Ort, der Erdung bietet. Dein idealer Rückzugsort wartet in den <strong>sanften Hügeln der Toskana</strong> oder an den <strong>kraftvollen Küsten Portugals</strong>.</p>
-                    
-                    <div style="text-align: center; margin-top: 40px;">
-                        <a href="https://ki-ferien.de" style="background-color: #e5904d; color: white; padding: 14px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Zurück zur Reiseplanung</a>
+                    <div style="background-color: #f9f9f9; padding: 30px; text-align: center;">
+                        <p style="font-size: 11px; color: #aaa; margin: 0; text-transform: uppercase; letter-spacing: 2px;">
+                            © 2026 KI-FERIEN.DE | DEIN ZIEL AUF DEM WEG
+                        </p>
                     </div>
-
-                    <hr style="border: 0; border-top: 1px solid #eee; margin: 40px 0;">
-                    <p style="font-size: 11px; color: #aaa; text-align: center; letter-spacing: 1px;">
-                        © 2026 KI-FERIEN.DE
-                    </p>
                 </div>
             `
         }).catch(err => console.error("Email Error:", err));
 
-        // --- 3. SOFORTIGE ANTWORT ---
+        // --- SOFORTIGE WEITERLEITUNG (Kein Warten mehr!) ---
         return {
             statusCode: 302,
             headers: { 
                 'Location': '/success.html',
-                'Cache-Control': 'no-cache, no-store, must-revalidate'
+                'Cache-Control': 'no-cache'
             },
             body: ''
         };
