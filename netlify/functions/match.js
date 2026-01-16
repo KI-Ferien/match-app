@@ -14,9 +14,9 @@ exports.handler = async (event) => {
 
         // Wir nutzen hier EINE einzige Zeile 'await', um zu sehen, ob Resend antwortet
         const response = await resend.emails.send({
-            from: 'onboarding@resend.dev',
+            from: 'Analyse <info@ki-ferien.de>',
             to: email,
-            subject: 'KI-Ferien Test',
+            subject: 'Deine KI-Ferien-Analyse ist fertig!',
             html: '<p>Test erfolgreich!</p>'
         });
 
