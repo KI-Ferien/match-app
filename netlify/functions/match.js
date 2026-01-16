@@ -35,9 +35,9 @@ exports.handler = async (event) => {
                     model: "mistral-tiny",
                     messages: [{
                         role: "user", 
-                        content: `Du bist ein erfahrener Reise-Experte. Berücksichtige Hinweise des auswärtigen Amtes und Erstelle für ${vorname} eine persönliche Reise-Empfehlung für das aktuelle Jahr. 
+                        content: `Du bist ein Reise-Experte. Berücksichtige Hinweise des auswärtigen Amtes und Erstelle für ${vorname} eine persönliche Reise-Empfehlung für das aktuelle Jahr. 
                         Details: Sternzeichen ${zodiacDe}, Lieblingsfarbe ${farbe}. 
-                        Anforderungen: Min. 3 Sätze, inspirierend, nenne das Sternzeichen korrekt (niemals Krabbe für Krebs nutzen) und beziehe die Farbe dezent ein.`
+                        Anforderungen: Max. 5 Sätze, inspirierend, nenne das Sternzeichen korrekt (niemals Krabbe für Krebs nutzen) und beziehe die Farbe dezent ein.`
                     }]
                 })
             });
