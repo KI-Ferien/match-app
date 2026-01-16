@@ -1,41 +1,27 @@
 const { Resend } = require('resend');
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 exports.handler = async (event) => {
-    if (event.httpMethod !== "POST") {
-        return { statusCode: 405, body: "Method Not Allowed" };
-    }
+    // 1. Log: Startet die Funktion überhaupt?
+    console.log("Funktion gestartet mit Methode:", event.httpMethod);
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     try {
         const data = new URLSearchParams(event.body);
         const email = data.get('email');
-        const zodiacRaw = data.get('q_zodiac');
+        
+        console.log("Versuche Mail zu senden an:", email);
 
-        const zodiacMap = {
-            'aries': 'Widder', 'taurus': 'Stier', 'gemini': 'Zwillinge', 
-            'cancer': 'Krebs', 'leo': 'Löwe', 'virgo': 'Jungfrau',
-            'libra': 'Waage', 'scorpio': 'Skorpion', 'sagittarius': 'Schütze',
-            'capricorn': 'Steinbock', 'aquarius': 'Wassermann', 'pisces': 'Fische'
-        };
-        const zodiacDe = zodiacMap[zodiacRaw] || "Reisender";
-
-        // E-Mail wird "gefeuert", aber wir warten nicht auf die Antwort (kein await)
-        resend.emails.send({
+        // Wir nutzen hier EINE einzige Zeile 'await', um zu sehen, ob Resend antwortet
+        const response = await resend.emails.send({
             from: 'onboarding@resend.dev',
             to: email,
-            bcc: 'mikostro@web.de', // Deine Kopie
-            subject: 'Deine KI-Ferien-Analyse ist fertig!',
-            html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; text-align: center; border: 1px solid #eee; padding: 20px;">
-                    <img src="https://ki-ferien.de/img/logo.png" alt="KI-FERIEN" style="width: 180px; height: auto; margin-bottom: 20px;">
-                    <h2 style="color: #333;">Hallo für das Sternzeichen ${zodiacDe}!</h2>
-                    <p>Deine KI-Analyse ist bereit. Wir berechnen gerade die besten Reiseziele für dich.</p>
-                    <p>Schau bald wieder auf <a href="https://ki-ferien.de">ki-ferien.de</a> vorbei für mehr Updates!</p>
-                </div>
-            `
-        }).catch(err => console.error("Resend Error:", err));
+            subject: 'KI-Ferien Test',
+            html: '<p>Test erfolgreich!</p>'
+        });
 
-        // Sofortiger Redirect
+        console.log("Resend Antwort:", JSON.stringify(response));
+
         return {
             statusCode: 302,
             headers: { 'Location': '/success.html' },
@@ -43,10 +29,10 @@ exports.handler = async (event) => {
         };
 
     } catch (error) {
-        console.error("Fehler:", error);
+        console.error("KRITISCHER FEHLER:", error.message);
         return {
             statusCode: 302,
-            headers: { 'Location': '/success.html?error=true' },
+            headers: { 'Location': '/success.html?error=' + encodeURIComponent(error.message) },
             body: ''
         };
     }
