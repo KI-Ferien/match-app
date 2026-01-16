@@ -35,7 +35,7 @@ exports.handler = async (event) => {
             html: `
                 <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #4a4a4a; max-width: 600px; margin: auto; border: 1px solid #f0f0f0; padding: 0; background-color: #ffffff;">
                     <div style="background-color: #ffffff; padding: 30px 20px; text-align: center; border-bottom: 1px solid #f9f9f9;">
-                        <img src="https://ki-ferien.de/logo.png" alt="KI-FERIEN" style="width: 220px; height: auto; display: block; margin: 0 auto;">
+                        <img src="https://ki-ferien.de/img/logo.png" alt="KI-FERIEN" style="width: 220px; height: auto; display: block; margin: 0 auto;">
                     </div>
                     
                     <div style="padding: 40px;">
