@@ -10,12 +10,10 @@
 <body>
 
     <header class="hero-section">
-    <div class="container">
-        <div style="width: 220px; height: 220px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-    <img src="img/logo.png" alt="KI-FERIEN Logo" style="width: 180px; height: auto;">
-</div>
-        </div>
-</div>
+        <div class="container">
+            <div style="width: 220px; height: 220px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <img src="img/logo.png" alt="KI-FERIEN Logo" style="width: 180px; height: auto;">
+            </div>
             
             <h1>Finde die richtigen Ferien.</h1>
             <p class="subline">Die KI-Analyse für deinen Seelen-Urlaub.</p>
@@ -27,6 +25,21 @@
     <div class="container" id="formular">
         <form action="/.netlify/functions/match" method="POST">
             
+            <div class="form-card">
+                <label for="vorname">6. Wie dürfen wir dich nennen?</label>
+                <input type="text" id="vorname" name="vorname" placeholder="Dein Vorname" required style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 10px;">
+            </div>
+
+            <div class="form-card">
+                <label for="farbe">7. Deine Lieblingsfarbe (für das visuelle Erlebnis):</label>
+                <select id="farbe" name="farbe" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 10px;">
+                    <option value="Blau">Blau (Ruhe & Meer)</option>
+                    <option value="Grün">Grün (Natur & Wald)</option>
+                    <option value="Rot">Rot (Energie & Abenteuer)</option>
+                    <option value="Gelb">Gelb (Sonne & Optimismus)</option>
+                </select>
+            </div>
+
             <div class="form-card">
                 <label for="q_sehnsucht">1. Welche Sehnsucht treibt dich an?</label>
                 <div class="range-info"><span>🧘‍♀️ Ruhe & Einkehr</span><span>🔥 Neues erleben</span></div>
@@ -41,27 +54,21 @@
 
             <div class="form-card">
                 <label for="q_age">3. Wie alt fühlst Du Dich?</label>
-                <input type="number" id="q_age" name="q_age" min="18" max="99" value="30" required>
+                <input type="number" id="q_age" name="q_age" min="18" max="99" value="30" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 10px;">
             </div>
 
             <div class="form-card">
-                <label for="q_gender">4. Dein Geschlecht (Für geschlechterspezifische Empfehlungen).</label>
+                <label>4. Dein Geschlecht</label>
                 <div style="display: flex; justify-content: space-around; margin-top: 15px;">
-                    <label style="font-weight: normal; margin-bottom: 0;">
-                        <input type="radio" name="q_gender" value="male" required> Männlich
-                    </label>
-                    <label style="font-weight: normal; margin-bottom: 0;">
-                        <input type="radio" name="q_gender" value="female"> Weiblich
-                    </label>
-                    <label style="font-weight: normal; margin-bottom: 0;">
-                        <input type="radio" name="q_gender" value="other"> Divers
-                    </label>
+                    <label style="font-weight: normal;"><input type="radio" name="q_gender" value="male" required> Männlich</label>
+                    <label style="font-weight: normal;"><input type="radio" name="q_gender" value="female"> Weiblich</label>
+                    <label style="font-weight: normal;"><input type="radio" name="q_gender" value="other"> Divers</label>
                 </div>
             </div>
 
             <div class="form-card">
-                <label for="q_zodiac">5. Dein Sternzeichen (Für die psychologische Analyse).</label>
-                <select id="q_zodiac" name="q_zodiac" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+                <label for="q_zodiac">5. Dein Sternzeichen (Für die psychologische Analyse):</label>
+                <select id="q_zodiac" name="q_zodiac" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 10px;">
                     <option value="" disabled selected>--- Bitte wählen ---</option>
                     <option value="aries">Widder</option>
                     <option value="taurus">Stier</option>
@@ -77,22 +84,13 @@
                     <option value="pisces">Fische</option>
                 </select>
             </div>
-<label for="vorname">Dein Vorname:</label>
-<input type="text" id="vorname" name="vorname" placeholder="z.B. Max" required>
 
-<label for="farbe">Deine Lieblingsfarbe:</label>
-<select id="farbe" name="farbe">
-  <option value="Blau">Blau (Ruhe & Meer)</option>
-  <option value="Grün">Grün (Natur & Wald)</option>
-  <option value="Rot">Rot (Energie & Abenteuer)</option>
-  <option value="Gelb">Gelb (Sonne & Optimismus)</option>
-</select>
             <div class="form-card">
                 <label for="email">Deine E-Mail-Adresse (Hier erhältst du dein Ergebnis):</label>
-                <input type="email" id="email" name="email" required>
+                <input type="email" id="email" name="email" required style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 10px;">
             </div>
             
-            <button type="submit" class="cta-button" style="width: 100%; margin-top: 30px;">
+            <button type="submit" class="cta-button" style="width: 100%; margin-top: 30px; border: none; cursor: pointer;">
                 MEIN FERIEN ZIEL FINDEN
             </button>
 
