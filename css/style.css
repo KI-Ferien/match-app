@@ -1,5 +1,4 @@
 /* --- Zen-Design: Globale Stile mit Fokus auf Größe & Klarheit --- */
-
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
 
 :root {
@@ -10,165 +9,228 @@
   --color-card-bg: #ffffff;
 }
 
+/* Box-Sizing für alle Elemente */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
-    background-color: var(--color-sand);
-    font-family: 'Roboto', sans-serif;
-    color: var(--color-text-dark);
-    margin: 0;
-    line-height: 1.6;
-    /* GRÖSSERE SCHRIFT GLOBAL */
-    font-size: 19px; 
+  background-color: var(--color-sand);
+  font-family: 'Roboto', sans-serif;
+  color: var(--color-text-dark);
+  line-height: 1.6;
+  font-size: 19px;
 }
 
+/* Container-Anpassung */
 .container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
-/* --- HERO SEKTION (Vergrößert) --- */
+/* Überschriften und Texte skalieren */
+h1 {
+  font-size: 2rem;
+}
+
+p {
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+}
+
+/* --- HERO SEKTION --- */
 .hero-section {
-    background-color: #3f473c;
-    color: white;
-    padding: 120px 20px 100px 20px;
-    text-align: center;
-    border-bottom-left-radius: 50px; 
-    border-bottom-right-radius: 50px; 
-    margin-bottom: 60px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  background-color: #3f473c;
+  color: white;
+  padding: 120px 20px 100px;
+  text-align: center;
+  border-bottom-left-radius: 50px;
+  border-bottom-right-radius: 50px;
+  margin-bottom: 60px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 .hero-section h1 {
-    font-size: 3.8em; /* Massive Überschrift */
-    font-weight: 700;
-    margin: 0 0 20px 0;
-    letter-spacing: -1px;
+  font-size: 3.8em;
+  font-weight: 700;
+  margin: 0 0 20px;
+  letter-spacing: -1px;
 }
 
 .hero-section .subline {
-    font-size: 1.6em; /* Größere Subline */
-    margin-bottom: 45px;
-    font-weight: 300;
-    opacity: 0.95;
+  font-size: 1.6em;
+  margin-bottom: 45px;
+  font-weight: 300;
+  opacity: 0.95;
+}
+
+@media (max-width: 480px) {
+  .hero-section {
+    padding: 40px 20px;
+  }
+
+  .hero-section h1 {
+    font-size: 2.2em;
+  }
+
+  .hero-section .subline {
+    font-size: 1.2em;
+  }
 }
 
 /* --- BUTTONS --- */
 .cta-button {
-    background-color: var(--color-safran);
-    color: white;
-    border: none;
-    padding: 20px 45px; /* Größerer Button */
-    border-radius: 15px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 1.3em; /* Größere Button-Schrift */
-    text-decoration: none;
-    transition: all 0.3s ease;
-    display: inline-block;
+  background-color: var(--color-safran);
+  color: white;
+  border: none;
+  padding: 20px 45px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.3em;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: inline-block;
+  width: auto;
 }
 
 .cta-button:hover {
-    background-color: #d17c37;
-    transform: scale(1.05);
+  background-color: #d17c37;
+  transform: scale(1.05);
+}
+
+@media (max-width: 480px) {
+  .cta-button {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.1em;
+  }
 }
 
 /* --- KACHELN & FORMULAR --- */
 .form-card-grid {
-    display: grid;
-    gap: 40px; 
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
-    margin-top: 50px;
+  display: grid;
+  gap: 40px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  margin-top: 50px;
 }
 
 .form-card {
-    background-color: var(--color-card-bg);
-    border-radius: 25px;
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.06); 
-    padding: 40px;
-    border: 1px solid rgba(0,0,0,0.03);
+  background-color: var(--color-card-bg);
+  border-radius: 25px;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.06);
+  padding: 40px;
+  border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
 .form-card label {
-    font-weight: 700;
-    margin-bottom: 20px;
-    display: block;
-    font-size: 1.3em; /* Größere Fragen-Überschriften */
+  font-weight: 700;
+  margin-bottom: 20px;
+  display: block;
+  font-size: 1.3em;
+}
+
+@media (max-width: 480px) {
+  .form-card {
+    padding: 20px;
+  }
+
+  .form-card label {
+    font-size: 1.1em;
+  }
 }
 
 /* --- ICONS & SLIDER --- */
-.range-info { 
-    display: flex; 
-    justify-content: space-between; 
-    font-size: 1.4em; /* ICONS VERGRÖSSERT */
-    margin-top: 10px; 
+.range-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.4em;
+  margin-top: 10px;
 }
 
-/* Die Icons/Emojis selbst nochmals betonen */
 .range-info span {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 input[type="range"] {
-    width: 100%;
-    margin: 25px 0;
-    accent-color: var(--color-safran);
-    height: 10px; /* Slider etwas dicker für bessere Haptik */
+  width: 100%;
+  margin: 25px 0;
+  accent-color: var(--color-safran);
+  height: 10px;
+}
+
+@media (max-width: 480px) {
+  input[type="range"] {
+    height: 12px;
+  }
+
+  .range-info {
+    font-size: 1.1em;
+  }
 }
 
 /* Input Felder & Select */
-input[type="text"], 
-input[type="email"], 
-input[type="number"], 
+input[type="text"],
+input[type="email"],
+input[type="number"],
 select {
-    width: 100%;
-    padding: 15px;
-    margin-top: 15px;
-    border: 2px solid #eee;
-    border-radius: 12px;
-    font-size: 1.1em; /* Größere Eingabeschrift */
-    box-sizing: border-box; 
+  width: 100%;
+  padding: 15px;
+  margin-top: 15px;
+  border: 2px solid #eee;
+  border-radius: 12px;
+  font-size: 1.1em;
+  box-sizing: border-box;
 }
 
-/* Gender Radio Buttons vergrößert */
+/* Gender Radio Buttons */
 .gender-options {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 20px;
-    font-size: 1.2em;
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+  font-size: 1.2em;
 }
-/* Logo-Styling für die Startseite */
+
+/* Logo-Styling */
 .logo-wrapper {
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: center;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
 }
 
 .brand-logo-top {
-    width: 240px; /* Auf 240px vergrößert */
-    height: 240px; /* Muss identisch sein für einen perfekten Kreis */
-    object-fit: cover;
-    border-radius: 50%;
-    border: 6px solid white; /* Rand etwas dicker gemacht, passend zur Größe */
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    background-color: white;
-    transition: transform 0.3s ease;
-    display: block; /* Sicherstellen, dass es als Block-Element zentriert werden kann */
-    margin: 0 auto; /* Zentriert das Logo im Container */
+  width: 240px;
+  height: 240px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 6px solid white;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  background-color: white;
+  transition: transform 0.3s ease;
+  display: block;
+  margin: 0 auto;
 }
 
 .brand-logo-top:hover {
-    transform: scale(1.05);
-}
-}
-
-.brand-logo-top:hover {
-    transform: scale(1.05);
-}
+  transform: scale(1.05);
 }
 
-/* Falls das Icon immer noch blau erscheint, erzwingen wir, dass es nicht als defektes Bild geladen wird */
 img:not([src]) {
-    visibility: hidden;
+  visibility: hidden;
 }
