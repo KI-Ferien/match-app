@@ -26,12 +26,12 @@
         <form action="/.netlify/functions/match" method="POST">
             
             <div class="form-card">
-                <label for="vorname">6. Wie dürfen wir dich nennen?</label>
+                <label for="vorname">1. Wie dürfen wir dich nennen?</label>
                 <input type="text" id="vorname" name="vorname" placeholder="Dein Vorname" required style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 10px;">
             </div>
 
             <div class="form-card">
-                <label for="farbe">7. Deine Lieblingsfarbe (für das visuelle Erlebnis):</label>
+                <label for="farbe">2. Deine Lieblingsfarbe (für das visuelle Erlebnis):</label>
                 <select id="farbe" name="farbe" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 10px;">
                     <option value="Blau">Blau (Ruhe & Meer)</option>
                     <option value="Grün">Grün (Natur & Wald)</option>
@@ -41,24 +41,24 @@
             </div>
 
             <div class="form-card">
-                <label for="q_sehnsucht">1. Welche Sehnsucht treibt dich an?</label>
+                <label for="q_sehnsucht">3. Welche Sehnsucht treibt dich an?</label>
                 <div class="range-info"><span>🧘‍♀️ Ruhe & Einkehr</span><span>🔥 Neues erleben</span></div>
                 <input type="range" id="q_sehnsucht" name="q_sehnsucht" min="1" max="5" value="3">
             </div>
             
             <div class="form-card">
-                <label for="q_activity">2. Wie aktiv soll dein Urlaub sein?</label>
+                <label for="q_activity">4. Wie aktiv soll dein Urlaub sein?</label>
                 <div class="range-info"><span>🛋️ Faulenzen</span><span>🧗‍♂️ Abenteuer</span></div>
                 <input type="range" id="q_activity" name="q_activity" min="1" max="5" value="3">
             </div>
 
             <div class="form-card">
-                <label for="q_age">3. Wie alt fühlst Du Dich?</label>
+                <label for="q_age">5. Wie alt fühlst Du Dich?</label>
                 <input type="number" id="q_age" name="q_age" min="18" max="99" value="30" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 10px;">
             </div>
 
             <div class="form-card">
-                <label>4. Dein Geschlecht</label>
+                <label>6. Dein Geschlecht</label>
                 <div style="display: flex; justify-content: space-around; margin-top: 15px;">
                     <label style="font-weight: normal;"><input type="radio" name="q_gender" value="male" required> Männlich</label>
                     <label style="font-weight: normal;"><input type="radio" name="q_gender" value="female"> Weiblich</label>
@@ -67,7 +67,7 @@
             </div>
 
             <div class="form-card">
-                <label for="q_zodiac">5. Dein Sternzeichen (Für die psychologische Analyse):</label>
+                <label for="q_zodiac">7. Dein Sternzeichen (Für die psychologische Analyse):</label>
                 <select id="q_zodiac" name="q_zodiac" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 10px;">
                     <option value="" disabled selected>--- Bitte wählen ---</option>
                     <option value="aries">Widder</option>
