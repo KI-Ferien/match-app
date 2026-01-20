@@ -3,145 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KI-Ferien.de | Deine Ferien Ziel KI</title>
-    <link rel="stylesheet" href="css/style.css"> 
-    <link rel="icon" type="image/png" href="img/logo.png">
+    <title>Das KI-Ferien Match | Astrologisch inspiriert. Von KI berechnet.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; }
+        .bg-gradient-main { background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%); }
+        .glass-card { 
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        input:focus, select:focus {
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+            border-color: #3b82f6 !important;
+        }
+    </style>
 </head>
-<body>
-<meta name="p:domain_verify" content="7711d58972e8f30344c5bbc392bd32e4"/>
-    <header class="hero-section">
-        <div class="container">
-            <div style="width: 220px; height: 220px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                <img src="img/logo.png" alt="KI-FERIEN Logo" style="width: 180px; height: auto;">
+<body class="bg-gradient-main text-slate-900 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="p-6">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-200">K</div>
+                <span class="text-xl font-extrabold tracking-tighter uppercase">Das KI-Ferien Match</span>
             </div>
-            
-            <h1>Finde die richtigen Ferien.</h1>
-            <p class="subline">Die KI-Analyse für deinen Seelen-Urlaub.</p>
-            
-            <a href="#formular" class="cta-button">Zur KI-Analyse</a>
         </div>
     </header>
 
-    <div class="container" id="formular">
-        <form action="/.netlify/functions/match" method="POST">
+    <main class="max-w-xl mx-auto px-6 py-8 flex-grow">
+        <!-- Hero Bereich -->
+        <div class="text-center mb-10">
+            <h1 class="text-5xl font-bold mb-4 tracking-tight text-slate-900">
+                Dein persönliches <span class="text-blue-600">Match.</span>
+            </h1>
+            <p class="text-slate-500 text-lg leading-relaxed font-light italic">
+                „Astrologisch inspiriert. Von KI berechnet. Für dich gefunden.“
+            </p>
+        </div>
+
+        <!-- Matching Formular -->
+        <form action="/.netlify/functions/match" method="POST" class="glass-card p-8 rounded-[2.5rem] shadow-2xl shadow-blue-900/10 space-y-6 border border-white">
             
-            <div class="form-card">
-                <label for="vorname">1. Wie dürfen wir dich nennen?</label>
-                <input type="text" id="vorname" name="vorname" placeholder="Dein Vorname" required style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 10px;">
-            </div>
+            <div class="grid grid-cols-1 gap-6">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2 ml-1">Dein Vorname</label>
+                    <input type="text" name="vorname" required placeholder="Vorname" 
+                        class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none transition-all">
+                </div>
 
-            <div class="form-card">
-                <label for="farbe">2. Deine Lieblingsfarbe (für das visuelle Erlebnis):</label>
-                <select id="farbe" name="farbe" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 10px;">
-                    <option value="Blau">Blau (Ruhe & Meer)</option>
-                    <option value="Grün">Grün (Natur & Wald)</option>
-                    <option value="Rot">Rot (Energie & Abenteuer)</option>
-                    <option value="Gelb">Gelb (Sonne & Optimismus)</option>
-                </select>
-            </div>
-
-            <div class="form-card">
-                <label for="q_sehnsucht">3. Welche Sehnsucht treibt dich an?</label>
-                <div class="range-info"><span>🧘‍♀️ Ruhe & Einkehr</span><span>🔥 Neues erleben</span></div>
-                <input type="range" id="q_sehnsucht" name="q_sehnsucht" min="1" max="5" value="3">
-            </div>
-            
-            <div class="form-card">
-                <label for="q_activity">4. Wie aktiv soll dein Urlaub sein?</label>
-                <div class="range-info"><span>🛋️ Faulenzen</span><span>🧗‍♂️ Abenteuer</span></div>
-                <input type="range" id="q_activity" name="q_activity" min="1" max="5" value="3">
-            </div>
-
-            <div class="form-card">
-                <label for="q_age">5. Wie alt fühlst Du Dich?</label>
-                <input type="number" id="q_age" name="q_age" min="18" max="99" value="30" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 10px;">
-            </div>
-
-            <div class="form-card">
-                <label>6. Dein Geschlecht</label>
-                <div style="display: flex; justify-content: space-around; margin-top: 15px;">
-                    <label style="font-weight: normal;"><input type="radio" name="q_gender" value="male" required> Männlich</label>
-                    <label style="font-weight: normal;"><input type="radio" name="q_gender" value="female"> Weiblich</label>
-                    <label style="font-weight: normal;"><input type="radio" name="q_gender" value="other"> Divers</label>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2 ml-1">E-Mail für dein Ergebnis</label>
+                    <input type="email" name="email" required placeholder="beispiel@mail.de" 
+                        class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none transition-all">
                 </div>
             </div>
 
-            <div class="form-card">
-                <label for="q_zodiac">7. Dein Sternzeichen (Für die psychologische Analyse):</label>
-                <select id="q_zodiac" name="q_zodiac" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 10px;">
-                    <option value="" disabled selected>--- Bitte wählen ---</option>
-                    <option value="aries">Widder</option>
-                    <option value="taurus">Stier</option>
-                    <option value="gemini">Zwilling</option>
-                    <option value="cancer">Krebs</option>
-                    <option value="leo">Löwe</option>
-                    <option value="virgo">Jungfrau</option>
-                    <option value="libra">Waage</option>
-                    <option value="scorpio">Skorpion</option>
-                    <option value="sagittarius">Schütze</option>
-                    <option value="capricorn">Steinbock</option>
-                    <option value="aquarius">Wassermann</option>
-                    <option value="pisces">Fische</option>
-                </select>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2 ml-1">Sternzeichen</label>
+                    <select name="q_zodiac" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M5%207L10%2012L15%207%22%20stroke%3D%22%2364748B%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E')] bg-[length:20px_20px] bg-[right_1rem_center] bg-no-repeat">
+                        <option value="Widder">Widder</option>
+                        <option value="Stier">Stier</option>
+                        <option value="Zwillinge">Zwillinge</option>
+                        <option value="Krebs">Krebs</option>
+                        <option value="Löwe">Löwe</option>
+                        <option value="Jungfrau">Jungfrau</option>
+                        <option value="Waage">Waage</option>
+                        <option value="Skorpion">Skorpion</option>
+                        <option value="Schütze">Schütze</option>
+                        <option value="Steinbock">Steinbock</option>
+                        <option value="Wassermann">Wassermann</option>
+                        <option value="Fische">Fische</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2 ml-1">Lieblingsfarbe</label>
+                    <input type="text" name="farbe" placeholder="z.B. Blau" 
+                        class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none transition-all">
+                </div>
             </div>
 
-            <div class="form-card">
-                <label for="email">Deine E-Mail-Adresse (Hier erhältst du dein Ergebnis):</label>
-                <input type="email" id="email" name="email" required style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 10px;">
+            <!-- Rechtliches Checkbox -->
+            <div class="flex items-start gap-3 px-1 py-2">
+                <input type="checkbox" name="privacy" id="privacy" required class="mt-1 w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500">
+                <label for="privacy" class="text-[11px] text-slate-400 leading-tight">
+                    Ich bin damit einverstanden, dass meine Daten zur Berechnung des KI-Ferien Matches verarbeitet werden. Das Ergebnis erhalte ich per E-Mail. Details in der <a href="/datenschutz.html" class="underline hover:text-blue-600">Datenschutzerklärung</a>.
+                </label>
             </div>
-            
-            <button type="submit" class="cta-button" style="width: 100%; margin-top: 30px; border: none; cursor: pointer;">
-                MEIN FERIEN ZIEL FINDEN
+
+            <button type="submit" 
+                class="w-full bg-blue-600 text-white font-bold py-5 rounded-2xl hover:bg-blue-700 hover:-translate-y-1 transition-all shadow-xl shadow-blue-200 flex items-center justify-center gap-3 text-lg">
+                <span>Mein Match berechnen</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
             </button>
-
-        </form>
-    </div>
-
-   <footer style="margin-top: 80px; padding: 40px 0; border-top: 1px solid rgba(0,0,0,0.05); text-align: center; color: var(--color-stone);">
-        <div class="container">
-            <p style="font-size: 0.9em; margin-bottom: 10px;">&copy; 2026 KI-Ferien – Dein Weg zur Ruhe.</p>
-            <nav>
-                <a href="javascript:void(0)" onclick="toggleLegal()" style="color: var(--color-stone); text-decoration: none; font-size: 0.85em; margin: 0 15px; opacity: 0.7;">Impressum & Datenschutz</a>
-            </nav>
-
-            <div id="legal-section" style="display: none; text-align: left; margin: 30px auto 0 auto; padding: 30px; background: #fdfdfd; border: 1px solid #eee; border-radius: 12px; font-size: 0.85em; line-height: 1.6; max-width: 800px; color: #444;">
-                
-                <h3 style="margin-top: 0;">Impressum</h3>
-                <p>
-                    <strong>Anbieter:</strong><br>
-                    Michael Strohmenger<br>
-                    69509 Mörlenbach<br>
-                    <strong>Kontakt:</strong><br>
-                    E-Mail: info@ki-ferien.de<br>
-                    <strong>Verantwortlich für den Inhalt:</strong> Michael Strohmenger 
+            
+            <div class="text-center">
+                <p class="text-[10px] text-slate-300 uppercase tracking-widest font-semibold">
+                    Offizieller Partner von TUI, Booking.com & GetYourGuide
                 </p>
-
-                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-
-                <h3>Datenschutzerklärung</h3>
-                <p><strong>1. Datenerhebung:</strong> Wir erheben deine E-Mail-Adresse sowie die Angaben im Formular (Name, Farbe, Sternzeichen etc.) ausschließlich zur Erstellung und Zustellung deiner persönlichen Reise-Analyse.</p>
-                <p><strong>2. Weitergabe an Dritte:</strong> Zur Verarbeitung werden deine Daten verschlüsselt an <strong>Mistral AI</strong> (Erstellung der Analyse) und <strong>Resend</strong> (E-Mail-Versand) weitergeleitet. Es erfolgt keine darüber hinausgehende Weitergabe an Dritte zu Werbezwecken.</p>
-                <p><strong>3. Speicherung:</strong> Deine Daten werden nur so lange gespeichert, wie es für die Erbringung des Dienstes erforderlich ist.</p>
-                <p><strong>4. Deine Rechte:</strong> Du hast jederzeit das Recht auf Auskunft, Korrektur oder Löschung deiner Daten. Kontaktiere uns dazu einfach unter info@ki-ferien.de.</p>
-
-                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-
-                <h3>Affiliate-Offenlegung</h3>
-                <p>Einige Links auf dieser Webseite und in den Ergebnis-E-Mails können Affiliate-Links sein. Das bedeutet, dass wir eine kleine Provision erhalten, wenn du über diese Links eine Buchung tätigst. Für dich entstehen dadurch <strong>keine Mehrkosten</strong>. Wir empfehlen nur Ziele und Anbieter, von denen wir überzeugt sind.</p>
-                
-                <button onclick="toggleLegal()" style="margin-top: 20px; background: none; border: 1px solid #ccc; padding: 5px 10px; cursor: pointer; border-radius: 4px;">Schließen</button>
             </div>
+        </form>
+    </main>
+
+    <!-- Footer mit Impressum & Datenschutz -->
+    <footer class="py-10 px-6 border-t border-slate-100 bg-white/50 mt-10">
+        <div class="max-w-xl mx-auto text-center">
+            <div class="flex justify-center gap-8 mb-6 text-sm font-medium text-slate-500">
+                <a href="/impressum.html" class="hover:text-blue-600 transition-colors">Impressum</a>
+                <a href="/datenschutz.html" class="hover:text-blue-600 transition-colors">Datenschutz</a>
+            </div>
+            <p class="text-xs text-slate-400">&copy; 2026 Das KI-Ferien Match. Alle Rechte vorbehalten.</p>
+            <p class="text-[10px] text-slate-300 mt-2 uppercase tracking-tighter">Empfehlungen enthalten Affiliate-Links.</p>
         </div>
     </footer>
 
-    <script>
-        function toggleLegal() {
-            var section = document.getElementById("legal-section");
-            if (section.style.display === "none") {
-                section.style.display = "block";
-                section.scrollIntoView({ behavior: 'smooth' });
-            } else {
-                section.style.display = "none";
-            }
-        }
-    </script>
+</body>
+</html>
