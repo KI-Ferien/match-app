@@ -2,16 +2,16 @@ const { Resend } = require('resend');
 
 /**
  * Netlify Function: match.js
- * Workflow: Mistral AI generiert Ziel -> Awin Deeplink Generator -> E-Mail Versand.
- * Fix: Korrekte Deeplink-Struktur für TUI (Awin) zur Vermeidung von Redirect-Fehlern.
+ * Workflow: Mistral AI generiert Ziel -> Statischer Awin Banner Link -> E-Mail Versand.
+ * Fix: Verwendung des statischen Awin-Werbemittels zur Vermeidung von Redirect-Problemen.
  */
 exports.handler = async (event) => {
     const resend = new Resend(process.env.RESEND_API_KEY);
     const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
 
-    // Deine hinterlegten IDs
-    const AWIN_ID = "2734466"; 
-    const TUI_MID = "5123"; 
+    // Statischer Awin-Link aus deinem Werbemittel
+    // Hinweis: Dieser Link führt zur TUI-Startseite mit deinem Tracking
+    const staticAffiliateLink = "https://www.awin1.com/cread.php?s=2902233&v=10102&q=415156&r=2734466";
 
     try {
         const data = new URLSearchParams(event.body);
@@ -56,15 +56,7 @@ exports.handler = async (event) => {
         const zielName = zielMatch ? zielMatch[1].trim() : "Mittelmeer";
         const analyseText = analyseMatch ? analyseMatch[1].trim() : "Dein perfektes Match.";
 
-        // 2. TUI DEEPLINK LOGIK (Optimiert)
-        // Die Ziel-URL auf tui.com
-        const tuiUrl = `https://www.tui.com/suchen/reisen?searchText=${encodeURIComponent(zielName)}`;
-        
-        // Der finale Awin-Link (Awin benötigt ued=URL)
-        // Wir nutzen hier cread.php, was für dynamische Deeplinks Standard ist.
-        const affiliateLink = `https://www.awin1.com/cread.php?awinmid=${TUI_MID}&awinaffid=${AWIN_ID}&ued=${encodeURIComponent(tuiUrl)}`;
-
-        // 3. E-MAIL VERSAND
+        // 2. E-MAIL VERSAND
         await resend.emails.send({
             from: 'KI-FERIEN <info@ki-ferien.de>',
             to: email,
@@ -81,10 +73,15 @@ exports.handler = async (event) => {
                         <p style="background: #f8fafc; padding: 20px; border-radius: 10px; font-style: italic;">"${analyseText}"</p>
                         
                         <div style="margin-top: 35px;">
-                            <a href="${affiliateLink}" target="_blank" style="background: #d40e14; color: white; padding: 20px 40px; text-decoration: none; border-radius: 15px; font-weight: bold; display: inline-block;">
-                                Jetzt Angebote bei TUI ansehen
+                            <p style="font-size: 14px; color: #64748b; margin-bottom: 20px;">Klicke hier, um Angebote für dein Match auf TUI.com zu finden:</p>
+                            <a href="${staticAffiliateLink}" target="_blank" style="background: #d40e14; color: white; padding: 20px 40px; text-decoration: none; border-radius: 15px; font-weight: bold; display: inline-block;">
+                                Jetzt bei TUI suchen
                             </a>
                         </div>
+                    </div>
+                    <div style="padding: 20px; text-align: center; background: #fafafa; font-size: 10px; color: #94a3b8;">
+                        &copy; 2026 KI-FERIEN. Offizieller TUI Partner.<br>
+                        Der Link führt zur TUI-Startseite.
                     </div>
                 </div>
             `
@@ -93,6 +90,7 @@ exports.handler = async (event) => {
         return { statusCode: 302, headers: { 'Location': '/success.html' }, body: '' };
 
     } catch (error) {
+        console.error("Error:", error);
         return { statusCode: 302, headers: { 'Location': '/success.html?error=true' }, body: '' };
     }
 };
