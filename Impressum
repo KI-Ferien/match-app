@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impressum | Das KI-Ferien Match</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; }
+        .bg-gradient-main { background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%); }
+    </style>
+</head>
+<body class="bg-gradient-main text-slate-900 min-h-screen flex flex-col">
+
+    <header class="p-6">
+        <div class="max-w-6xl mx-auto flex items-center gap-2">
+            <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-md">K</div>
+                <span class="text-lg font-extrabold tracking-tighter uppercase">Das KI-Ferien Match</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-6 py-12 flex-grow">
+        <div class="bg-white p-10 rounded-[2.5rem] shadow-xl shadow-blue-900/5 border border-white">
+            <h1 class="text-4xl font-bold mb-8 text-slate-900">Impressum</h1>
+            
+            <section class="space-y-6 text-slate-600 leading-relaxed">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800 mb-2">Angaben gemäß § 5 TMG</h2>
+                    <p>
+                        Michael Strohmenger<br>
+                        69509 Mörlenbach 
+                    </p>
+                </div>
+
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800 mb-2">Kontakt</h2>
+                    <p>
+                        E-Mail:info@KI-Ferien.de<br>
+                        </p>
+                </div>
+
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800 mb-2">Redaktionell verantwortlich</h2>
+                    <p>[Vorname Nachname]</p>
+                </div>
+
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800 mb-2">EU-Streitschlichtung</h2>
+                    <p>Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: <a href="https://ec.europa.eu/consumers/odr/" target="_blank" class="text-blue-600 underline">https://ec.europa.eu/consumers/odr/</a>.</p>
+                </div>
+
+                <div class="pt-6 border-t border-slate-100">
+                    <p class="text-sm italic">
+                        <strong>Hinweis zu Affiliate-Links:</strong> Diese Webseite enthält Affiliate-Links zu Partnern wie TUI, Booking.com und GetYourGuide. Wenn Sie über diese Links buchen, erhalten wir eine Provision. Für Sie entstehen keine Mehrkosten.
+                    </p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="py-10 px-6 text-center text-xs text-slate-400">
+        <a href="/" class="hover:text-blue-600 underline mr-4">Zurück zur Startseite</a>
+        <span>&copy; 2026 Das KI-Ferien Match</span>
+    </footer>
+
+</body>
+</html>
