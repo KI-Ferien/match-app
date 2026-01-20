@@ -1,88 +1,82 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta http-equiv="refresh" content="10; URL='https://ki-ferien.de/'" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dein Ferien-Ziel wird berechnet | KI-Ferien</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Erfolg | Das KI-Ferien Match</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        .success-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 80vh;
-            text-align: center;
-            padding: 20px;
+        body { font-family: 'Outfit', sans-serif; }
+        .bg-gradient-main { background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%); }
+        .glass-card { 
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
-        /* Das pulsierende Logo */
-        .logo-pulse {
-            width: 150px; /* Größe deines Logos auf der Bestätigungsseite */
-            height: auto;
-            margin-bottom: 30px;
-            border-radius: 50%;
-            animation: breathe 3s infinite ease-in-out;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        .animate-check {
+            animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-
-        @keyframes breathe {
-            0% { transform: scale(1); opacity: 0.9; }
-            50% { transform: scale(1.08); opacity: 1; filter: brightness(1.05); }
-            100% { transform: scale(1); opacity: 0.9; }
-        }
-
-        .loading-line {
-            width: 120px;
-            height: 2px;
-            background: #eee;
-            margin: 25px 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .loading-line::after {
-            content: '';
-            position: absolute;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: #e5904d;
-            animation: flow 2s infinite linear;
-        }
-
-        @keyframes flow {
-            to { left: 100%; }
+        @keyframes scaleIn {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
     </style>
 </head>
-<body>
+<body class="bg-gradient-main text-slate-900 min-h-screen flex flex-col items-center justify-center p-6">
 
-    <div class="container">
-        <div class="success-wrapper">
-            <img src="img/logo.png" alt="KI-Ferien Logo" class="logo-pulse">
-            
-            <h1 style="color: var(--color-stone); font-family: 'Georgia', serif; font-style: italic;">
-                Dein Ferien Ziel ist auf dem Weg...
+    <div class="max-w-md w-full text-center">
+        <!-- Status Icon -->
+        <div id="statusIcon" class="mb-8 flex justify-center">
+            <div class="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center text-white shadow-2xl shadow-blue-200 animate-check">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- Erfolgs-Box -->
+        <div class="glass-card p-10 rounded-[2.5rem] shadow-2xl shadow-blue-900/10 border border-white">
+            <h1 id="mainTitle" class="text-3xl font-bold mb-4 tracking-tight text-slate-900">
+                Anfrage <span class="text-blue-600">erfolgreich!</span>
             </h1>
             
-            <div class="loading-line"></div>
-            
-            <p style="max-width: 500px; line-height: 1.6;">
-                Vielen Dank. Unsere KI berechnet nun basierend auf deinen Angaben den idealen Ort für deine Auszeit.
+            <p id="subTitle" class="text-slate-500 leading-relaxed mb-8">
+                Dein persönliches Match wird gerade von unserer KI berechnet. Du erhältst das Ergebnis in wenigen Minuten per E-Mail.
             </p>
-            
-            <p style="font-style: italic; color: #888; font-size: 0.9em; margin-top: 20px;">
-                Du erhältst dein persönliches Match in wenigen Augenblicken per E-Mail.
-            </p>
-            
-            <br><br>
-            <a href="/" style="color: var(--color-stone); text-decoration: none; font-size: 0.8em; letter-spacing: 1px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">
-                ZURÜCK ZUR STARTSEITE
-            </a>
+
+            <div class="space-y-4">
+                <a href="/" class="block w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-slate-800 transition-all shadow-lg text-center">
+                    Zurück zur Startseite
+                </a>
+                
+                <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
+                    Checke auch deinen Spam-Ordner
+                </p>
+            </div>
         </div>
+
+        <!-- Footer Footer -->
+        <p class="mt-10 text-xs text-slate-400 font-light italic">
+            „Astrologisch inspiriert. Von KI berechnet.“
+        </p>
     </div>
+
+    <script>
+        // Einfache Logik für den Fehlerfall (falls ?error=true in der URL ist)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('error')) {
+            document.getElementById('statusIcon').innerHTML = `
+                <div class="w-20 h-20 bg-red-500 rounded-3xl flex items-center justify-center text-white shadow-2xl shadow-red-200 animate-check">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </div>
+            `;
+            document.getElementById('mainTitle').innerHTML = 'Hoppla... <span class="text-red-500">Fehler.</span>';
+            document.getElementById('subTitle').innerText = 'Da ist etwas schiefgelaufen. Bitte versuche es später noch einmal oder prüfe deine Internetverbindung.';
+        }
+    </script>
 
 </body>
 </html>
