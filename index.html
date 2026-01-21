@@ -14,7 +14,6 @@
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
-        /* Smooth transition for inputs */
         input, select {
             transition: all 0.2s ease-in-out;
         }
@@ -35,65 +34,45 @@
             <p class="text-lg text-slate-500 max-w-xl mx-auto">Basierend auf Astrologie, deinen Vorlieben und deinen Hobbys berechnet unsere KI dein nächstes Traumziel.</p>
         </div>
 
-        <!-- Formular mit allen Feldern -->
         <form action="/.netlify/functions/match" method="POST" class="glass-card p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-blue-900/10">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                
-                <!-- Vorname -->
                 <div>
                     <label class="block text-sm font-semibold mb-2 ml-1">Dein Vorname</label>
                     <input type="text" name="vorname" required placeholder="z.B. Maria" 
                            class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none bg-white/50">
                 </div>
-
-                <!-- Email -->
                 <div>
                     <label class="block text-sm font-semibold mb-2 ml-1">E-Mail Adresse</label>
                     <input type="email" name="email" required placeholder="deine@mail.com" 
                            class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none bg-white/50">
                 </div>
-
-                <!-- Sternzeichen -->
                 <div>
                     <label class="block text-sm font-semibold mb-2 ml-1">Dein Sternzeichen</label>
-                    <div class="relative">
-                        <select name="q_zodiac" required class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none bg-white/50 appearance-none cursor-pointer">
-                            <option value="Widder">Widder</option>
-                            <option value="Stier">Stier</option>
-                            <option value="Zwillinge">Zwillinge</option>
-                            <option value="Krebs">Krebs</option>
-                            <option value="Löwe">Löwe</option>
-                            <option value="Jungfrau">Jungfrau</option>
-                            <option value="Waage">Waage</option>
-                            <option value="Skorpion">Skorpion</option>
-                            <option value="Schütze">Schütze</option>
-                            <option value="Steinbock">Steinbock</option>
-                            <option value="Wassermann">Wassermann</option>
-                            <option value="Fische">Fische</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                    </div>
+                    <select name="q_zodiac" required class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none bg-white/50 appearance-none cursor-pointer">
+                        <option value="Widder">Widder</option>
+                        <option value="Stier">Stier</option>
+                        <option value="Zwillinge">Zwillinge</option>
+                        <option value="Krebs">Krebs</option>
+                        <option value="Löwe">Löwe</option>
+                        <option value="Jungfrau">Jungfrau</option>
+                        <option value="Waage">Waage</option>
+                        <option value="Skorpion">Skorpion</option>
+                        <option value="Schütze">Schütze</option>
+                        <option value="Steinbock">Steinbock</option>
+                        <option value="Wassermann">Wassermann</option>
+                        <option value="Fische">Fische</option>
+                    </select>
                 </div>
-
-                <!-- Gefühlte Alter -->
                 <div>
                     <label class="block text-sm font-semibold mb-2 ml-1">Gefühltes Alter</label>
                     <input type="number" name="alter" required placeholder="z.B. 25" 
                            class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none bg-white/50">
                 </div>
-
-                <!-- Lieblingsfarbe -->
                 <div>
                     <label class="block text-sm font-semibold mb-2 ml-1">Lieblingsfarbe</label>
                     <input type="text" name="farbe" placeholder="z.B. Ozeanblau" 
                            class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none bg-white/50">
                 </div>
-
-                <!-- Hobbys & Sport -->
                 <div>
                     <label class="block text-sm font-semibold mb-2 ml-1">Hobbys & Sportarten</label>
                     <input type="text" name="hobbys" placeholder="z.B. Surfen, Wandern, Yoga" 
@@ -104,10 +83,6 @@
             <button type="submit" class="w-full mt-10 bg-blue-600 text-white font-bold py-5 rounded-2xl hover:bg-blue-700 hover:scale-[1.01] active:scale-[0.99] transition-all shadow-xl shadow-blue-200 text-lg">
                 Mein Match berechnen
             </button>
-
-            <p class="text-center mt-6 text-xs text-slate-400">
-                Mit der Nutzung akzeptierst du unsere <a href="/datenschutz.html" class="underline hover:text-blue-600">Datenschutzerklärung</a>.
-            </p>
         </form>
     </main>
 
