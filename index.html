@@ -14,8 +14,26 @@
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
-        input, select {
+        input, select, textarea {
             transition: all 0.2s ease-in-out;
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #2563eb;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.3);
         }
     </style>
 </head>
@@ -26,28 +44,35 @@
             <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">K</div>
             <span class="text-xl font-extrabold tracking-tighter uppercase">KI-FERIEN</span>
         </div>
+        <div class="hidden md:block text-xs font-semibold text-blue-600 uppercase tracking-widest">
+            MVP-Funnel v1.0
+        </div>
     </header>
 
     <main class="max-w-4xl mx-auto px-6 py-12">
         <div class="text-center mb-12">
+            <span class="inline-block px-4 py-1.5 mb-4 text-xs font-bold tracking-widest text-blue-700 uppercase bg-blue-100 rounded-full">AI-Powered Travel Matching</span>
             <h1 class="text-5xl md:text-6xl font-bold tracking-tight mb-4">Finde dein <span class="text-blue-600">Urlaubs-Match</span>.</h1>
-            <p class="text-lg text-slate-500 max-w-xl mx-auto">Basierend auf Astrologie, deinen Vorlieben und deinen Hobbys berechnet unsere KI dein nächstes Traumziel.</p>
+            <p class="text-lg text-slate-500 max-w-xl mx-auto">Unser Mistral-Modell analysiert deine psychografischen Daten und findet das Ziel, das wirklich zu deiner Seele passt.</p>
         </div>
 
-        <form action="/.netlify/functions/match" method="POST" class="glass-card p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-blue-900/10">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <form action="/.netlify/functions/match" method="POST" class="glass-card p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-blue-900/10 border border-white">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <!-- Basisdaten -->
                 <div>
                     <label class="block text-sm font-semibold mb-2 ml-1">Dein Vorname</label>
                     <input type="text" name="vorname" required placeholder="z.B. Maria" 
                            class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none bg-white/50">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold mb-2 ml-1">E-Mail Adresse</label>
+                    <label class="block text-sm font-semibold mb-2 ml-1">E-Mail für dein Ergebnis</label>
                     <input type="email" name="email" required placeholder="deine@mail.com" 
                            class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none bg-white/50">
                 </div>
+
+                <!-- Psychografische Daten: Sternzeichen & Alter -->
                 <div>
-                    <label class="block text-sm font-semibold mb-2 ml-1">Dein Sternzeichen</label>
+                    <label class="block text-sm font-semibold mb-2 ml-1">Sternzeichen (Astrologie-Faktor)</label>
                     <select name="q_zodiac" required class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none bg-white/50 appearance-none cursor-pointer">
                         <option value="Widder">Widder</option>
                         <option value="Stier">Stier</option>
@@ -68,21 +93,32 @@
                     <input type="number" name="alter" required placeholder="z.B. 25" 
                            class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none bg-white/50">
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold mb-2 ml-1">Lieblingsfarbe</label>
-                    <input type="text" name="farbe" placeholder="z.B. Ozeanblau" 
-                           class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none bg-white/50">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold mb-2 ml-1">Hobbys & Sportarten</label>
-                    <input type="text" name="hobbys" placeholder="z.B. Surfen, Wandern, Yoga" 
-                           class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none bg-white/50">
+            </div>
+
+            <!-- Psychografischer Slider: Energie-Level -->
+            <div class="mb-8">
+                <label class="block text-sm font-semibold mb-4 ml-1">Wie viel Energie hast du für diesen Urlaub?</label>
+                <div class="flex items-center gap-4">
+                    <span class="text-xs font-bold text-slate-400">PURE ENTSPANNUNG</span>
+                    <input type="range" name="energy_level" min="1" max="100" value="50" class="flex-grow">
+                    <span class="text-xs font-bold text-slate-400">ABENTEUER PUR</span>
                 </div>
             </div>
 
-            <button type="submit" class="w-full mt-10 bg-blue-600 text-white font-bold py-5 rounded-2xl hover:bg-blue-700 hover:scale-[1.01] active:scale-[0.99] transition-all shadow-xl shadow-blue-200 text-lg">
-                Mein Match berechnen
+            <!-- Freitext-Analyse -->
+            <div class="mb-8">
+                <label class="block text-sm font-semibold mb-2 ml-1">Beschreibe deinen Traumtag im Urlaub (Freitext)</label>
+                <textarea name="hobbys" rows="3" placeholder="z.B. Erst Yoga am Strand, dann ein lokaler Marktbesuch und abends ein Dinner im Sonnenuntergang..." 
+                          class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none bg-white/50 resize-none"></textarea>
+            </div>
+
+            <button type="submit" class="w-full bg-blue-600 text-white font-bold py-5 rounded-2xl hover:bg-blue-700 hover:scale-[1.01] active:scale-[0.99] transition-all shadow-xl shadow-blue-200 text-lg uppercase tracking-wide">
+                KI-Analyse starten
             </button>
+            
+            <p class="text-center mt-6 text-[10px] text-slate-400 uppercase tracking-widest">
+                Deine Daten werden anonymisiert an das LLM übertragen.
+            </p>
         </form>
     </main>
 
