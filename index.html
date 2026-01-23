@@ -37,6 +37,15 @@
         }
     </style>
     <script src="match.js"></script>
+    <script>
+    (function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('go') === 'tui') {
+            // Die Weiterleitung zu Awin passiert erst hier im Browser des Nutzers
+            window.location.href = "https://www.awin1.com/cread.php?s=2902233&v=10102&q=415156&r=2734466";
+        }
+    })();
+</script>
 </head>
 <body class="bg-gradient-main text-slate-900 min-h-screen">
 
