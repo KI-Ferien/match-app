@@ -9,7 +9,7 @@ exports.handler = async (event) => {
     const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
 
     // Dein statischer Awin-Link (TUI Startseite) mit deinem Tracking r=2734466
-    const staticAffiliateLink = "https://www.awin1.com/cread.php?s=2902233&v=10102&q=415156&r=2734466";
+    const staticAffiliateLink = "https://ki-ferien.de/?go=tui";
 
     try {
         // Daten aus dem Formular extrahieren
