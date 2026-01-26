@@ -1,94 +1,128 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="5; URL='https://ki-ferien.de/'" />
-    
-    <title>Erfolg | Das KI-Ferien Match</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Outfit', sans-serif; }
-        .bg-gradient-main { background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%); }
-        .glass-card { 
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+const { Resend } = require('resend');
+
+/**
+ * Erzeugt einen Affiliate-Link über die Travelpayouts API v1
+ * Isoliert aufgebaut, um den Rest der Funktion nicht zu gefährden.
+ */
+async function generateAffiliateLink(targetUrl) {
+    const token = process.env.TRAVELPAYOUTS_TOKEN;
+    if (!token) return targetUrl;
+
+    try {
+        const response = await fetch('https://api.travelpayouts.com/links/v1/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Access-Token': token
+            },
+            body: JSON.stringify({
+                "trs": 492044,
+                "marker": "698672",
+                "shorten": true,
+                "links": [{ "url": targetUrl }]
+            })
+        });
+
+        const data = await response.json();
+        // Sicherstellen, dass wir nur zugreifen, wenn die API-Antwort korrekt ist
+        if (data && data.result && data.result.links && data.result.links[0]) {
+            return data.result.links[0].partner_url;
         }
-        .animate-check {
-            animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        return targetUrl;
+    } catch (error) {
+        console.error("Travelpayouts Link-Erstellung fehlgeschlagen:", error);
+        return targetUrl; // Bei Fehler wird die normale URL genutzt -> kein Absturz!
+    }
+}
+
+exports.handler = async (event) => {
+    if (event.httpMethod !== "POST") {
+        return { statusCode: 302, headers: { 'Location': '/' } };
+    }
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
+
+    try {
+        const params = new URLSearchParams(event.body);
+        const email = params.get('email');
+        const vorname = params.get('vorname') || "Entdecker";
+        const zodiac = params.get('q_zodiac') || "Sternzeichen";
+        const alter = params.get('q_age') || "junggeblieben";
+        const slider = params.get('q_adventure') || "ausgeglichen";
+        const hobbys = params.get('hobbys') || "Ferien";
+
+        if (!email) {
+            return { statusCode: 302, headers: { 'Location': '/success.html' } };
         }
-        @keyframes scaleIn {
-            from { transform: scale(0); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-    </style>
-</head>
-<body class="bg-gradient-main text-slate-900 min-h-screen flex flex-col items-center justify-center p-6">
 
-    <div class="max-w-md w-full text-center">
-        <div id="statusIcon" class="mb-8 flex justify-center">
-            <div class="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center text-white shadow-2xl shadow-blue-200 animate-check">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                </svg>
-            </div>
-        </div>
+        // 1. Mistral KI-Analyse
+        const aiResponse = await fetch("https://api.mistral.ai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${MISTRAL_API_KEY}`
+            },
+            body: JSON.stringify({
+                model: "mistral-tiny",
+                messages: [{
+                    role: "user", 
+                    content: `Du bist ein professioneller Reiseberater. Empfiehl ${vorname} ein Ferienziel.
+                    Details: Sternzeichen ${zodiac}, gefühltes Alter ${alter}, Abenteuer-Level ${slider}, Interessen: ${hobbys}.
+                    Antworte STILVOLL und FAMILIENFREUNDLICH. 
+                    Format: ZIEL: [Ort] ANALYSE: [3 Sätze Begründung]`
+                }],
+                max_tokens: 250
+            })
+        });
 
-        <div class="glass-card p-10 rounded-[2.5rem] shadow-2xl shadow-blue-900/10 border border-white">
-            <h1 id="mainTitle" class="text-3xl font-bold mb-4 tracking-tight text-slate-900">
-                Anfrage <span class="text-blue-600">erfolgreich!</span>
-            </h1>
-            
-            <p id="subTitle" class="text-slate-500 leading-relaxed mb-8">
-                Dein persönliches Match wird gerade von unserer KI berechnet. Du erhältst das Ergebnis in wenigen Minuten per E-Mail.
-            </p>
+        const kiData = await aiResponse.json();
+        const fullText = kiData.choices?.[0]?.message?.content || "";
+        const zielName = fullText.match(/ZIEL:\s*([^\n]*)/i)?.[1]?.trim() || "Mittelmeer";
+        const analyseText = fullText.match(/ANALYSE:\s*([\s\S]*?)$/i)?.[1]?.trim() || "Genieße deine Ferien!";
 
-            <div class="space-y-4">
-                <a href="/" id="backButton" class="block w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-slate-800 transition-all shadow-lg text-center">
-                    Zurück zur Startseite
-                </a>
-                
-                <p id="timerHint" class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
-                    Weiterleitung in 5 Sekunden...
-                </p>
-            </div>
-        </div>
+        // 2. Travelpayouts Link-Generierung
+        const targetSearchUrl = `https://www.tripadvisor.de/Search?q=${encodeURIComponent(zielName)}`;
+        const affiliateLink = await generateAffiliateLink(targetSearchUrl);
 
-        <p class="mt-10 text-xs text-slate-400 font-light italic">
-            „Astrologisch inspiriert. Von KI berechnet.“
-        </p>
-    </div>
+        // 3. E-Mail Versand (mit Idempotency-Schutz)
+        try {
+            const today = new Date().toISOString().split('T')[0];
+            const idempotencyKey = `match-${email.replace(/[^a-zA-Z0-9]/g, '')}-${today}`;
 
-    <script>
-        // Logik für den Fehlerfall
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('error')) {
-            // Timer stoppen bei Fehler (optional, hier lassen wir ihn einfach weg)
-            document.getElementById('timerHint').classList.add('hidden');
-            
-            document.getElementById('statusIcon').innerHTML = `
-                <div class="w-20 h-20 bg-red-500 rounded-3xl flex items-center justify-center text-white shadow-2xl shadow-red-200 animate-check">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </div>
-            `;
-            document.getElementById('mainTitle').innerHTML = 'Hoppla... <span class="text-red-500">Fehler.</span>';
-            document.getElementById('subTitle').innerText = 'Da ist etwas schiefgelaufen. Bitte versuche es später noch einmal.';
-        } else {
-            // Kleiner Countdown für den Text
-            let timeLeft = 5;
-            const timerHint = document.getElementById('timerHint');
-            setInterval(() => {
-                if (timeLeft > 0) {
-                    timeLeft--;
-                    timerHint.innerText = `Weiterleitung in ${timeLeft} Sekunden...`;
-                }
-            }, 1000);
-        }
-    </script>
+            await resend.emails.send({
+                from: 'KI-FERIEN <info@ki-ferien.de>',
+                to: email,
+                bcc: 'mikostro@web.de', 
+                subject: `Dein Ferien-Match: ${zielName} 🌴`,
+                html: `
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 20px; overflow: hidden;">
+                        <div style="background: #eff6ff; padding: 30px; text-align: center;">
+                            <h1 style="color: #1e293b; margin:0;">Hallo ${vorname}!</h1>
+                        </div>
+                        <div style="padding: 30px; text-align: center;">
+                            <h2 style="color: #2563eb; font-size: 24px;">${zielName}</h2>
+                            <p style="background: #f8fafc; padding: 20px; border-radius: 12px; text-align: left; line-height: 1.6;">${analyseText}</p>
+                            <div style="margin-top: 30px;">
+                                <a href="${affiliateLink}" style="background: #2563eb; color: white; padding: 18px 30px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold;">Angebote in ${zielName} entdecken</a>
+                            </div>
+                        </div>
+                    </div>`
+            }, { idempotencyKey });
+        } catch (e) { console.error("Mail Error:", e); }
 
-</body>
-</html>
+        // 4. Weiterleitung (Absolut sicher am Ende)
+        return {
+            statusCode: 302,
+            headers: { 
+                'Location': '/success.html',
+                'Cache-Control': 'no-cache, no-store, must-revalidate'
+            },
+            body: ''
+        };
+
+    } catch (error) {
+        console.error("Globaler Fehler:", error);
+        return { statusCode: 302, headers: { 'Location': '/success.html?error=true' } };
+    }
+};
