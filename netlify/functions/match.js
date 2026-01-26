@@ -1,17 +1,17 @@
 const { Resend } = require('resend');
 
 exports.handler = async (event) => {
-    // Falls kein POST-Request vorliegt, sofortiger Abbruch
+    // 1. Grundeinstellungen & Sicherheit
     if (event.httpMethod !== "POST") {
         return { statusCode: 302, headers: { 'Location': '/' } };
     }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
     const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
-    // Robuster Awin-Link
     const tuiAwinLink = "https://www.awin1.com/awclick.php?mid=12531&id=2734466";
 
     try {
+        // 2. Daten aus dem Formular extrahieren
         const params = new URLSearchParams(event.body);
         const email = params.get('email');
         const vorname = params.get('vorname') || "Reisender";
@@ -21,10 +21,10 @@ exports.handler = async (event) => {
         const hobbys = params.get('hobbys') || "Ferien genießen";
 
         if (!email) {
-            return { statusCode: 302, headers: { 'Location': '/?error=missing_email' } };
+            return { statusCode: 302, headers: { 'Location': '/success.html?error=noemail' } };
         }
 
-        // 1. KI-Anfrage (Mistral) - Jetzt mit allen Details
+        // 3. KI-Anfrage an Mistral AI
         const aiResponse = await fetch("https://api.mistral.ai/v1/chat/completions", {
             method: "POST",
             headers: {
@@ -35,7 +35,12 @@ exports.handler = async (event) => {
                 model: "mistral-tiny",
                 messages: [{
                     role: "user", 
-                    content: `Reiseexperte-Match für ${vorname}: Sternzeichen ${zodiac}, gefühltes Alter ${alter}, Abenteuer-Level ${slider}, Interessen: ${hobbys}. Begründe kurz im Text, warum das Ziel zu diesen Details passt. Format: ZIEL: [Ort] ANALYSE: [3 Sätze]`
+                    content: `Du bist ein Reiseexperte. Erstelle ein Ferien-Match für ${vorname}. 
+                    Details: Sternzeichen ${zodiac}, gefühltes Alter ${alter}, Präferenz ${slider}, Interessen: ${hobbys}. 
+                    Begründe die Wahl des Ziels basierend auf ALL diesen Details.
+                    Format:
+                    ZIEL: [Name des Ortes]
+                    ANALYSE: [3-4 Sätze Begründung]`
                 }],
                 max_tokens: 250
             })
@@ -43,10 +48,10 @@ exports.handler = async (event) => {
 
         const kiData = await aiResponse.json();
         const fullText = kiData.choices?.[0]?.message?.content || "";
-        const zielName = fullText.match(/ZIEL:\s*([^\n]*)/i)?.[1]?.trim() || "Traumziel";
-        const analyseText = fullText.match(/ANALYSE:\s*([\s\S]*?)$/i)?.[1]?.trim() || "Ein perfekt abgestimmtes Ziel.";
+        const zielName = fullText.match(/ZIEL:\s*([^\n]*)/i)?.[1]?.trim() || "Mittelmeer";
+        const analyseText = fullText.match(/ANALYSE:\s*([\s\S]*?)$/i)?.[1]?.trim() || "Ein perfekt auf dich abgestimmtes Ziel.";
 
-        // 2. E-Mail Versand (Abgesichert gegen Abstürze)
+        // 4. E-Mail Versand via Resend (mit Idempotency-Key)
         try {
             const today = new Date().toISOString().split('T')[0];
             const idempotencyKey = `match-${email.replace(/[^a-zA-Z0-9]/g, '')}-${today}`;
@@ -57,31 +62,36 @@ exports.handler = async (event) => {
                 bcc: 'mikostro@web.de', 
                 subject: `Dein Ferien-Match: ${zielName} 🌴`,
                 html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 20px; overflow: hidden;">
-                        <div style="background: #eff6ff; padding: 30px; text-align: center;">
-                            <h1 style="margin:0;">Hallo ${vorname}!</h1>
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 24px; overflow: hidden;">
+                        <div style="background: #eff6ff; padding: 40px; text-align: center;">
+                            <h1 style="color: #1e293b; margin:0;">Hallo ${vorname}!</h1>
+                            <p style="color: #2563eb; font-weight: bold; margin-top: 10px;">Deine persönliche Analyse ist fertig.</p>
                         </div>
-                        <div style="padding: 30px; text-align: center;">
-                            <h2 style="color: #2563eb;">${zielName}</h2>
-                            <p style="background: #f8fafc; padding: 15px; border-radius: 10px; text-align: left; line-height: 1.6;">${analyseText}</p>
-                            <div style="margin-top: 25px;">
-                                <a href="${tuiAwinLink}" style="background: #d40e14; color: white; padding: 15px 25px; text-decoration: none; border-radius: 10px; display: block; font-weight: bold; font-size: 18px;">Jetzt Ferien bei TUI entdecken</a>
+                        <div style="padding: 40px; text-align: center;">
+                            <h2 style="color: #1e293b; font-size: 28px; margin-bottom: 20px;">${zielName}</h2>
+                            <div style="background: #f8fafc; padding: 25px; border-radius: 16px; border-left: 4px solid #2563eb; color: #1e3a8a; line-height: 1.6; text-align: left;">
+                                ${analyseText}
+                            </div>
+                            <div style="margin-top: 35px;">
+                                <a href="${tuiAwinLink}" target="_blank" style="background: #d40e14; color: white; padding: 20px 40px; text-decoration: none; border-radius: 16px; font-weight: bold; font-size: 18px; display: inline-block;">
+                                    Jetzt bei TUI entdecken
+                                </a>
                             </div>
                         </div>
-                        <div style="padding: 15px; text-align: center; background: #fafafa; font-size: 10px; color: #999;">
-                            Basierend auf Sternzeichen ${zodiac} & Interessen.
+                        <div style="padding: 20px; text-align: center; background: #fafafa; font-size: 11px; color: #94a3b8;">
+                            &copy; 2026 KI-FERIEN. Basierend auf Sternzeichen ${zodiac}, Alter ${alter} und deinen Vorlieben.
                         </div>
                     </div>`
             }, { idempotencyKey });
         } catch (mailError) {
-            console.error("Mail-Versand Fehler (wird ignoriert für Redirect):", mailError);
+            console.error("Mail Error:", mailError);
         }
 
-        // 3. Direkte Weiterleitung zur Startseite (wie im Original)
+        // 5. Weiterleitung zur success.html (Redirect)
         return {
             statusCode: 302,
             headers: { 
-                'Location': '/?success=true',
+                'Location': '/success.html',
                 'Cache-Control': 'no-cache, no-store, must-revalidate'
             },
             body: ''
@@ -89,6 +99,10 @@ exports.handler = async (event) => {
 
     } catch (error) {
         console.error("Kritischer Fehler:", error);
-        return { statusCode: 302, headers: { 'Location': '/?error=true' }, body: '' };
+        return { 
+            statusCode: 302, 
+            headers: { 'Location': '/success.html?error=true' },
+            body: ''
+        };
     }
 };
