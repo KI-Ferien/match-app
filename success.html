@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="5; URL='https://ki-ferien.de/'" />
+    
     <title>Erfolg | Das KI-Ferien Match</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -26,7 +28,6 @@
 <body class="bg-gradient-main text-slate-900 min-h-screen flex flex-col items-center justify-center p-6">
 
     <div class="max-w-md w-full text-center">
-        <!-- Status Icon -->
         <div id="statusIcon" class="mb-8 flex justify-center">
             <div class="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center text-white shadow-2xl shadow-blue-200 animate-check">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -35,7 +36,6 @@
             </div>
         </div>
 
-        <!-- Erfolgs-Box -->
         <div class="glass-card p-10 rounded-[2.5rem] shadow-2xl shadow-blue-900/10 border border-white">
             <h1 id="mainTitle" class="text-3xl font-bold mb-4 tracking-tight text-slate-900">
                 Anfrage <span class="text-blue-600">erfolgreich!</span>
@@ -46,26 +46,28 @@
             </p>
 
             <div class="space-y-4">
-                <a href="/" class="block w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-slate-800 transition-all shadow-lg text-center">
+                <a href="/" id="backButton" class="block w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-slate-800 transition-all shadow-lg text-center">
                     Zurück zur Startseite
                 </a>
                 
-                <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
-                    Checke auch deinen Spam-Ordner
+                <p id="timerHint" class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
+                    Weiterleitung in 5 Sekunden...
                 </p>
             </div>
         </div>
 
-        <!-- Footer Footer -->
         <p class="mt-10 text-xs text-slate-400 font-light italic">
             „Astrologisch inspiriert. Von KI berechnet.“
         </p>
     </div>
 
     <script>
-        // Einfache Logik für den Fehlerfall (falls ?error=true in der URL ist)
+        // Logik für den Fehlerfall
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('error')) {
+            // Timer stoppen bei Fehler (optional, hier lassen wir ihn einfach weg)
+            document.getElementById('timerHint').classList.add('hidden');
+            
             document.getElementById('statusIcon').innerHTML = `
                 <div class="w-20 h-20 bg-red-500 rounded-3xl flex items-center justify-center text-white shadow-2xl shadow-red-200 animate-check">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -74,7 +76,17 @@
                 </div>
             `;
             document.getElementById('mainTitle').innerHTML = 'Hoppla... <span class="text-red-500">Fehler.</span>';
-            document.getElementById('subTitle').innerText = 'Da ist etwas schiefgelaufen. Bitte versuche es später noch einmal oder prüfe deine Internetverbindung.';
+            document.getElementById('subTitle').innerText = 'Da ist etwas schiefgelaufen. Bitte versuche es später noch einmal.';
+        } else {
+            // Kleiner Countdown für den Text
+            let timeLeft = 5;
+            const timerHint = document.getElementById('timerHint');
+            setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    timerHint.innerText = `Weiterleitung in ${timeLeft} Sekunden...`;
+                }
+            }, 1000);
         }
     </script>
 
