@@ -1,35 +1,51 @@
 const { Resend } = require('resend');
 
 /**
- * Netlify Function: match.js
- * Workflow: Mistral AI generiert Ziel basierend auf Hobbys -> Statischer Awin Banner Link -> E-Mail Versand via Resend.
+ * Hilfsfunktion: NUR für Travelpayouts-Links (Booking, etc.)
  */
+async function createTravelpayoutsLink(targetUrl) {
+    const token = process.env.TRAVELPAYOUTS_TOKEN;
+    if (!token) return targetUrl;
+
+    try {
+        const response = await fetch('https://api.travelpayouts.com/links/v1/create', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json', 
+                'X-Access-Token': token 
+            },
+            body: JSON.stringify({
+                "trs": 492044,
+                "marker": 698672,
+                "shorten": true,
+                "links": [{ "url": targetUrl }]
+            })
+        });
+        const data = await response.json();
+        if (data && data.result && data.result.links[0]) {
+            return data.result.links[0].partner_url;
+        }
+        return targetUrl;
+    } catch (e) {
+        return targetUrl;
+    }
+}
+
 exports.handler = async (event) => {
     const resend = new Resend(process.env.RESEND_API_KEY);
     const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
 
-    // Dein statischer Awin-Link (TUI Startseite) mit deinem Tracking r=2734466
-    const staticAffiliateLink = "https://ki-ferien.de/?go=tui";
+    // Dein Awin TUI-Link (bleibt statisch, da Awin)
+    const tuiAwinLink = "https://www.awin1.com/cread.php?awinmid=12531&awinaffid=2734466&ued=https%3A%2F%2Fwww.tui.com";
 
     try {
-        // Daten aus dem Formular extrahieren
-        const data = new URLSearchParams(event.body);
-        const email = data.get('email');
-        const vorname = data.get('vorname') || "Reisender";
-        const farbe = data.get('farbe') || "bunt";
-        const zodiacRaw = data.get('q_zodiac');
-        const hobbys = data.get('hobbys') || "Entspannung und Entdeckung";
+        const params = new URLSearchParams(event.body);
+        const email = params.get('email');
+        const vorname = params.get('vorname') || "Reisender";
+        const hobbys = params.get('hobbys') || "Entdeckung";
 
-        const zodiacMap = {
-            'Widder': 'Widder', 'Stier': 'Stier', 'Zwillinge': 'Zwillinge', 
-            'Krebs': 'Krebs', 'Löwe': 'Löwe', 'Jungfrau': 'Jungfrau',
-            'Waage': 'Waage', 'Skorpion': 'Skorpion', 'Schütze': 'Schütze',
-            'Steinbock': 'Steinbock', 'Wassermann': 'Wassermann', 'Fische': 'Fische'
-        };
-        const zodiacDe = zodiacMap[zodiacRaw] || zodiacRaw || "Reisender";
-
-        // 1. KI ANFRAGE an Mistral AI
-        const response = await fetch("https://api.mistral.ai/v1/chat/completions", {
+        // 1. KI-Anfrage (Mistral)
+        const aiResponse = await fetch("https://api.mistral.ai/v1/chat/completions", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -39,66 +55,61 @@ exports.handler = async (event) => {
                 model: "mistral-tiny",
                 messages: [{
                     role: "user", 
-                    content: `Du bist ein erfahrener Reise-Experte. Wähle GENAU EIN ideales Urlaubsziel für ${vorname}.
-                    Persönliche Details: Sternzeichen ${zodiacDe}, Lieblingsfarbe ${farbe}, Interessen/Hobbys: ${hobbys}.
-                    Berücksichtige besonders die genannten Sportarten oder Hobbys bei der Wahl des Ziels.
-                    Antworte STRENG im folgenden Format:
-                    ZIEL: [Name des Ortes]
-                    ANALYSE: [Begründung in maximal 2 Sätzen, warum dieser Ort perfekt für diese Hobbys und dieses Sternzeichen ist]`
+                    content: `Wähle ein Urlaubsziel für ${vorname} (Hobbys: ${hobbys}). Antworte STRENG: ZIEL: [Ort] ANALYSE: [Grund]`
                 }]
             })
         });
 
-        const kiData = await response.json();
+        const kiData = await aiResponse.json();
         const fullText = kiData.choices?.[0]?.message?.content || "";
-
-        // Ziel und Analyse extrahieren
         const zielMatch = fullText.match(/ZIEL:\s*([^\n]*)/i);
-        const analyseMatch = fullText.match(/ANALYSE:\s*([\s\S]*?)(?=ZIEL:|$)/i);
-
         const zielName = zielMatch ? zielMatch[1].trim() : "Mittelmeer";
-        const analyseText = analyseMatch ? analyseMatch[1].trim() : "Dieses Ziel passt wunderbar zu deinen individuellen Interessen.";
+        const analyseMatch = fullText.match(/ANALYSE:\s*([\s\S]*?)(?=ZIEL:|$)/i);
+        const analyseText = analyseMatch ? analyseMatch[1].trim() : "Ein wunderbarer Ort für dich.";
 
-        // 2. E-MAIL VERSAND via Resend
+        // 2. LINKS GENERIEREN
+        // Dieser Link geht über Travelpayouts (z.B. Booking)
+        const bookingUrl = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(zielName)}`;
+        const dynamicTravelLink = await createTravelpayoutsLink(bookingUrl);
+
+        // 3. E-MAIL VERSAND (Resend)
+        const today = new Date().toISOString().split('T')[0];
+        const idempotencyKey = `match-${email.replace(/[^a-zA-Z0-9]/g, '')}-${today}`;
+
         await resend.emails.send({
             from: 'KI-FERIEN <info@ki-ferien.de>',
             to: email,
-            bcc: 'mikostro@web.de', // Deine Kopie zur Kontrolle
-            subject: `Dein Ferien-Match für ${hobbys}: ${zielName} 🌴`,
+            bcc: 'mikostro@web.de', 
+            subject: `Dein Ferien-Match: ${zielName} 🌴`,
             html: `
-                <div style="font-family: 'Outfit', Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border-radius: 24px; border: 1px solid #eee; overflow: hidden;">
                     <div style="background: #eff6ff; padding: 40px; text-align: center;">
-                        <span style="text-transform: uppercase; letter-spacing: 2px; font-size: 10px; color: #2563eb; font-weight: bold;">Analyse abgeschlossen</span>
-                        <h1 style="color: #1e293b; font-size: 26px; margin: 10px 0 0 0;">Hallo ${vorname}, hier ist dein Match!</h1>
+                        <h1 style="color: #1e293b;">Hallo ${vorname}, dein Match ist da!</h1>
                     </div>
                     <div style="padding: 40px; text-align: center;">
-                        <p style="color: #64748b; margin-bottom: 5px;">Basierend auf deinen Interessen für <b>${hobbys}</b> empfehlen wir:</p>
-                        <h2 style="color: #2563eb; font-size: 36px; margin: 10px 0;">${zielName}</h2>
+                        <h2 style="color: #2563eb; font-size: 32px;">${zielName}</h2>
+                        <p style="font-style: italic; color: #1e3a8a; background: #f8fafc; padding: 20px; border-radius: 12px;">"${analyseText}"</p>
                         
-                        <div style="background: #f8fafc; padding: 25px; border-radius: 16px; border-left: 4px solid #2563eb; color: #1e3a8a; font-style: italic; line-height: 1.6; text-align: left; margin: 30px 0;">
-                            "${analyseText}"
-                        </div>
-                        
-                        <div style="margin-top: 40px;">
-                            <p style="font-size: 14px; color: #64748b; margin-bottom: 20px;">Finde jetzt die besten Angebote für ${zielName} auf TUI.com:</p>
-                            <a href="${staticAffiliateLink}" target="_blank" style="background: #d40e14; color: white; padding: 20px 40px; text-decoration: none; border-radius: 16px; font-weight: bold; font-size: 18px; display: inline-block;">
-                                Jetzt bei TUI entdecken
+                        <div style="margin-top: 30px;">
+                            <a href="${dynamicTravelLink}" style="background: #2563eb; color: white; padding: 18px 30px; text-decoration: none; border-radius: 12px; font-weight: bold; display: block; margin-bottom: 15px;">
+                                Hotels in ${zielName} finden
+                            </a>
+                            
+                            <a href="${tuiAwinLink}" style="background: #d40e14; color: white; padding: 18px 30px; text-decoration: none; border-radius: 12px; font-weight: bold; display: block;">
+                                Ferien-Angebote bei TUI prüfen
                             </a>
                         </div>
                     </div>
-                    <div style="padding: 20px; text-align: center; background: #fafafa; font-size: 10px; color: #94a3b8; border-top: 1px solid #eee;">
-                        &copy; 2026 KI-FERIEN. Deine Hobbys standen im Mittelpunkt unserer Analyse.<br>
-                        Dieser Link führt zur TUI-Startseite (Affiliate-Tracking aktiv).
+                    <div style="padding: 20px; text-align: center; background: #fafafa; font-size: 10px; color: #94a3b8;">
+                        &copy; 2026 KI-FERIEN. Enthält Partner-Links von Travelpayouts & TUI (Awin).
                     </div>
                 </div>
             `
-        });
+        }, { idempotencyKey });
 
-        // 3. ERFOLGS-WEITERLEITUNG
         return { statusCode: 302, headers: { 'Location': '/success.html' }, body: '' };
 
     } catch (error) {
-        console.error("Function Error:", error);
         return { statusCode: 302, headers: { 'Location': '/success.html?error=true' }, body: '' };
     }
 };
