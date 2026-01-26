@@ -1,7 +1,7 @@
 const { Resend } = require('resend');
 
 /**
- * Hilfsfunktion: NUR für Travelpayouts-Links (Booking, etc.)
+ * Hilfsfunktion: Travelpayouts Link-Erstellung (Booking etc.)
  */
 async function createTravelpayoutsLink(targetUrl) {
     const token = process.env.TRAVELPAYOUTS_TOKEN;
@@ -22,10 +22,7 @@ async function createTravelpayoutsLink(targetUrl) {
             })
         });
         const data = await response.json();
-        if (data && data.result && data.result.links[0]) {
-            return data.result.links[0].partner_url;
-        }
-        return targetUrl;
+        return (data?.result?.links?.[0]?.partner_url) || targetUrl;
     } catch (e) {
         return targetUrl;
     }
@@ -35,12 +32,15 @@ exports.handler = async (event) => {
     const resend = new Resend(process.env.RESEND_API_KEY);
     const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
 
-    // Dein Awin TUI-Link (bleibt statisch, da Awin)
+    // KORREKTUR: Dein direkter TUI-Awin Link
+    // Falls "This link is inactive" kommt, prüfe bitte in Awin, ob die Kampagne noch aktiv ist.
     const tuiAwinLink = "https://www.awin1.com/cread.php?awinmid=12531&awinaffid=2734466&ued=https%3A%2F%2Fwww.tui.com";
 
     try {
         const params = new URLSearchParams(event.body);
         const email = params.get('email');
+        if (!email) throw new Error("Keine E-Mail-Adresse gefunden");
+
         const vorname = params.get('vorname') || "Reisender";
         const hobbys = params.get('hobbys') || "Entdeckung";
 
@@ -55,24 +55,21 @@ exports.handler = async (event) => {
                 model: "mistral-tiny",
                 messages: [{
                     role: "user", 
-                    content: `Wähle ein Urlaubsziel für ${vorname} (Hobbys: ${hobbys}). Antworte STRENG: ZIEL: [Ort] ANALYSE: [Grund]`
+                    content: `Wähle ein Urlaubsziel für ${vorname} (Hobbys: ${hobbys}). Antworte nur: ZIEL: [Ort] ANALYSE: [Grund]`
                 }]
             })
         });
 
         const kiData = await aiResponse.json();
         const fullText = kiData.choices?.[0]?.message?.content || "";
-        const zielMatch = fullText.match(/ZIEL:\s*([^\n]*)/i);
-        const zielName = zielMatch ? zielMatch[1].trim() : "Mittelmeer";
-        const analyseMatch = fullText.match(/ANALYSE:\s*([\s\S]*?)(?=ZIEL:|$)/i);
-        const analyseText = analyseMatch ? analyseMatch[1].trim() : "Ein wunderbarer Ort für dich.";
+        const zielName = fullText.match(/ZIEL:\s*([^\n]*)/i)?.[1]?.trim() || "Mittelmeer";
+        const analyseText = fullText.match(/ANALYSE:\s*([\s\S]*?)(?=ZIEL:|$)/i)?.[1]?.trim() || "Ein tolles Ziel für dich!";
 
-        // 2. LINKS GENERIEREN
-        // Dieser Link geht über Travelpayouts (z.B. Booking)
+        // 2. Travelpayouts Link für das dynamische Ziel
         const bookingUrl = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(zielName)}`;
         const dynamicTravelLink = await createTravelpayoutsLink(bookingUrl);
 
-        // 3. E-MAIL VERSAND (Resend)
+        // 3. E-Mail Versand mit Idempotency
         const today = new Date().toISOString().split('T')[0];
         const idempotencyKey = `match-${email.replace(/[^a-zA-Z0-9]/g, '')}-${today}`;
 
@@ -82,34 +79,37 @@ exports.handler = async (event) => {
             bcc: 'mikostro@web.de', 
             subject: `Dein Ferien-Match: ${zielName} 🌴`,
             html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border-radius: 24px; border: 1px solid #eee; overflow: hidden;">
-                    <div style="background: #eff6ff; padding: 40px; text-align: center;">
-                        <h1 style="color: #1e293b;">Hallo ${vorname}, dein Match ist da!</h1>
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 20px; overflow: hidden;">
+                    <div style="background: #eff6ff; padding: 30px; text-align: center;">
+                        <h1 style="margin:0;">Hallo ${vorname}!</h1>
                     </div>
-                    <div style="padding: 40px; text-align: center;">
-                        <h2 style="color: #2563eb; font-size: 32px;">${zielName}</h2>
-                        <p style="font-style: italic; color: #1e3a8a; background: #f8fafc; padding: 20px; border-radius: 12px;">"${analyseText}"</p>
-                        
-                        <div style="margin-top: 30px;">
-                            <a href="${dynamicTravelLink}" style="background: #2563eb; color: white; padding: 18px 30px; text-decoration: none; border-radius: 12px; font-weight: bold; display: block; margin-bottom: 15px;">
-                                Hotels in ${zielName} finden
-                            </a>
-                            
-                            <a href="${tuiAwinLink}" style="background: #d40e14; color: white; padding: 18px 30px; text-decoration: none; border-radius: 12px; font-weight: bold; display: block;">
-                                Ferien-Angebote bei TUI prüfen
-                            </a>
+                    <div style="padding: 30px; text-align: center;">
+                        <h2 style="color: #2563eb;">${zielName}</h2>
+                        <p style="background: #f8fafc; padding: 15px; border-radius: 10px;">${analyseText}</p>
+                        <div style="margin-top: 25px;">
+                            <a href="${dynamicTravelLink}" style="background: #2563eb; color: white; padding: 15px 25px; text-decoration: none; border-radius: 10px; display: block; margin-bottom: 10px; font-weight: bold;">Hotels in ${zielName} (Booking)</a>
+                            <a href="${tuiAwinLink}" style="background: #d40e14; color: white; padding: 15px 25px; text-decoration: none; border-radius: 10px; display: block; font-weight: bold;">Angebote bei TUI prüfen</a>
                         </div>
                     </div>
-                    <div style="padding: 20px; text-align: center; background: #fafafa; font-size: 10px; color: #94a3b8;">
-                        &copy; 2026 KI-FERIEN. Enthält Partner-Links von Travelpayouts & TUI (Awin).
-                    </div>
-                </div>
-            `
+                </div>`
         }, { idempotencyKey });
 
-        return { statusCode: 302, headers: { 'Location': '/success.html' }, body: '' };
+        // 4. ERFOLGREICHER ABSCHLUSS & WEITERLEITUNG
+        return {
+            statusCode: 302,
+            headers: { 
+                'Location': '/success.html',
+                'Cache-Control': 'no-cache'
+            },
+            body: JSON.stringify({ status: "success" })
+        };
 
     } catch (error) {
-        return { statusCode: 302, headers: { 'Location': '/success.html?error=true' }, body: '' };
+        console.error("Fehler:", error);
+        return {
+            statusCode: 302,
+            headers: { 'Location': '/success.html?error=true' },
+            body: ''
+        };
     }
 };
