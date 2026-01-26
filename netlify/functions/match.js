@@ -34,6 +34,7 @@ async function generateAffiliateLink(targetUrl) {
 }
 
 exports.handler = async (event) => {
+    // 1. Sicherheit: Nur POST-Anfragen verarbeiten
     if (event.httpMethod !== "POST") {
         return { statusCode: 302, headers: { 'Location': '/' } };
     }
@@ -51,10 +52,10 @@ exports.handler = async (event) => {
         const hobbys = params.get('hobbys') || "Ferien genießen";
 
         if (!email) {
-            return { statusCode: 302, headers: { 'Location': '/success.html' } };
+            return { statusCode: 302, headers: { 'Location': '/success.html?error=noemail' } };
         }
 
-        // 1. Mistral KI-Analyse (Stilvoll & Familienfreundlich)
+        // 2. Mistral KI-Analyse (Stilvoll & Familienfreundlich)
         const aiResponse = await fetch("https://api.mistral.ai/v1/chat/completions", {
             method: "POST",
             headers: {
@@ -65,10 +66,7 @@ exports.handler = async (event) => {
                 model: "mistral-tiny",
                 messages: [{
                     role: "user", 
-                    content: `Du bist ein professioneller Reiseberater. Empfiehl ${vorname} ein Ferienziel.
-                    Details: Sternzeichen ${zodiac}, gefühltes Alter ${alter}, Abenteuer-Level ${slider}, Interessen: ${hobbys}.
-                    WICHTIGE REGEL: Antworte STILVOLL und FAMILIENFREUNDLICH. Ignoriere unpassende Begriffe.
-                    Format: ZIEL: [Ort] ANALYSE: [3 Sätze Begründung]`
+                    content: `Du bist ein professioneller Reiseberater. Empfiehl ${vorname} ein Ferienziel. Details: Sternzeichen ${zodiac}, gefühltes Alter ${alter}, Abenteuer-Level ${slider}, Interessen: ${hobbys}. Antworte STILVOLL und FAMILIENFREUNDLICH. Format: ZIEL: [Ort] ANALYSE: [3 Sätze Begründung]`
                 }],
                 max_tokens: 250
             })
@@ -79,11 +77,11 @@ exports.handler = async (event) => {
         const zielName = fullText.match(/ZIEL:\s*([^\n]*)/i)?.[1]?.trim() || "Mittelmeer";
         const analyseText = fullText.match(/ANALYSE:\s*([\s\S]*?)$/i)?.[1]?.trim() || "Genieße deine Ferien!";
 
-        // 2. Affiliate Link erstellen
+        // 3. Affiliate Link über Travelpayouts erstellen
         const targetSearchUrl = `https://www.tripadvisor.de/Search?q=${encodeURIComponent(zielName)}`;
         const affiliateLink = await generateAffiliateLink(targetSearchUrl);
 
-        // 3. E-Mail Versand
+        // 4. E-Mail Versand via Resend
         try {
             const today = new Date().toISOString().split('T')[0];
             const idempotencyKey = `match-${email.replace(/[^a-zA-Z0-9]/g, '')}-${today}`;
@@ -100,14 +98,37 @@ exports.handler = async (event) => {
                         </div>
                         <div style="padding: 30px; text-align: center;">
                             <h2 style="color: #2563eb; font-size: 24px;">${zielName}</h2>
-                            <p style="background: #f8fafc; padding: 20px; border-radius: 12px; text-align: left; line-height: 1.6; color: #334155;">
-                                ${analyseText}
-                            </p>
+                            <p style="background: #f8fafc; padding: 20px; border-radius: 12px; text-align: left; line-height: 1.6; color: #334155;">${analyseText}</p>
                             <div style="margin-top: 30px;">
-                                <a href="${affiliateLink}" style="background: #2563eb; color: white; padding: 18px 30px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; font-size: 18px; text-align: center;">
-                                    Angebote in ${zielName} entdecken
-                                </a>
+                                <a href="${affiliateLink}" style="background: #2563eb; color: white; padding: 18px 30px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; font-size: 18px; text-align: center;">Angebote in ${zielName} entdecken</a>
                             </div>
                         </div>
                         <div style="padding: 15px; text-align: center; background: #fafafa; font-size: 10px; color: #94a3b8;">
-                            &copy;
+                            &copy; 2026 KI-FERIEN. Basierend auf Sternzeichen ${zodiac}.
+                        </div>
+                    </div>`
+            }, { idempotencyKey });
+        } catch (mailErr) {
+            console.error("Mail Versand Fehler:", mailErr);
+        }
+
+        // 5. Finaler Redirect zur Success-Seite
+        return {
+            statusCode: 302,
+            headers: { 
+                'Location': '/success.html',
+                'Cache-Control': 'no-cache, no-store, must-revalidate'
+            },
+            body: ''
+        };
+
+    } catch (error) {
+        console.error("Globaler Funktionsfehler:", error);
+        return { 
+            statusCode: 302, 
+            headers: { 'Location': '/success.html?error=true' },
+            body: '' 
+        };
+    }
+};
+// --- ENDE DER DATEI ---
