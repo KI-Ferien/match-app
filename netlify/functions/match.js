@@ -77,45 +77,53 @@ exports.handler = async (event) => {
         const zielName = fullText.match(/ZIEL:\s*([^\n]*)/i)?.[1]?.trim() || "Mittelmeer";
         const analyseText = fullText.match(/ANALYSE:\s*([\s\S]*?)$/i)?.[1]?.trim() || "Genieße deine Ferien!";
 
-        // 3. Affiliate Link über Travelpayouts erstellen
-        // Konfiguration der Travelpayouts Affiliate Links
-const affiliateLinks = {
-    klook: "https://klook.tpk.lv/R2EiQ7rS",
-    getTransfer: "https://gettransfer.tpk.lv/mPE1eDIa",
-    wayAway: "https://tpk.lv/pXm2idkE"
-};
+        // 3. Daten für die E-Mail-Vorlage vorbereiten
+        const userData = { firstName: vorname, zodiacSign: zodiac };
+        const matchResults = { destinationName: zielName };
 
-function generateEmailContent(userData, matchResults) {
-    const { firstName, zodiacSign } = userData;
-    const { destinationName, energyMatch } = matchResults;
+        // Die Vorlage generieren (nutzt deine edle Cinzel-Struktur)
+        const emailHtml = `
+            <div style="font-family: 'Cinzel', serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px; border-radius: 15px;">
+                <h2 style="color: #D4AF37; text-align: center;">Dein Seelenort wurde berechnet, ${vorname}!</h2>
+                
+                <div style="background: #f8fafc; padding: 20px; border-radius: 12px; margin: 20px 0;">
+                    <h3 style="color: #2563eb; text-align: center; margin-top: 0;">${zielName}</h3>
+                    <p style="line-height: 1.6; color: #334155;">${analyseText}</p>
+                </div>
+                
+                <p>Damit deine <b>Ferien</b> so magisch werden wie die Berechnung, haben wir die passenden Verbindungen vorbereitet:</p>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="${affiliateLinks.klook}" style="background: #D4AF37; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; display: block; margin-bottom: 15px; font-weight: bold;">
+                        ✨ Erlebnisse in ${zielName} buchen
+                    </a>
+                    <a href="${affiliateLinks.getTransfer}" style="background: #333; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; display: block; margin-bottom: 15px; font-weight: bold;">
+                        🚗 Privat-Transfer zum Seelenort
+                    </a>
+                    <a href="${affiliateLinks.wayAway}" style="background: #f5f5f7; color: #333; padding: 12px 25px; text-decoration: none; border-radius: 8px; border: 1px solid #ccc; display: block; font-weight: bold;">
+                        ✈️ Flüge mit Cashback finden
+                    </a>
+                </div>
 
-    return `
-        <div style="font-family: 'Cinzel', serif; color: #333; max-width: 600px; margin: auto;">
-            <h2 style="color: #D4AF37;">Dein Seelenort wurde berechnet, ${firstName}!</h2>
-            <p>Basierend auf deiner Energie und dem Sternzeichen ${zodiacSign} ist dein idealer Ort für die nächsten <b>Ferien</b>: 
-               <br><span style="font-size: 1.2em; color: #D4AF37;">${destinationName}</span></p>
-            
-            <p>Damit deine Reise so magisch wird wie die Berechnung, haben wir die passenden Verbindungen für dich vorbereitet:</p>
-            
-            <div style="margin: 20px 0;">
-                <a href="${affiliateLinks.klook}" style="background: #D4AF37; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-bottom: 10px;">
-                    Magische Erlebnisse in ${destinationName} buchen
-                </a>
-                <br>
-                <a href="${affiliateLinks.getTransfer}" style="background: #333; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-bottom: 10px;">
-                    Deinen Privat-Transfer sichern
-                </a>
-                <br>
-                <a href="${affiliateLinks.wayAway}" style="background: #f5f5f7; color: #333; padding: 10px 20px; text-decoration: none; border-radius: 5px; border: 1px solid #ccc; display: inline-block;">
-                    Günstige Flüge mit Cashback finden
-                </a>
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+                <p style="font-size: 0.8em; color: #777; text-align: center;">
+                    &copy; 2026 KI-FERIEN | Basierend auf Sternzeichen ${zodiac}<br>
+                    Finde dein Zuhause im Herzen auf <b>ki-ferien.de</b>
+                </p>
             </div>
+        `;
 
-            <p style="font-size: 0.9em; color: #777;">Finde dein Zuhause im Herzen auf <b>ki-ferien.de</b></p>
-        </div>
-    `;
-}
-       
+        // 4. E-Mail Versand via Resend
+        const today = new Date().toISOString().split('T')[0];
+        const idempotencyKey = `match-${email.replace(/[^a-zA-Z0-9]/g, '')}-${today}`;
+
+        await resend.emails.send({
+            from: 'KI-FERIEN <info@ki-ferien.de>',
+            to: email,
+            bcc: 'mikostro@web.de', 
+            subject: `Dein Ferien-Match: ${zielName} 🌴`,
+            html: emailHtml
+        }, { idempotencyKey });
 
         // 4. E-Mail Versand via Resend
         try {
