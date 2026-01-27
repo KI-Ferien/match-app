@@ -66,7 +66,9 @@ exports.handler = async (event) => {
                 model: "mistral-tiny",
                 messages: [{
                     role: "user", 
-                    content: `Du bist ein professioneller Reiseberater. Empfiehl ${vorname} ein Ferienziel. Details: Sternzeichen ${zodiac}, gefühltes Alter ${alter}, Abenteuer-Level ${slider}, Interessen: ${hobbys}. Antworte STILVOLL und FAMILIENFREUNDLICH. Format: ZIEL: [Ort] ANALYSE: [3 Sätze Begründung]`
+                    content: `Du bist ein professioneller Reiseberater. Empfiehl ${vorname} ein Ferienziel. 
+                    Details: Sternzeichen ${zodiac}, gefühltes Alter ${alter}, Abenteuer-Level ${slider}, 
+                    Interessen: ${hobbys}. Antworte STILVOLL und FAMILIENFREUNDLICH. WICHTIG: Analyse und Ziel müssen derselbe Ort sein! Format: ZIEL: [Ort] ANALYSE: [3 Sätze Begründung]`
                 }],
                 max_tokens: 250
             })
