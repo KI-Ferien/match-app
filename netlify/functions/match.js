@@ -55,7 +55,7 @@ exports.handler = async (event) => {
             return { statusCode: 302, headers: { 'Location': '/success.html?error=noemail' } };
         }
 
-        // 2. Mistral KI-Analyse (Stilvoll & Familienfreundlich)
+        // 2. Mistral KI-Analyse
         const aiResponse = await fetch("https://api.mistral.ai/v1/chat/completions", {
             method: "POST",
             headers: {
@@ -77,41 +77,31 @@ exports.handler = async (event) => {
         const zielName = fullText.match(/ZIEL:\s*([^\n]*)/i)?.[1]?.trim() || "Mittelmeer";
         const analyseText = fullText.match(/ANALYSE:\s*([\s\S]*?)$/i)?.[1]?.trim() || "Genieße deine Ferien!";
 
-        // 3. Daten für die E-Mail-Vorlage vorbereiten
-        const userData = { firstName: vorname, zodiacSign: zodiac };
-        const matchResults = { destinationName: zielName };
-
-        // Die Vorlage generieren (nutzt deine edle Cinzel-Struktur)
+        // 3. E-Mail Inhalt generieren (Stilvoll mit deinen 3 Travelpayouts Links)
         const emailHtml = `
-            <div style="font-family: 'Cinzel', serif; color: #333; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px; border-radius: 15px;">
-                <h2 style="color: #D4AF37; text-align: center;">Dein Seelenort wurde berechnet, ${vorname}!</h2>
-                
-                <div style="background: #f8fafc; padding: 20px; border-radius: 12px; margin: 20px 0;">
-                    <h3 style="color: #2563eb; text-align: center; margin-top: 0;">${zielName}</h3>
-                    <p style="line-height: 1.6; color: #334155;">${analyseText}</p>
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 20px; overflow: hidden; border: 1px solid #D4AF37;">
+                <div style="background: #fdfbf7; padding: 30px; text-align: center; border-bottom: 1px solid #eee;">
+                    <h1 style="color: #1e293b; margin:0; font-family: serif;">Hallo ${vorname}!</h1>
                 </div>
-                
-                <p>Damit deine <b>Ferien</b> so magisch werden wie die Berechnung, haben wir die passenden Verbindungen vorbereitet:</p>
-                
-                <div style="text-align: center; margin: 30px 0;">
-                    <a href="${affiliateLinks.klook}" style="background: #D4AF37; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; display: block; margin-bottom: 15px; font-weight: bold;">
-                        ✨ Erlebnisse in ${zielName} buchen
-                    </a>
-                    <a href="${affiliateLinks.getTransfer}" style="background: #333; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; display: block; margin-bottom: 15px; font-weight: bold;">
-                        🚗 Privat-Transfer zum Seelenort
-                    </a>
-                    <a href="${affiliateLinks.wayAway}" style="background: #f5f5f7; color: #333; padding: 12px 25px; text-decoration: none; border-radius: 8px; border: 1px solid #ccc; display: block; font-weight: bold;">
-                        ✈️ Flüge mit Cashback finden
-                    </a>
+                <div style="padding: 30px; text-align: center;">
+                    <h2 style="color: #D4AF37; font-size: 26px; font-family: serif;">${zielName}</h2>
+                    <p style="background: #f8fafc; padding: 20px; border-radius: 12px; text-align: left; line-height: 1.6; color: #334155; border-left: 4px solid #D4AF37;">${analyseText}</p>
+                    
+                    <div style="margin-top: 30px;">
+                        <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">Passend zu deiner Analyse haben wir diese Empfehlungen für dich:</p>
+                        
+                        <a href="https://klook.tpk.lv/R2EiQ7rS" style="background: #D4AF37; color: white; padding: 15px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; margin-bottom: 12px;">✨ Erlebnisse in ${zielName} entdecken</a>
+                        
+                        <a href="https://gettransfer.tpk.lv/mPE1eDIa" style="background: #1e293b; color: white; padding: 15px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; margin-bottom: 12px;">🚗 Dein Privat-Transfer vor Ort</a>
+                        
+                        <a href="https://tpk.lv/pXm2idkE" style="background: #ffffff; color: #1e293b; padding: 15px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; border: 1px solid #cbd5e1;">✈️ Flug-Angebote & Cashback</a>
+                    </div>
                 </div>
-
-                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-                <p style="font-size: 0.8em; color: #777; text-align: center;">
-                    &copy; 2026 KI-FERIEN | Basierend auf Sternzeichen ${zodiac}<br>
-                    Finde dein Zuhause im Herzen auf <b>ki-ferien.de</b>
-                </p>
-            </div>
-        `;
+                <div style="padding: 20px; text-align: center; background: #fafafa; font-size: 11px; color: #94a3b8;">
+                    &copy; 2026 KI-FERIEN | Basierend auf Sternzeichen ${zodiac}. <br>
+                    Finde dein Zuhause im Herzen auf <strong>ki-ferien.de</strong>
+                </div>
+            </div>`;
 
         // 4. E-Mail Versand via Resend
         const today = new Date().toISOString().split('T')[0];
@@ -121,40 +111,9 @@ exports.handler = async (event) => {
             from: 'KI-FERIEN <info@ki-ferien.de>',
             to: email,
             bcc: 'mikostro@web.de', 
-            subject: `Dein Ferien-Match: ${zielName} 🌴`,
+            subject: `Dein Seelenort Match: ${zielName} 🌴`,
             html: emailHtml
         }, { idempotencyKey });
-
-        // 4. E-Mail Versand via Resend
-        try {
-            const today = new Date().toISOString().split('T')[0];
-            const idempotencyKey = `match-${email.replace(/[^a-zA-Z0-9]/g, '')}-${today}`;
-
-            await resend.emails.send({
-                from: 'KI-FERIEN <info@ki-ferien.de>',
-                to: email,
-                bcc: 'mikostro@web.de', 
-                subject: `Dein Ferien-Match: ${zielName} 🌴`,
-                html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 20px; overflow: hidden;">
-                        <div style="background: #eff6ff; padding: 30px; text-align: center;">
-                            <h1 style="color: #1e293b; margin:0;">Hallo ${vorname}!</h1>
-                        </div>
-                        <div style="padding: 30px; text-align: center;">
-                            <h2 style="color: #2563eb; font-size: 24px;">${zielName}</h2>
-                            <p style="background: #f8fafc; padding: 20px; border-radius: 12px; text-align: left; line-height: 1.6; color: #334155;">${analyseText}</p>
-                            <div style="margin-top: 30px;">
-                                <a href="${affiliateLink}" style="background: #2563eb; color: white; padding: 18px 30px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; font-size: 18px; text-align: center;">Angebote in ${zielName} entdecken</a>
-                            </div>
-                        </div>
-                        <div style="padding: 15px; text-align: center; background: #fafafa; font-size: 10px; color: #94a3b8;">
-                            &copy; 2026 KI-FERIEN. Basierend auf Sternzeichen ${zodiac}.
-                        </div>
-                    </div>`
-            }, { idempotencyKey });
-        } catch (mailErr) {
-            console.error("Mail Versand Fehler:", mailErr);
-        }
 
         // 5. Finaler Redirect zur Success-Seite
         return {
@@ -167,7 +126,7 @@ exports.handler = async (event) => {
         };
 
     } catch (error) {
-        console.error("Globaler Funktionsfehler:", error);
+        console.error("Globaler Fehler:", error);
         return { 
             statusCode: 302, 
             headers: { 'Location': '/success.html?error=true' },
@@ -175,4 +134,3 @@ exports.handler = async (event) => {
         };
     }
 };
-// --- ENDE DER DATEI ---
