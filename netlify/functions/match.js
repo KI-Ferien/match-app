@@ -78,8 +78,44 @@ exports.handler = async (event) => {
         const analyseText = fullText.match(/ANALYSE:\s*([\s\S]*?)$/i)?.[1]?.trim() || "Genieße deine Ferien!";
 
         // 3. Affiliate Link über Travelpayouts erstellen
-        const targetSearchUrl = `https://www.tripadvisor.de/Search?q=${encodeURIComponent(zielName)}`;
-        const affiliateLink = await generateAffiliateLink(targetSearchUrl);
+        // Konfiguration der Travelpayouts Affiliate Links
+const affiliateLinks = {
+    klook: "https://klook.tpk.lv/R2EiQ7rS",
+    getTransfer: "https://gettransfer.tpk.lv/mPE1eDIa",
+    wayAway: "https://tpk.lv/pXm2idkE"
+};
+
+function generateEmailContent(userData, matchResults) {
+    const { firstName, zodiacSign } = userData;
+    const { destinationName, energyMatch } = matchResults;
+
+    return `
+        <div style="font-family: 'Cinzel', serif; color: #333; max-width: 600px; margin: auto;">
+            <h2 style="color: #D4AF37;">Dein Seelenort wurde berechnet, ${firstName}!</h2>
+            <p>Basierend auf deiner Energie und dem Sternzeichen ${zodiacSign} ist dein idealer Ort für die nächsten <b>Ferien</b>: 
+               <br><span style="font-size: 1.2em; color: #D4AF37;">${destinationName}</span></p>
+            
+            <p>Damit deine Reise so magisch wird wie die Berechnung, haben wir die passenden Verbindungen für dich vorbereitet:</p>
+            
+            <div style="margin: 20px 0;">
+                <a href="${affiliateLinks.klook}" style="background: #D4AF37; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-bottom: 10px;">
+                    Magische Erlebnisse in ${destinationName} buchen
+                </a>
+                <br>
+                <a href="${affiliateLinks.getTransfer}" style="background: #333; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-bottom: 10px;">
+                    Deinen Privat-Transfer sichern
+                </a>
+                <br>
+                <a href="${affiliateLinks.wayAway}" style="background: #f5f5f7; color: #333; padding: 10px 20px; text-decoration: none; border-radius: 5px; border: 1px solid #ccc; display: inline-block;">
+                    Günstige Flüge mit Cashback finden
+                </a>
+            </div>
+
+            <p style="font-size: 0.9em; color: #777;">Finde dein Zuhause im Herzen auf <b>ki-ferien.de</b></p>
+        </div>
+    `;
+}
+       
 
         // 4. E-Mail Versand via Resend
         try {
