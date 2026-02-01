@@ -95,9 +95,9 @@ exports.handler = async (event) => {
             "Klook"
         );
         const transferLink = await generateAffiliateLink(
-            `https://gettransfer.com/de/search?to_key=${encodeURIComponent(zielName)}`, 
-            "GetTransfer"
-        );
+    `https://gettransfer.com/de/search?to=${encodeURIComponent(zielName)}`, 
+    "GetTransfer"
+);
         const flightLink = await generateAffiliateLink(
             `https://www.aviasales.com/search?destination_name=${encodeURIComponent(zielName)}`, 
             "Aviasales"
