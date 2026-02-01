@@ -79,6 +79,7 @@ exports.handler = async (event) => {
                     content: `Du bist ein professioneller Reiseberater. Empfiehl ${vorname} ein Ferienziel. 
                     Details: Sternzeichen ${zodiac}, gefühltes Alter ${alter}, Abenteuer-Level ${slider}, 
                     Interessen: ${hobbys}. Antworte STILVOLL und FAMILIENFREUNDLICH. Format: ZIEL: [Ort] ANALYSE: [3 Sätze Begründung]`
+                    WICHTIG: Das ZIEL muss ein einzelner, bekannter Stadt- oder Ländername sein (z.B. "Mallorca" statt "ein kleines Dorf auf Mallorca"). Format: ZIEL: [Ort] ANALYSE: [Text]
                 }],
                 max_tokens: 250
             })
