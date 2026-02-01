@@ -40,7 +40,7 @@ exports.handler = async (event) => {
 
         if (!email) return { statusCode: 302, headers: { 'Location': '/success.html?error=noemail' } };
 
-        // 2. Mistral KI-Analyse mit sauberem Prompt
+        // 1. Mistral KI-Analyse
         const aiResponse = await fetch("https://api.mistral.ai/v1/chat/completions", {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": `Bearer ${MISTRAL_API_KEY}` },
@@ -48,40 +48,37 @@ exports.handler = async (event) => {
                 model: "mistral-tiny",
                 messages: [{
                     role: "user", 
-                    content: `Professioneller Reiseberater. Empfiehl ${vorname} ein Ziel. Details: Sternzeichen ${zodiac}, Alter ${alter}, Abenteuer ${slider}, Interessen: ${hobbys}. STILVOLL & FAMILIENFREUNDLICH. WICHTIG: Das ZIEL muss ein einzelner, bekannter Stadt- oder Ländername sein. Format: ZIEL: [Ort] ANALYSE: [3 Sätze Begründung]`
+                    content: `Professioneller Reiseberater. Empfiehl ${vorname} ein Ziel. Details: Sternzeichen ${zodiac}, Alter ${alter}, Abenteuer ${slider}, Interessen: ${hobbys}. STILVOLL & FAMILIENFREUNDLICH. WICHTIG: Antworte in REINEM TEXT, keine Sternchen, keine Formatierung. Das ZIEL muss ein einzelner, bekannter Stadt- oder Ländername sein. Format: ZIEL: [Ort] ANALYSE: [3 Sätze Begründung]`
                 }],
                 max_tokens: 250
             })
         });
-// 1. Ziel extrahieren
-let zielName = fullText.match(/ZIEL:\s*([^\n]*)/i)?.[1]?.trim() || "Mittelmeer";
 
-// 2. BEREINIGUNG: Entfernt Sternchen und andere Markdown-Reste
-zielName = zielName.replace(/\*/g, '').trim(); 
-
-// 3. Erst danach die Links bauen
-const marker = "698672";
-const transferBaseUrl = `https://gettransfer.com/de/search?to=${encodeURIComponent(zielName)}`;
-const transferLink = `https://tp.media/r?marker=${marker}&trs=492044&p=2335&u=${encodeURIComponent(transferBaseUrl)}`;
         const kiData = await aiResponse.json();
         const fullText = kiData.choices?.[0]?.message?.content || "";
-        const zielName = fullText.match(/ZIEL:\s*([^\n]*)/i)?.[1]?.trim() || "Mittelmeer";
+
+        // --- ZIEL EXTRAHIEREN & BEREINIGEN ---
+        let zielNameRaw = fullText.match(/ZIEL:\s*([^\n]*)/i)?.[1]?.trim() || "Mittelmeer";
+        // Entfernt alle Sternchen, falls die KI doch welche macht
+        const zielName = zielNameRaw.replace(/\*/g, '').trim(); 
+        
         const analyseText = fullText.match(/ANALYSE:\s*([\s\S]*?)$/i)?.[1]?.trim() || "Genieße deine Ferien!";
 
-        // --- Dynamische Travelpayouts Links generieren ---
+        // --- DYNAMISCHE LINKS GENERIEREN ---
         const marker = "698672";
+        const trs = "492044";
         
-        // Klook über API (funktioniert gut)
+        // Klook über API
         const klookLink = await generateAffiliateLink(`https://www.klook.com/de/search?query=${encodeURIComponent(zielName)}`, "Klook");
 
-        // GetTransfer & Aviasales MANUELL (für maximale Stabilität)
+        // GetTransfer & Aviasales MANUELL (Stabil gegen Sternchen-Reste)
         const transferBaseUrl = `https://gettransfer.com/de/search?to=${encodeURIComponent(zielName)}`;
-        const transferLink = `https://tp.media/r?marker=${marker}&trs=492044&p=2335&u=${encodeURIComponent(transferBaseUrl)}`;
+        const transferLink = `https://tp.media/r?marker=${marker}&trs=${trs}&p=2335&u=${encodeURIComponent(transferBaseUrl)}`;
 
         const flightBaseUrl = `https://www.aviasales.com/search?destination_name=${encodeURIComponent(zielName)}`;
-        const flightLink = `https://tp.media/r?marker=${marker}&trs=492044&p=4114&u=${encodeURIComponent(flightBaseUrl)}`;
+        const flightLink = `https://tp.media/r?marker=${marker}&trs=${trs}&p=4114&u=${encodeURIComponent(flightBaseUrl)}`;
 
-        // 3. E-Mail Inhalt
+        // 2. E-Mail Inhalt
         const emailHtml = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #D4AF37; border-radius: 20px; overflow: hidden;">
                 <div style="background: #fdfbf7; padding: 30px; text-align: center; border-bottom: 1px solid #eee;">
