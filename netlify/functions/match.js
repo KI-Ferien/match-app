@@ -94,14 +94,18 @@ exports.handler = async (event) => {
             `https://www.klook.com/de/search?query=${encodeURIComponent(zielName)}`, 
             "Klook"
         );
+        // GetTransfer: Manueller Affiliate-Link (to-Parameter für die Suche)
+const transferBaseUrl = `https://gettransfer.com/de/search?to=${encodeURIComponent(zielName)}`;
+const transferLink = `https://tp.media/r?marker=${marker}&trs=492044&p=2335&u=${encodeURIComponent(transferBaseUrl)}`;
+
+// Aviasales/Flüge: Manueller Affiliate-Link (Suchseite)
+const flightBaseUrl = `https://www.aviasales.com/search?destination_name=${encodeURIComponent(zielName)}`;
+const flightLink = `https://tp.media/r?marker=${marker}&trs=492044&p=4114&u=${encodeURIComponent(flightBaseUrl)}`;
         const transferLink = await generateAffiliateLink(
     `https://gettransfer.com/de/search?to=${encodeURIComponent(zielName)}`, 
     "GetTransfer"
 );
-        const flightLink = await generateAffiliateLink(
-            `https://www.aviasales.com/search?destination_name=${encodeURIComponent(zielName)}`, 
-            "Aviasales"
-        );
+        
 
         // 3. E-Mail Inhalt generieren
         const emailHtml = `
