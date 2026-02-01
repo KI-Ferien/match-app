@@ -48,7 +48,7 @@ exports.handler = async (event) => {
                 model: "mistral-tiny",
                 messages: [{
                     role: "user", 
-                    content: `Professioneller Reiseberater. Empfiehl ${vorname} ein Ziel. Details: Sternzeichen ${zodiac}, Alter ${alter}, Abenteuer ${slider}, Interessen: ${hobbys}. STILVOLL & FAMILIENFREUNDLICH. WICHTIG: Antworte in REINEM TEXT, keine Sternchen, keine Formatierung. Das ZIEL muss ein einzelner, bekannter Stadt- oder Ländername sein. Format: ZIEL: [Ort] ANALYSE: [3 Sätze Begründung]`
+                    content: `Professioneller Reiseberater. Empfiehl ${vorname} ein Ziel für die Ferien. Details: Sternzeichen ${zodiac}, Alter ${alter}, Abenteuer ${slider}, Interessen: ${hobbys}. STILVOLL & FAMILIENFREUNDLICH. WICHTIG: Antworte in REINEM TEXT, keine Sternchen, keine Formatierung. Das ZIEL muss ein einzelner, bekannter Stadt- oder Ländername sein. Format: ZIEL: [Ort] ANALYSE: [3 Sätze Begründung]`
                 }],
                 max_tokens: 250
             })
@@ -59,24 +59,20 @@ exports.handler = async (event) => {
 
         // --- ZIEL EXTRAHIEREN & BEREINIGEN ---
         let zielNameRaw = fullText.match(/ZIEL:\s*([^\n]*)/i)?.[1]?.trim() || "Mittelmeer";
-        // Entfernt alle Sternchen, falls die KI doch welche macht
         const zielName = zielNameRaw.replace(/\*/g, '').trim(); 
-        
         const analyseText = fullText.match(/ANALYSE:\s*([\s\S]*?)$/i)?.[1]?.trim() || "Genieße deine Ferien!";
 
-        // --- DYNAMISCHE LINKS GENERIEREN ---
-        const marker = "698672";
-        const trs = "492044";
+        // --- STABILE LINKS GENERIEREN ---
         
-        // Klook über API
-        const klookLink = await generateAffiliateLink(`https://www.klook.com/de/search?query=${encodeURIComponent(zielName)}`, "Klook");
+        // Klook über API (da es dort funktioniert)
+        const klookLink = await generateAffiliateLink(
+            `https://www.klook.com/de/search?query=${encodeURIComponent(zielName)}`, 
+            "Klook"
+        );
 
-        // GetTransfer & Aviasales MANUELL (Stabil gegen Sternchen-Reste)
-        const transferBaseUrl = `https://gettransfer.com/de/search?to=${encodeURIComponent(zielName)}`;
-        const transferLink = `https://tp.media/r?marker=${marker}&trs=${trs}&p=2335&u=${encodeURIComponent(transferBaseUrl)}`;
-
-        const flightBaseUrl = `https://www.aviasales.com/search?destination_name=${encodeURIComponent(zielName)}`;
-        const flightLink = `https://tp.media/r?marker=${marker}&trs=${trs}&p=4114&u=${encodeURIComponent(flightBaseUrl)}`;
+        // GetTransfer & Aviasales über validierte Shortlink-Basis (um Subscription-Fehler zu umgehen)
+        const transferLink = `https://gettransfer.tpk.lv/mPE1eDIa?u=${encodeURIComponent(`https://gettransfer.com/de/search?to=${zielName}`)}`;
+        const flightLink = `https://tpk.lv/pXm2idkE?u=${encodeURIComponent(`https://www.aviasales.com/search?destination_name=${zielName}`)}`;
 
         // 2. E-Mail Inhalt
         const emailHtml = `
@@ -88,7 +84,7 @@ exports.handler = async (event) => {
                     <h2 style="color: #D4AF37; font-size: 26px; font-family: serif;">${zielName}</h2>
                     <p style="background: #f8fafc; padding: 20px; border-radius: 12px; text-align: left; line-height: 1.6; color: #334155; border-left: 4px solid #D4AF37;">${analyseText}</p>
                     <div style="margin-top: 30px;">
-                        <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">Passend zu deiner Analyse haben wir diese Empfehlungen für dich:</p>
+                        <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">Passend zu deiner Analyse haben wir diese Empfehlungen für deine Ferien:</p>
                         <a href="${klookLink}" style="background: #D4AF37; color: white; padding: 15px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; margin-bottom: 12px;">✨ Erlebnisse in ${zielName} entdecken</a>
                         <a href="${transferLink}" style="background: #1e293b; color: white; padding: 15px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; margin-bottom: 12px;">🚗 Dein Privat-Transfer vor Ort</a>
                         <a href="${flightLink}" style="background: #ffffff; color: #1e293b; padding: 15px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; border: 1px solid #cbd5e1;">✈️ Flug-Angebote & Cashback</a>
