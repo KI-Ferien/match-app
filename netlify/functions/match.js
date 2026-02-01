@@ -1,9 +1,7 @@
 const { Resend } = require('resend');
 
-/**
- * Erzeugt einen Affiliate-Link über die Travelpayouts API v1
- */
-async function generateAffiliateLink(targetUrl, linkName = "Unbekannt") {
+// Hilfsfunktion für Affiliate-Links
+async function generateAffiliateLink(targetUrl) {
     const token = process.env.TRAVELPAYOUTS_TOKEN;
     if (!token) return targetUrl;
     try {
@@ -18,16 +16,13 @@ async function generateAffiliateLink(targetUrl, linkName = "Unbekannt") {
             })
         });
         const data = await response.json();
-        if (data?.result?.links?.[0]) return data.result.links[0].partner_url;
-        return targetUrl;
-    } catch (error) {
-        console.error(`Fehler bei ${linkName}:`, error);
+        return data?.result?.links?.[0]?.partner_url || targetUrl;
+    } catch (e) {
         return targetUrl;
     }
 }
 
 exports.handler = async (event) => {
-    // 1. Sicherheit: Nur POST-Anfragen
     if (event.httpMethod !== "POST") {
         return { statusCode: 302, headers: { 'Location': '/' } };
     }
@@ -40,66 +35,75 @@ exports.handler = async (event) => {
         const email = params.get('email');
         const vorname = params.get('vorname') || "Entdecker";
         const zodiac = params.get('q_zodiac') || "Sternzeichen";
-        const alter = params.get('q_age') || "junggeblieben";
-        const slider = params.get('q_adventure') || "ausgeglichen";
         const hobbys = params.get('hobbys') || "Ferien genießen";
 
-        if (!email) {
-            return { statusCode: 302, headers: { 'Location': '/success.html?error=noemail' } };
+        if (!email) return { statusCode: 302, headers: { 'Location': '/success.html?error=mail' } };
+
+        // 1. KI-Analyse mit Fallback-Schutz
+        let zielName = "Mittelmeer";
+        let analyseText = "Deine Sterne deuten auf eine wunderbare Zeit hin. Genieße deine Ferien!";
+
+        try {
+            const aiResponse = await fetch("https://api.mistral.ai/v1/chat/completions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${MISTRAL_API_KEY}` },
+                body: JSON.stringify({
+                    model: "mistral-tiny",
+                    messages: [{
+                        role: "user", 
+                        content: `Reiseberater. Empfiehl ${vorname} ein Ferienziel für: ${zodiac}, Hobbys: ${hobbys}. REINER TEXT, keine Sternchen. Format: ZIEL: [Ort] ANALYSE: [Text]`
+                    }],
+                    temperature: 0.8
+                })
+            });
+            const kiData = await aiResponse.json();
+            const fullText = kiData.choices?.[0]?.message?.content || "";
+            
+            const matchZiel = fullText.match(/ZIEL:\s*([^\n]*)/i);
+            const matchAnalyse = fullText.match(/ANALYSE:\s*([\s\S]*?)$/i);
+            
+            if (matchZiel) zielName = matchZiel[1].replace(/\*/g, '').trim();
+            if (matchAnalyse) analyseText = matchAnalyse[1].trim();
+        } catch (aiErr) {
+            console.error("Mistral Fehler, nutze Fallback");
         }
 
-        // 2. Mistral KI-Analyse mit hoher Temperature für maximale Abwechslung
-        const aiResponse = await fetch("https://api.mistral.ai/v1/chat/completions", {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json", 
-                "Authorization": `Bearer ${MISTRAL_API_KEY}` 
-            },
-            body: JSON.stringify({
-                model: "mistral-tiny",
-                messages: [{
-                    role: "user", 
-                    content: `Du bist ein erfahrener Reise-Astrologe. Empfiehl ${vorname} ein einzigartiges Ferienziel. 
-                    Daten: Sternzeichen ${zodiac}, gefühltes Alter ${alter}, Abenteuer-Lust: ${slider}/100, Interessen: ${hobbys}. 
-                    WICHTIG: Sei extrem kreativ! Wähle NICHT immer Lissabon oder Paris. Es muss exakt zu den Hobbys passen.
-                    Antworte NUR in REINEM TEXT, absolut KEINE Sternchen, KEIN Fettdruck, kein Markdown. 
-                    Format:
-                    ZIEL: [Stadtname und Land]
-                    ANALYSE: [3 Sätze Begründung warum das Ziel energetisch zu ${zodiac} und ${hobbys} passt]`
-                }],
-                max_tokens: 300,
-                temperature: 0.9 // Verhindert repetitive Ergebnisse
-            })
-        });
-
-        const kiData = await aiResponse.json();
-        const fullText = kiData.choices?.[0]?.message?.content || "";
-
-        // --- ZIEL EXTRAHIEREN & REINIGEN (Wichtig für funktionierende Links!) ---
-        let zielRaw = fullText.match(/ZIEL:\s*([^\n]*)/i)?.[1]?.trim() || "Mittelmeer";
-        // Entfernt alle Sternchen (*), die die Links unbrauchbar machen würden
-        const zielName = zielRaw.replace(/\*/g, '').trim(); 
-        const analyseText = fullText.match(/ANALYSE:\s*([\s\S]*?)$/i)?.[1]?.trim() || "Deine perfekten Ferien warten auf dich!";
-
-        // --- DYNAMISCHE AFFILIATE LINKS ---
+        // 2. Links generieren
         const marker = "698672";
         const trs = "492044";
-
-        // Klook (Nutzt API für Shortlinks)
-        const klookLink = await generateAffiliateLink(
-            `https://www.klook.com/de/search?query=${encodeURIComponent(zielName)}`, 
-            "Klook"
-        );
-
-        // GetTransfer & Aviasales via Universal-Redirect (Stabilster Deep-Link-Weg)
+        const klookLink = await generateAffiliateLink(`https://www.klook.com/de/search?query=${encodeURIComponent(zielName)}`);
+        
         const transferTarget = `https://gettransfer.com/de/search?to=${encodeURIComponent(zielName)}`;
         const transferLink = `https://tp.media/r?marker=${marker}&trs=${trs}&p=2335&u=${encodeURIComponent(transferTarget)}`;
 
         const flightTarget = `https://www.aviasales.com/search?destination_name=${encodeURIComponent(zielName)}`;
         const flightLink = `https://tp.media/r?marker=${marker}&trs=${trs}&p=4114&u=${encodeURIComponent(flightTarget)}`;
 
-        // 3. E-Mail Design (Optimiert für Ferien-Branding)
-        const emailHtml = `
-            <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #D4AF37; border-radius: 20px; overflow: hidden; background-color: #ffffff;">
-                <div style="background: #fdfbf7; padding: 40px 20px; text-align: center; border-bottom: 1px solid #eee;">
-                    <h1 style="color: #1e293b; margin:0; font-size: 28px; font-weight
+        // 3. E-Mail Versand
+        await resend.emails.send({
+            from: 'KI-FERIEN <info@ki-ferien.de>',
+            to: email,
+            bcc: 'mikostro@web.de', 
+            subject: `Dein Ferien-Match: ${zielName} 🌴`,
+            html: `
+                <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #D4AF37; border-radius: 20px; overflow: hidden;">
+                    <div style="background: #fdfbf7; padding: 30px; text-align: center;">
+                        <h1 style="color: #1e293b;">Hallo ${vorname}!</h1>
+                        <h2 style="color: #D4AF37;">${zielName}</h2>
+                        <p style="text-align: left; padding: 20px; background: #f8fafc; border-radius: 10px;">${analyseText}</p>
+                        <div style="margin-top: 25px;">
+                            <a href="${klookLink}" style="background: #D4AF37; color: white; padding: 15px; text-decoration: none; border-radius: 10px; display: block; margin-bottom: 10px;">✨ Erlebnisse in ${zielName}</a>
+                            <a href="${transferLink}" style="background: #1e293b; color: white; padding: 15px; text-decoration: none; border-radius: 10px; display: block; margin-bottom: 10px;">🚗 Privat-Transfer</a>
+                            <a href="${flightLink}" style="background: #ffffff; color: #1e293b; padding: 15px; text-decoration: none; border-radius: 10px; display: block; border: 1px solid #ccc;">✈️ Flug-Angebote</a>
+                        </div>
+                    </div>
+                </div>`
+        });
+
+        return { statusCode: 302, headers: { 'Location': '/success.html' } };
+
+    } catch (error) {
+        console.error("Kritischer Fehler:", error);
+        return { statusCode: 302, headers: { 'Location': '/success.html?error=true' } };
+    }
+};
