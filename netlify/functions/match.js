@@ -53,7 +53,16 @@ exports.handler = async (event) => {
                 max_tokens: 250
             })
         });
+// 1. Ziel extrahieren
+let zielName = fullText.match(/ZIEL:\s*([^\n]*)/i)?.[1]?.trim() || "Mittelmeer";
 
+// 2. BEREINIGUNG: Entfernt Sternchen und andere Markdown-Reste
+zielName = zielName.replace(/\*/g, '').trim(); 
+
+// 3. Erst danach die Links bauen
+const marker = "698672";
+const transferBaseUrl = `https://gettransfer.com/de/search?to=${encodeURIComponent(zielName)}`;
+const transferLink = `https://tp.media/r?marker=${marker}&trs=492044&p=2335&u=${encodeURIComponent(transferBaseUrl)}`;
         const kiData = await aiResponse.json();
         const fullText = kiData.choices?.[0]?.message?.content || "";
         const zielName = fullText.match(/ZIEL:\s*([^\n]*)/i)?.[1]?.trim() || "Mittelmeer";
