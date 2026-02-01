@@ -1,3 +1,45 @@
+async function generateAffiliateLink(targetUrl, linkName = "Unbekannt") {
+    const token = process.env.TRAVELPAYOUTS_TOKEN;
+    if (!token) {
+        console.warn(`[Affiliate] Kein Token gefunden. Nutze Original-URL für: ${linkName}`);
+        return targetUrl;
+    }
+
+    try {
+        const response = await fetch('https://api.travelpayouts.com/links/v1/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Access-Token': token
+            },
+            body: JSON.stringify({
+                "trs": 492044,
+                "marker": "698672",
+                "shorten": true,
+                "links": [{ "url": targetUrl }]
+            })
+        });
+
+        const data = await response.json();
+        
+        // Prüfen, ob die API einen Fehlercode zurückgibt (z.B. 400 oder 401)
+        if (!response.ok) {
+            console.error(`[Affiliate Error] API-Status ${response.status} für ${linkName}:`, data);
+            return targetUrl;
+        }
+
+        if (data && data.result && data.result.links && data.result.links[0]) {
+            console.log(`[Affiliate Success] Link generiert für: ${linkName}`);
+            return data.result.links[0].partner_url;
+        }
+
+        console.warn(`[Affiliate] API lieferte kein Ergebnis für: ${linkName}`);
+        return targetUrl;
+    } catch (error) {
+        console.error(`[Affiliate Exception] Fehler bei ${linkName}:`, error);
+        return targetUrl;
+    }
+}
 const { Resend } = require('resend');
 
 /**
