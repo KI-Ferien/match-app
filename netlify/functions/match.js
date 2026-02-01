@@ -40,7 +40,7 @@ exports.handler = async (event) => {
 
         if (!email) return { statusCode: 302, headers: { 'Location': '/success.html?error=noemail' } };
 
-        // 1. Mistral KI-Analyse
+        // 1. Mistral KI-Analyse mit Kreativitäts-Parametern
         const aiResponse = await fetch("https://api.mistral.ai/v1/chat/completions", {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": `Bearer ${MISTRAL_API_KEY}` },
@@ -48,51 +48,67 @@ exports.handler = async (event) => {
                 model: "mistral-tiny",
                 messages: [{
                     role: "user", 
-                    content: `Professioneller Reiseberater. Empfiehl ${vorname} ein Ziel für die Ferien. Details: Sternzeichen ${zodiac}, Alter ${alter}, Abenteuer ${slider}, Interessen: ${hobbys}. STILVOLL & FAMILIENFREUNDLICH. WICHTIG: Antworte in REINEM TEXT, keine Sternchen, keine Formatierung. Das ZIEL muss ein einzelner, bekannter Stadt- oder Ländername sein. Format: ZIEL: [Ort] ANALYSE: [3 Sätze Begründung]`
+                    content: `Du bist ein exklusiver Reiseberater. Empfiehl ${vorname} ein außergewöhnliches Ferienziel. 
+                    Daten: Sternzeichen ${zodiac}, gefühltes Alter ${alter}, Abenteuer-Lust: ${slider}/100, Interessen: ${hobbys}. 
+                    WICHTIG: Sei kreativ! Wähle NICHT immer Lissabon. Es muss perfekt zu ${hobbys} passen.
+                    Antworte NUR in REINEM TEXT, absolut KEINE Sternchen, KEIN Fettdruck. 
+                    Format:
+                    ZIEL: [Nur Stadtname und Land]
+                    ANALYSE: [3 Sätze Begründung warum das Ziel zu diesem Sternzeichen und den Hobbys passt]`
                 }],
-                max_tokens: 250
+                max_tokens: 300,
+                temperature: 0.85 // Sorgt für Abwechslung bei den Zielen
             })
         });
 
         const kiData = await aiResponse.json();
         const fullText = kiData.choices?.[0]?.message?.content || "";
 
-        // --- ZIEL EXTRAHIEREN & BEREINIGEN ---
-        let zielNameRaw = fullText.match(/ZIEL:\s*([^\n]*)/i)?.[1]?.trim() || "Mittelmeer";
-        const zielName = zielNameRaw.replace(/\*/g, '').trim(); 
-        const analyseText = fullText.match(/ANALYSE:\s*([\s\S]*?)$/i)?.[1]?.trim() || "Genieße deine Ferien!";
+        // --- ZIEL EXTRAHIEREN & REINIGEN ---
+        let zielRaw = fullText.match(/ZIEL:\s*([^\n]*)/i)?.[1]?.trim() || "Mittelmeer";
+        const zielName = zielRaw.replace(/\*/g, '').trim(); 
+        const analyseText = fullText.match(/ANALYSE:\s*([\s\S]*?)$/i)?.[1]?.trim() || "Deine perfekten Ferien warten auf dich!";
 
-        // --- STABILE LINKS GENERIEREN ---
-        
-        // Klook über API (da es dort funktioniert)
-        const klookLink = await generateAffiliateLink(
-            `https://www.klook.com/de/search?query=${encodeURIComponent(zielName)}`, 
-            "Klook"
-        );
+        // --- LINKS GENERIEREN ---
+        const marker = "698672";
+        const trs = "492044";
 
-        // GetTransfer & Aviasales über validierte Shortlink-Basis (um Subscription-Fehler zu umgehen)
-        const transferLink = `https://gettransfer.tpk.lv/mPE1eDIa?u=${encodeURIComponent(`https://gettransfer.com/de/search?to=${zielName}`)}`;
-        const flightLink = `https://tpk.lv/pXm2idkE?u=${encodeURIComponent(`https://www.aviasales.com/search?destination_name=${zielName}`)}`;
+        // Klook (API ist hier zuverlässig)
+        const klookLink = await generateAffiliateLink(`https://www.klook.com/de/search?query=${encodeURIComponent(zielName)}`, "Klook");
 
-        // 2. E-Mail Inhalt
+        // GetTransfer & Aviasales via Shortlink-Redirect (Deep-Link Modus)
+        // Wir hängen das Ziel an deine funktionierenden Shortlinks an
+        const transferLink = `https://gettransfer.tpk.lv/mPE1eDIa?u=${encodeURIComponent("https://gettransfer.com/de/search?to=" + zielName)}`;
+        const flightLink = `https://tpk.lv/pXm2idkE?u=${encodeURIComponent("https://www.aviasales.com/search?destination_name=" + zielName)}`;
+
+        // 2. E-Mail Design
         const emailHtml = `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #D4AF37; border-radius: 20px; overflow: hidden;">
-                <div style="background: #fdfbf7; padding: 30px; text-align: center; border-bottom: 1px solid #eee;">
-                    <h1 style="color: #1e293b; margin:0; font-family: serif;">Hallo ${vorname}!</h1>
+            <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #D4AF37; border-radius: 20px; overflow: hidden; background-color: #ffffff;">
+                <div style="background: #fdfbf7; padding: 40px 20px; text-align: center; border-bottom: 1px solid #eee;">
+                    <h1 style="color: #1e293b; margin:0; font-size: 28px; font-weight: normal;">Hallo ${vorname},</h1>
+                    <p style="color: #64748b; margin-top: 10px;">deine Sterne haben gesprochen.</p>
                 </div>
-                <div style="padding: 30px; text-align: center;">
-                    <h2 style="color: #D4AF37; font-size: 26px; font-family: serif;">${zielName}</h2>
-                    <p style="background: #f8fafc; padding: 20px; border-radius: 12px; text-align: left; line-height: 1.6; color: #334155; border-left: 4px solid #D4AF37;">${analyseText}</p>
-                    <div style="margin-top: 30px;">
-                        <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">Passend zu deiner Analyse haben wir diese Empfehlungen für deine Ferien:</p>
-                        <a href="${klookLink}" style="background: #D4AF37; color: white; padding: 15px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; margin-bottom: 12px;">✨ Erlebnisse in ${zielName} entdecken</a>
-                        <a href="${transferLink}" style="background: #1e293b; color: white; padding: 15px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; margin-bottom: 12px;">🚗 Dein Privat-Transfer vor Ort</a>
-                        <a href="${flightLink}" style="background: #ffffff; color: #1e293b; padding: 15px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; border: 1px solid #cbd5e1;">✈️ Flug-Angebote & Cashback</a>
+                <div style="padding: 40px 30px; text-align: center;">
+                    <span style="text-transform: uppercase; letter-spacing: 2px; color: #D4AF37; font-size: 12px; font-weight: bold;">Dein Seelenort Match</span>
+                    <h2 style="color: #1e293b; font-size: 32px; margin: 10px 0 25px 0;">${zielName}</h2>
+                    
+                    <div style="background: #f8fafc; padding: 25px; border-radius: 15px; text-align: left; line-height: 1.7; color: #334155; border-left: 5px solid #D4AF37; margin-bottom: 35px;">
+                        ${analyseText}
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <p style="color: #64748b; font-size: 15px; margin-bottom: 25px;">Exklusive Angebote für deine <strong>Ferien</strong>:</p>
+                        
+                        <a href="${klookLink}" style="background: #D4AF37; color: white; padding: 18px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; margin-bottom: 15px; font-size: 16px;">✨ Erlebnisse in ${zielName}</a>
+                        
+                        <a href="${transferLink}" style="background: #1e293b; color: white; padding: 18px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; margin-bottom: 15px; font-size: 16px;">🚗 Privat-Transfer buchen</a>
+                        
+                        <a href="${flightLink}" style="background: #ffffff; color: #1e293b; padding: 18px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; border: 1px solid #cbd5e1; font-size: 16px;">✈️ Flug-Angebote prüfen</a>
                     </div>
                 </div>
-                <div style="padding: 20px; text-align: center; background: #fafafa; font-size: 11px; color: #94a3b8;">
-                    &copy; 2026 KI-FERIEN | Basierend auf Sternzeichen ${zodiac}. <br>
-                    Finde dein Zuhause im Herzen auf <strong>ki-ferien.de</strong>
+                <div style="padding: 30px; text-align: center; background: #fafafa; font-size: 12px; color: #94a3b8; border-top: 1px solid #eee;">
+                    &copy; 2026 KI-FERIEN.de | Magie & Technologie vereint.<br>
+                    Basierend auf deinem Sternzeichen ${zodiac}.
                 </div>
             </div>`;
 
@@ -103,14 +119,14 @@ exports.handler = async (event) => {
             from: 'KI-FERIEN <info@ki-ferien.de>',
             to: email,
             bcc: 'mikostro@web.de', 
-            subject: `Dein Seelenort Match: ${zielName} 🌴`,
+            subject: `Dein Ferien-Match ist da: ${zielName} 🌴`,
             html: emailHtml
         }, { idempotencyKey });
 
-        return { statusCode: 302, headers: { 'Location': '/success.html', 'Cache-Control': 'no-cache' }, body: '' };
+        return { statusCode: 302, headers: { 'Location': '/success.html' }, body: '' };
 
     } catch (error) {
-        console.error("Globaler Fehler:", error);
+        console.error("Fehler:", error);
         return { statusCode: 302, headers: { 'Location': '/success.html?error=true' } };
     }
 };
