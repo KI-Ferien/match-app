@@ -2,7 +2,7 @@ const { Resend } = require('resend');
 
 /**
  * Erzeugt einen Affiliate-Link über die Travelpayouts API v1
- * Funktioniert für Klook bei dir stabil.
+ * Optimiert für Klook.
  */
 async function generateAffiliateLink(targetUrl, linkName = "Unbekannt") {
     const token = process.env.TRAVELPAYOUTS_TOKEN;
@@ -27,7 +27,10 @@ async function generateAffiliateLink(targetUrl, linkName = "Unbekannt") {
 }
 
 exports.handler = async (event) => {
-    if (event.httpMethod !== "POST") return { statusCode: 302, headers: { 'Location': '/' } };
+    // Sicherheit: Nur POST zulassen
+    if (event.httpMethod !== "POST") {
+        return { statusCode: 302, headers: { 'Location': '/' } };
+    }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
     const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
@@ -38,73 +41,60 @@ exports.handler = async (event) => {
         const vorname = params.get('vorname') || "Entdecker";
         const zodiac = params.get('q_zodiac') || "Sternzeichen";
         const hobbys = params.get('hobbys') || "Ferien genießen";
-        // Neuer Budget-Parameter vom Slider (480€ - 4800€)
         const budget = params.get('q_budget') || "1500"; 
 
-        if (!email) return { statusCode: 302, headers: { 'Location': '/success.html?error=noemail' } };
+        if (!email) {
+            return { statusCode: 302, headers: { 'Location': '/success.html?error=noemail' } };
+        }
 
-        // 1. Mistral KI-Analyse mit Budget-Berücksichtigung
-        const aiResponse = await fetch("https://api.mistral.ai/v1/chat/completions", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${MISTRAL_API_KEY}` },
-            body: JSON.stringify({
-                model: "mistral-tiny",
-                messages: [{
-                    role: "user", 
-                    content: `Du bist ein exklusiver Reiseberater. Empfiehl ${vorname} ein außergewöhnliches Ferienziel. 
-                    Daten: Sternzeichen ${zodiac}, Interessen: ${hobbys}. 
-                    VERFÜGBARES BUDGET: ${budget} Euro.
-                    
-                    WICHTIG: 
-                    - Wähle das Ziel passend zum Budget (bei 480€ eher Low-Budget/Europa, bei 4800€ Luxus/Fernreise).
-                    - Sei kreativ! Wähle NICHT immer Lissabon.
-                    - Antworte NUR in REINEM TEXT, absolut KEINE Sternchen, KEIN Fettdruck. 
-                    Format:
-                    ZIEL: [Stadtname und Land]
-                    ANALYSE: [3 Sätze Begründung warum das Ziel zu diesem Sternzeichen, den Hobbys und dem Budget von ${budget}€ passt]`
-                }],
-                temperature: 0.9
-            })
-        });
+        // 1. Mistral KI-Analyse mit Timeout-Schutz gegen "Invocation Failed"
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8500); // 8.5 Sekunden Limit
 
-        const kiData = await aiResponse.json();
-        const fullText = kiData.choices?.[0]?.message?.content || "";
+        let zielName = "Mittelmeer";
+        let analyseText = "Deine Sterne deuten auf eine wunderbare Zeit hin. Genieße deine Ferien!";
 
-        // --- ZIEL EXTRAHIEREN & REINIGEN ---
-        let zielRaw = fullText.match(/ZIEL:\s*([^\n]*)/i)?.[1]?.trim() || "Mittelmeer";
-        const zielName = zielRaw.replace(/\*/g, '').trim(); 
-        const analyseText = fullText.match(/ANALYSE:\s*([\s\S]*?)$/i)?.[1]?.trim() || "Deine perfekten Ferien warten auf dich!";
+        try {
+            const aiResponse = await fetch("https://api.mistral.ai/v1/chat/completions", {
+                method: "POST",
+                signal: controller.signal,
+                headers: { 
+                    "Content-Type": "application/json", 
+                    "Authorization": `Bearer ${MISTRAL_API_KEY}` 
+                },
+                body: JSON.stringify({
+                    model: "mistral-tiny",
+                    messages: [{
+                        role: "user", 
+                        content: `Professioneller Reiseberater. Empfiehl ${vorname} ein Ferienziel. 
+                        Daten: Sternzeichen ${zodiac}, Interessen: ${hobbys}, Budget: ${budget}€.
+                        WICHTIG: Ziel muss zum Budget passen. Antworte NUR in REINEM TEXT, KEINE Sternchen, KEIN Markdown.
+                        Format: ZIEL: [Ort] ANALYSE: [3 Sätze Begründung]`
+                    }],
+                    temperature: 0.9
+                })
+            });
 
-        // --- GÜLTIGE VERBINDUNGEN (STABILITÄTS-MODUS) ---
+            const kiData = await aiResponse.json();
+            const fullText = kiData.choices?.[0]?.message?.content || "";
+
+            // Ziel und Analyse extrahieren & bereinigen
+            const matchZiel = fullText.match(/ZIEL:\s*([^\n]*)/i);
+            const matchAnalyse = fullText.match(/ANALYSE:\s*([\s\S]*?)$/i);
+
+            if (matchZiel) zielName = matchZiel[1].replace(/\*/g, '').trim();
+            if (matchAnalyse) analyseText = matchAnalyse[1].trim();
+
+        } catch (aiError) {
+            console.error("KI-Timeout oder Fehler, nutze Fallback-Ziel.");
+        } finally {
+            clearTimeout(timeoutId);
+        }
+
+        // 2. Affiliate Links (Klook dynamisch, andere stabil als Basis-Links)
         const marker = "698672";
-
-        // Klook: Funktioniert über API
         const klookLink = await generateAffiliateLink(`https://www.klook.com/de/search?query=${encodeURIComponent(zielName)}`, "Klook");
-
-        // Welcome Pickups: Sicherer Basis-Link (verhindert "not subscribed" Fehler)
+        
+        // Basis-Links ohne Deep-Link-Umwege (um "not subscribed" Fehler zu vermeiden)
         const transferLink = `https://www.welcomepickups.com/?tap_a=23245-77987a&tap_s=${marker}-698672`;
-
-        // Aviasales: Sicherer Basis-Link
-        const flightLink = `https://www.aviasales.com/?marker=${marker}`;
-
-        // 2. E-Mail Inhalt
-        const emailHtml = `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #D4AF37; border-radius: 20px; overflow: hidden; background: #ffffff;">
-                <div style="background: #fdfbf7; padding: 40px 20px; text-align: center; border-bottom: 1px solid #eee;">
-                    <h1 style="color: #1e293b; margin:0; font-family: serif;">Hallo ${vorname},</h1>
-                    <p style="color: #64748b; margin-top: 10px;">Passend zu deinem Budget von ${budget} € haben die Sterne gewählt.</p>
-                </div>
-                <div style="padding: 40px 30px; text-align: center;">
-                    <h2 style="color: #D4AF37; font-size: 30px; margin: 0 0 25px 0; font-family: serif;">${zielName}</h2>
-                    <div style="background: #f8fafc; padding: 25px; border-radius: 15px; text-align: left; line-height: 1.7; color: #334155; border-left: 5px solid #D4AF37; margin-bottom: 35px;">
-                        ${analyseText}
-                    </div>
-                    <div style="margin-top: 20px;">
-                        <p style="color: #64748b; font-size: 15px; margin-bottom: 25px;">Exklusive Empfehlungen für deine <strong>Ferien</strong>:</p>
-                        <a href="${klookLink}" style="background: #D4AF37; color: white; padding: 18px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; margin-bottom: 15px; font-size: 16px;">✨ Erlebnisse in ${zielName} entdecken</a>
-                        <a href="${transferLink}" style="background: #1e293b; color: white; padding: 18px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; margin-bottom: 15px; font-size: 16px;">🚗 Dein Privat-Transfer vor Ort</a>
-                        <a href="${flightLink}" style="background: #ffffff; color: #1e293b; padding: 18px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; border: 1px solid #cbd5e1; font-size: 16px;">✈️ Flug-Angebote & Cashback</a>
-                    </div>
-                </div>
-                <div style="padding: 30px; text-align: center; background: #fafafa; font-size: 11px; color: #94a3b8; border-top: 1px solid #eee;">
-                    &copy; 2026 KI-FERIEN
+        const flightLink = `https://www.av
