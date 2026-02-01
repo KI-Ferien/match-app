@@ -78,32 +78,37 @@ exports.handler = async (event) => {
         const fullText = kiData.choices?.[0]?.message?.content || "";
         const zielName = fullText.match(/ZIEL:\s*([^\n]*)/i)?.[1]?.trim() || "Mittelmeer";
         const analyseText = fullText.match(/ANALYSE:\s*([\s\S]*?)$/i)?.[1]?.trim() || "Genieße deine Ferien!";
+        // Dynamische Travelpayouts Links generieren
+const klookLink = await generateAffiliateLink(`https://www.klook.com/de/search?query=${encodeURIComponent(zielName)}`);
+const transferLink = await generateAffiliateLink(`https://gettransfer.com/de/search?to=${encodeURIComponent(zielName)}`);
+const flightLink = await generateAffiliateLink(`https://aviasales.tp.st/search?destination=${encodeURIComponent(zielName)}`);
+// ----------------------
 
         // 3. E-Mail Inhalt generieren (Stilvoll mit deinen 3 Travelpayouts Links)
         const emailHtml = `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 20px; overflow: hidden; border: 1px solid #D4AF37;">
-                <div style="background: #fdfbf7; padding: 30px; text-align: center; border-bottom: 1px solid #eee;">
-                    <h1 style="color: #1e293b; margin:0; font-family: serif;">Hallo ${vorname}!</h1>
-                </div>
-                <div style="padding: 30px; text-align: center;">
-                    <h2 style="color: #D4AF37; font-size: 26px; font-family: serif;">${zielName}</h2>
-                    <p style="background: #f8fafc; padding: 20px; border-radius: 12px; text-align: left; line-height: 1.6; color: #334155; border-left: 4px solid #D4AF37;">${analyseText}</p>
-                    
-                    <div style="margin-top: 30px;">
-                        <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">Passend zu deiner Analyse haben wir diese Empfehlungen für dich:</p>
-                        
-                        <a href="https://klook.tpk.lv/R2EiQ7rS" style="background: #D4AF37; color: white; padding: 15px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; margin-bottom: 12px;">✨ Erlebnisse in ${zielName} entdecken</a>
-                        
-                        <a href="https://gettransfer.tpk.lv/mPE1eDIa" style="background: #1e293b; color: white; padding: 15px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; margin-bottom: 12px;">🚗 Dein Privat-Transfer vor Ort</a>
-                        
-                        <a href="https://tpk.lv/pXm2idkE" style="background: #ffffff; color: #1e293b; padding: 15px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; border: 1px solid #cbd5e1;">✈️ Flug-Angebote & Cashback</a>
-                    </div>
-                </div>
-                <div style="padding: 20px; text-align: center; background: #fafafa; font-size: 11px; color: #94a3b8;">
-                    &copy; 2026 KI-FERIEN | Basierend auf Sternzeichen ${zodiac}. <br>
-                    Finde dein Zuhause im Herzen auf <strong>ki-ferien.de</strong>
-                </div>
-            </div>`;
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #D4AF37; border-radius: 20px; overflow: hidden;">
+        <div style="background: #fdfbf7; padding: 30px; text-align: center; border-bottom: 1px solid #eee;">
+            <h1 style="color: #1e293b; margin:0; font-family: serif;">Hallo ${vorname}!</h1>
+        </div>
+        <div style="padding: 30px; text-align: center;">
+            <h2 style="color: #D4AF37; font-size: 26px; font-family: serif;">${zielName}</h2>
+            <p style="background: #f8fafc; padding: 20px; border-radius: 12px; text-align: left; line-height: 1.6; color: #334155; border-left: 4px solid #D4AF37;">${analyseText}</p>
+            
+            <div style="margin-top: 30px;">
+                <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">Passend zu deiner Analyse haben wir diese Empfehlungen für dich:</p>
+                
+                <a href="${klookLink}" style="background: #D4AF37; color: white; padding: 15px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; margin-bottom: 12px;">✨ Erlebnisse in ${zielName} entdecken</a>
+                
+                <a href="${transferLink}" style="background: #1e293b; color: white; padding: 15px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; margin-bottom: 12px;">🚗 Dein Privat-Transfer vor Ort</a>
+                
+                <a href="${flightLink}" style="background: #ffffff; color: #1e293b; padding: 15px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; border: 1px solid #cbd5e1;">✈️ Flug-Angebote & Cashback</a>
+            </div>
+        </div>
+        <div style="padding: 20px; text-align: center; background: #fafafa; font-size: 11px; color: #94a3b8;">
+            &copy; 2026 KI-FERIEN | Basierend auf Sternzeichen ${zodiac}. <br>
+            Finde dein Zuhause im Herzen auf <strong>ki-ferien.de</strong>
+        </div>
+    </div>`;
 
         // 4. E-Mail Versand via Resend
         const today = new Date().toISOString().split('T')[0];
