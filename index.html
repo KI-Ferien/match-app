@@ -38,22 +38,21 @@
     </style>
     
     <script>
-    (function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('go') === 'tui') {
-            // Die Weiterleitung zu Awin passiert erst hier im Browser des Nutzers
-            window.location.href = "https://www.awin1.com/cread.php?s=2902233&v=10102&q=415156&r=2734466";
-        }
-    })();
-</script>
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('go') === 'tui') {
+                window.location.href = "https://www.awin1.com/cread.php?s=2902233&v=10102&q=415156&r=2734466";
+            }
+        })();
+    </script>
     <script data-noptimize="1" data-cfasync="false" data-wpfc-render="false">
-  (function () {
-      var script = document.createElement("script");
-      script.async = 1;
-      script.src = 'https://emrldtp.cc/NDkyMDQ0.js?t=492044';
-      document.head.appendChild(script);
-  })();
-</script>
+        (function () {
+            var script = document.createElement("script");
+            script.async = 1;
+            script.src = 'https://emrldtp.cc/NDkyMDQ0.js?t=492044';
+            document.head.appendChild(script);
+        })();
+    </script>
 </head>
 <body class="bg-gradient-main text-slate-900 min-h-screen">
 
@@ -76,7 +75,6 @@
 
         <form action="/.netlify/functions/match" method="POST" class="glass-card p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-blue-900/10 border border-white">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                <!-- Basisdaten -->
                 <div>
                     <label class="block text-sm font-semibold mb-2 ml-1">Dein Vorname</label>
                     <input type="text" name="vorname" required placeholder="z.B. Maria" 
@@ -88,7 +86,6 @@
                            class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none bg-white/50">
                 </div>
 
-                <!-- Psychografische Daten: Sternzeichen & Alter -->
                 <div>
                     <label class="block text-sm font-semibold mb-2 ml-1">Sternzeichen (Astrologie-Faktor)</label>
                     <select name="q_zodiac" required class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none bg-white/50 appearance-none cursor-pointer">
@@ -113,19 +110,31 @@
                 </div>
             </div>
 
-            <!-- Psychografischer Slider: Energie-Level -->
-            <div class="mb-8">
-                <label class="block text-sm font-semibold mb-4 ml-1">Wie viel Energie hast du für diesen Urlaub?</label>
-                <div class="flex items-center gap-4">
-                    <span class="text-xs font-bold text-slate-400">PURE ENTSPANNUNG</span>
-                    <input type="range" name="energy_level" min="1" max="100" value="50" class="flex-grow">
-                    <span class="text-xs font-bold text-slate-400">ABENTEUER PUR</span>
+            <div class="mb-8 p-6 bg-blue-50/50 rounded-3xl border border-blue-100/50">
+                <label class="flex justify-between items-center text-sm font-semibold mb-4 ml-1">
+                    <span>Dein Budget für diese Ferien</span>
+                    <span class="text-blue-600 bg-white px-3 py-1 rounded-full shadow-sm"><span id="budgetValue">1500</span> €</span>
+                </label>
+                <div class="px-2">
+                    <input type="range" id="q_budget" name="q_budget" min="480" max="4800" step="100" value="1500" class="w-full">
+                    <div class="flex justify-between text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-tighter">
+                        <span>480 € (Economy)</span>
+                        <span>4800 € (First Class)</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Freitext-Analyse -->
             <div class="mb-8">
-                <label class="block text-sm font-semibold mb-2 ml-1">Beschreibe deinen Traumtag im Urlaub (Freitext)</label>
+                <label class="block text-sm font-semibold mb-4 ml-1">Wie viel Energie hast du für diese Ferien?</label>
+                <div class="flex items-center gap-4">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Pure Entspannung</span>
+                    <input type="range" name="energy_level" min="1" max="100" value="50" class="flex-grow">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Abenteuer Pur</span>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <label class="block text-sm font-semibold mb-2 ml-1">Beschreibe deinen Traumtag in den Ferien (Freitext)</label>
                 <textarea name="hobbys" rows="3" placeholder="z.B. Erst Yoga am Strand, dann ein lokaler Marktbesuch und abends ein Dinner im Sonnenuntergang..." 
                           class="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none bg-white/50 resize-none"></textarea>
             </div>
@@ -152,6 +161,16 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        // Script zur Live-Anzeige des Budget-Wertes
+        const budgetSlider = document.getElementById('q_budget');
+        const budgetDisplay = document.getElementById('budgetValue');
+        
+        budgetSlider.oninput = function() {
+            budgetDisplay.innerText = this.value;
+        }
+    </script>
 
 </body>
 </html>
