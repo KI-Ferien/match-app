@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KI-Ferien.de | Kosmische Ferien-Analyse</title>
     <style>
+        /* Grundlegendes Design */
         body {
             font-family: 'Segoe UI', sans-serif;
             background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
@@ -14,11 +15,15 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            color: #333;
         }
+
+        /* Der Haupt-Container (Glas-Effekt) */
         .glass-container {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.25);
             backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
             border-radius: 20px;
             padding: 40px;
             width: 90%;
@@ -26,44 +31,104 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
             text-align: center;
         }
+
+        h1 { color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); margin-bottom: 5px; }
+        p.subtitle { color: #f0f0f0; margin-top: 0; margin-bottom: 30px; font-size: 1.1rem; }
+
+        /* Teilnehmer-Karten Grid */
         .participants-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 20px;
-            margin: 30px 0;
+            margin: 20px 0;
         }
+
         .card {
-            background: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.5);
             padding: 20px;
             border-radius: 15px;
-            transition: transform 0.3s;
+            text-align: left;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
-        .card:hover { transform: translateY(-5px); }
-        select, input {
+
+        .card h3 { margin-top: 0; color: #444; font-size: 1rem; }
+
+        /* Eingabefelder allgemein */
+        select, input[type="number"], input[type="text"], input[type="email"], textarea {
             width: 100%;
             padding: 10px;
-            margin-top: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
             border-radius: 8px;
-            border: none;
+            border: 1px solid rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.9);
+            box-sizing: border-box; /* Wichtig für Padding */
+            font-family: inherit;
         }
-        button {
-            background: #ff6b6b;
+
+        /* Der Bereich für die Zusatz-Optionen (Email, Slider etc.) */
+        .extra-options {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            text-align: left;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .extra-options label { font-weight: bold; font-size: 0.9rem; display: block; margin-bottom: 5px; }
+
+        /* Slider Styling */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            margin: 10px 0 20px 0;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ffd700;
+            cursor: pointer;
+        }
+
+        /* Der Action Button */
+        button.main-btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5253 100%);
             color: white;
             border: none;
-            padding: 15px 30px;
+            padding: 15px 40px;
             border-radius: 30px;
             font-size: 1.1em;
+            font-weight: bold;
             cursor: pointer;
-            transition: 0.3s;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(238, 82, 83, 0.4);
+            width: 100%;
+            max-width: 400px;
         }
-        button:hover { background: #ee5253; }
+        button.main-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(238, 82, 83, 0.6); }
+        button.main-btn:disabled { background: #ccc; cursor: wait; transform: none; box-shadow: none; }
+
+        /* Ergebnis-Box */
+        #result { margin-top: 30px; }
     </style>
 </head>
 <body>
+
     <div class="glass-container">
-        <h1>Perfekte Ferien für alle</h1>
-        <p>Wie viele Personen reisen?</p>
-        <select id="personCount" onchange="renderCards()">
+        <h1>KI-Ferien.de</h1>
+        <p class="subtitle">Deine kosmische Ferien-Analyse</p>
+        
+        <label style="color:white; font-weight:bold;">Wie viele Personen reisen?</label>
+        <select id="personCount" onchange="renderCards()" style="max-width: 200px; margin: 10px auto; display:block;">
             <option value="1">1 Person</option>
             <option value="2">2 Personen</option>
             <option value="3">3 Personen</option>
@@ -73,9 +138,29 @@
 
         <div id="participants-grid" class="participants-grid"></div>
 
-        <button onclick="startMatching()">Ferien-Ziel berechnen</button>
-        <div id="result" style="margin-top: 20px; font-weight: bold;"></div>
+        <div class="extra-options">
+            <h3 style="margin-top:0; color:#ffd700; border-bottom:1px solid rgba(255,255,255,0.3); padding-bottom:10px;">Reise-Details</h3>
+            
+            <label>Urlaubs-Vibe:</label>
+            <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:5px;">
+                <span>🧘 Entspannt</span>
+                <span>🧗 Action</span>
+            </div>
+            <input type="range" id="vibeRange" min="0" max="100" value="50">
+
+            <label>Wünsche & Hobbies:</label>
+            <textarea id="hobbiesInput" rows="3" placeholder="z.B. Wandern, Veganes Essen, bloß keine Hitze..."></textarea>
+
+            <label style="color:#ffd700;">Deine Email für das Ergebnis (Pflicht):</label>
+            <input type="email" id="userEmail" placeholder="name@beispiel.de" style="border: 2px solid #ffd700;">
+        </div>
+
+        <button id="matchButton" class="main-btn" onclick="startMatching()">Kosmische Analyse per Email anfordern</button>
+        
+        <div id="result"></div>
     </div>
+
     <script src="match.js"></script>
+
 </body>
 </html>
