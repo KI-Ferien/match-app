@@ -1,80 +1,116 @@
+/**
+ * match.js - KI-Ferien.de
+ * Version: Full-Service (Inputs + Email)
+ */
+
 const ZODIACS = [
     "Widder", "Stier", "Zwillinge", "Krebs", "Löwe", "Jungfrau", 
     "Waage", "Skorpion", "Schütze", "Steinbock", "Wassermann", "Fische"
 ];
 
-function renderCards() {
-    const personCountSelect = document.getElementById('personCount');
-    const container = document.getElementById('participants-grid');
+// Initialisierung
+document.addEventListener('DOMContentLoaded', () => {
+    injectExtraFields(); // Baut Slider & Email-Feld ein
+    renderCards();       // Baut die Teilnehmer-Karten
     
-    if (!personCountSelect || !container) return;
-    
-    const count = personCountSelect.value;
-    container.innerHTML = ''; 
+    // Button Text anpassen
+    const btn = document.querySelector('button');
+    if (btn) btn.innerHTML = "Kosmische Ferien-Analyse per Email";
+});
 
-    for (let i = 1; i <= count; i++) {
-        const card = document.createElement('div');
-        card.className = 'card'; 
+// Fügt die fehlenden Eingabefelder (Slider, Email, Hobbies) dynamisch hinzu
+function injectExtraFields() {
+    const grid = document.getElementById('participants-grid');
+    if (!grid || document.getElementById('extra-options')) return;
+
+    const extras = document.createElement('div');
+    extras.id = 'extra-options';
+    extras.style.cssText = "grid-column: 1 / -1; background: rgba(255,255,255,0.2); padding: 20px; border-radius: 15px; margin-top: 20px; text-align: left; color: white;";
+    
+    extras.innerHTML = `
+        <h3 style="margin-top:0; color:#ffd700;">Reise-Details</h3>
         
-        card.innerHTML = `
-            <h3 style="margin:0 0 10px 0;">Reisende(r) ${i}</h3>
-            <div style="text-align: left;">
-                <label style="font-size: 0.8rem; font-weight: bold;">Sternzeichen:</label>
-                <select class="participant-zodiac" style="width:100%; padding:8px; border-radius:8px; margin-bottom:10px; border:1px solid #ccc;">
-                    ${ZODIACS.map(z => `<option value="${z}">${z}</option>`).join('')}
-                </select>
-                <label style="font-size: 0.8rem; font-weight: bold; display: block;">Gefühltes Alter:</label>
-                <input type="number" class="participant-age" value="25" min="1" max="100" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;">
-            </div>
+        <label style="display:block; margin-bottom:5px;">Vibe: Entspannt ⟷ Action</label>
+        <input type="range" id="vibeRange" min="0" max="100" value="50" style="width:100%; margin-bottom:15px;">
+        
+        <label style="display:block; margin-bottom:5px;">Hobbies & Wünsche:</label>
+        <textarea id="hobbiesInput" rows="3" placeholder="z.B. Wandern, Veganes Essen, bloß keine Hitze..." style="width:100%; padding:10px; border-radius:8px; border:none; margin-bottom:15px; font-family:sans-serif;"></textarea>
+        
+        <label style="display:block; margin-bottom:5px;">Deine Email für das Ergebnis:</label>
+        <input type="email" id="userEmail" placeholder="name@beispiel.de" style="width:100%; padding:10px; border-radius:8px; border:none;">
+    `;
+    
+    // Fügt es nach dem Grid ein
+    grid.parentNode.insertBefore(extras, grid.nextSibling);
+}
+
+function renderCards() {
+    const count = document.getElementById('personCount').value;
+    const container = document.getElementById('participants-grid');
+    if (!container) return;
+    
+    container.innerHTML = ''; 
+    for (let i = 1; i <= count; i++) {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerHTML = `
+            <h3 style="margin-top:0;">Teilnehmer ${i}</h3>
+            <select class="participant-zodiac" style="width:100%; padding:8px; margin-bottom:10px; border-radius:5px;">
+                ${ZODIACS.map(z => `<option value="${z}">${z}</option>`).join('')}
+            </select>
+            <input type="number" class="participant-age" value="30" style="width:100%; padding:8px; border-radius:5px;">
         `;
-        container.appendChild(card);
+        container.appendChild(div);
     }
 }
 
 async function startMatching() {
-    const resultDiv = document.getElementById('result');
     const btn = document.querySelector('button');
-    
-    if (!resultDiv || !btn) return;
+    const resultDiv = document.getElementById('result');
+    const email = document.getElementById('userEmail').value;
 
+    if (!email || !email.includes('@')) {
+        alert("Bitte gib eine gültige Email-Adresse an, damit wir dir das Ziel senden können!");
+        return;
+    }
+
+    // Daten sammeln
     const participants = Array.from(document.querySelectorAll('.participant-zodiac')).map((z, i) => ({
         zodiac: z.value,
         age: document.querySelectorAll('.participant-age')[i].value
     }));
 
+    const vibe = document.getElementById('vibeRange').value;
+    const hobbies = document.getElementById('hobbiesInput').value;
+
     btn.disabled = true;
-    const originalText = "Ferien-Ziel finden"; 
-    btn.innerHTML = "✨ Suche läuft...";
-    resultDiv.innerHTML = "<p style='color: white;'>Die KI sucht nach eurem Ferien-Ziel...</p>";
+    btn.innerHTML = "✨ Analyse & Versand läuft...";
+    resultDiv.innerHTML = "<p style='color:white;'>Verbindung zum Kosmos (und Mailserver)...</p>";
 
     try {
         const response = await fetch('/api/match', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ participants })
+            body: JSON.stringify({ participants, vibe, hobbies, email })
         });
-
-        if (!response.ok) throw new Error(`Server-Fehler: ${response.status}`);
 
         const data = await response.json();
         
+        if (!response.ok) throw new Error(data.error || "Fehler beim Versand");
+
         resultDiv.innerHTML = `
-            <div style="background: rgba(255, 255, 255, 0.9); padding: 25px; border-radius: 15px; margin-top: 20px; color: #333; text-align: left; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-                <h2 style="margin-top: 0; color: #ff6b6b;">Eure Ferien-Empfehlung</h2>
-                <div style="font-size: 1.1rem; line-height: 1.6;">${data.recommendation}</div>
-            </div>
-        `;
-    } catch (error) {
-        resultDiv.innerHTML = `<div style="color: #ff6b6b; background: white; padding: 15px; border-radius: 10px;">Fehler: ${error.message}</div>`;
+            <div style="background:rgba(255,255,255,0.95); padding:25px; border-radius:15px; margin-top:20px; color:#333; border-left: 5px solid #2ecc71;">
+                <h2 style="color:#2ecc71; margin-top:0;">Erfolg! 📬</h2>
+                <p>Deine kosmische Ferien-Analyse wurde an <strong>${email}</strong> gesendet.</p>
+                <div style="background:#f0f0f0; padding:15px; border-radius:10px; margin-top:10px; font-style:italic; color:#555;">
+                    "${data.preview.substring(0, 100)}..."
+                </div>
+            </div>`;
+
+    } catch (e) {
+        resultDiv.innerHTML = `<div style="background:white; color:red; padding:15px; border-radius:10px;">Fehler: ${e.message}</div>`;
     } finally {
         btn.disabled = false;
-        btn.innerHTML = "Ferien-Ziel finden";
+        btn.innerHTML = "Neue Analyse starten";
     }
 }
-
-// Erster Aufruf direkt beim Laden der Datei
-document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.querySelector('button');
-    if (btn) btn.innerHTML = "Ferien-Ziel finden";
-    renderCards();
-});
