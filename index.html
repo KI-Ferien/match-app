@@ -7,7 +7,6 @@
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            /* Hintergrundbild bleibt, aber wir machen es im Overlay ruhiger */
             background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
             background-size: cover;
             margin: 0;
@@ -15,11 +14,11 @@
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Oben anfangen, besser für Handy */
+            align-items: flex-start;
         }
 
         .main-container {
-            background: rgba(255, 255, 255, 0.95); /* Fast komplett weiß für Lesbarkeit */
+            background: rgba(255, 255, 255, 0.95);
             padding: 30px;
             border-radius: 20px;
             width: 100%;
@@ -27,7 +26,7 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             text-align: center;
             margin-top: 20px;
-            color: #333; /* Dunkle Schrift! */
+            color: #333;
         }
 
         h1 { color: #2c3e50; margin-bottom: 5px; font-size: 2.2rem; }
@@ -43,11 +42,10 @@
             color: #2c3e50;
         }
 
-        /* Große, gut lesbare Eingabefelder */
         select, input, textarea {
             width: 100%;
             padding: 12px;
-            font-size: 16px; /* Wichtig für Handy, damit es nicht zoomt */
+            font-size: 16px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             background: #fff;
@@ -55,31 +53,20 @@
             color: #333;
         }
         
-        select:focus, input:focus, textarea:focus {
-            border-color: #ff6b6b;
-            outline: none;
-        }
+        select:focus, input:focus, textarea:focus { border-color: #ff6b6b; outline: none; }
 
-        /* Das Grid für die Teilnehmer */
         .participants-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Breitere Karten */
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 15px;
             margin: 25px 0;
         }
 
-        .card {
-            background: #f8f9fa; /* Hellgrau für Kontrast */
-            border: 1px solid #ddd;
-            padding: 15px;
-            border-radius: 12px;
-            text-align: left;
-        }
+        .card { background: #f8f9fa; border: 1px solid #ddd; padding: 15px; border-radius: 12px; text-align: left; }
         .card h3 { margin-top: 0; color: #ff6b6b; }
 
-        /* Zusatz-Box */
         .extra-box {
-            background: #fff3e0; /* Ganz leichtes Orange für Hervorhebung */
+            background: #fff3e0;
             border: 2px solid #ffe0b2;
             padding: 20px;
             border-radius: 15px;
@@ -102,14 +89,13 @@
         }
         button.cta-btn:hover { background: #ee5253; }
         button.cta-btn:disabled { background: #ccc; box-shadow: none; }
-
     </style>
 </head>
 <body>
 
 <div class="main-container">
     <h1>KI-Ferien.de</h1>
-    <p class="subtitle">Finde das perfekte Ziel für euch.</p>
+    <p class="subtitle">Finde das perfekte Ziel für dich.</p>
 
     <label>Wie viele Personen reisen?</label>
     <select id="personCount" onchange="renderCards()">
@@ -132,6 +118,13 @@
         </div>
         <input type="range" id="vibeRange" min="0" max="100" value="50">
 
+        <label>Budget:</label>
+        <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.9rem;">
+            <span>Sparsam 💶</span>
+            <span>Luxus 💎</span>
+        </div>
+        <input type="range" id="budgetRange" min="0" max="100" value="50">
+
         <label>Besondere Hobbies / Wünsche:</label>
         <textarea id="hobbiesInput" rows="3" placeholder="z.B. Vegan, Surfen, Nachtleben..."></textarea>
 
@@ -140,7 +133,6 @@
     </div>
 
     <button onclick="startMatching()" class="cta-btn">Kostenlose Analyse starten</button>
-    
     <div id="result" style="margin-top:20px;"></div>
 </div>
 
