@@ -1,6 +1,6 @@
 /**
  * match.js - Frontend Logic
- * Supports: Budget & Singular/Plural UI
+ * Supports: Budget, Singular/Plural, Gefühltes Alter
  */
 
 const ZODIACS = [
@@ -39,8 +39,8 @@ function renderCards() {
             <select class="participant-zodiac">
                 ${ZODIACS.map(z => `<option value="${z}">${z}</option>`).join('')}
             </select>
-            <label>Alter:</label>
-            <input type="number" class="participant-age" value="30" min="1" max="99">
+            <label>Gefühltes Alter:</label>
+            <input type="number" class="participant-age" value="25" min="1" max="99">
         `;
         container.appendChild(div);
     }
@@ -51,7 +51,7 @@ async function startMatching() {
     const resultDiv = document.getElementById('result');
     const emailField = document.getElementById('userEmail');
     const vibeField = document.getElementById('vibeRange');
-    const budgetField = document.getElementById('budgetRange'); // NEU
+    const budgetField = document.getElementById('budgetRange');
     const hobbiesField = document.getElementById('hobbiesInput');
 
     const email = emailField ? emailField.value : '';
@@ -78,7 +78,7 @@ async function startMatching() {
             body: JSON.stringify({ 
                 participants, 
                 vibe: vibeField ? vibeField.value : 50, 
-                budget: budgetField ? budgetField.value : 50, // NEU gesendet
+                budget: budgetField ? budgetField.value : 50,
                 hobbies: hobbiesField ? hobbiesField.value : '', 
                 email 
             })
