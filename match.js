@@ -1,6 +1,6 @@
 /**
- * match.js - KI-Ferien.de
- * CLEAN VERSION: Nur Logik, kein Bauen.
+ * match.js - Frontend Logic
+ * Supports: Budget & Singular/Plural UI
  */
 
 const ZODIACS = [
@@ -8,27 +8,33 @@ const ZODIACS = [
     "Waage", "Skorpion", "Schütze", "Steinbock", "Wassermann", "Fische"
 ];
 
-// Initialisierung beim Laden
 document.addEventListener('DOMContentLoaded', () => {
-    // Nur Karten rendern, sonst NICHTS tun (kein Injecten mehr!)
     renderCards();
 });
 
-// Erzeugt die Sternzeichen-Auswahl basierend auf der Anzahl
 function renderCards() {
     const countSelect = document.getElementById('personCount');
     const container = document.getElementById('participants-grid');
+    const subtitle = document.querySelector('.subtitle');
     
     if (!container || !countSelect) return;
     
-    const count = countSelect.value;
+    const count = parseInt(countSelect.value);
+    
+    // UI Text Anpassung: Singular vs Plural
+    if (subtitle) {
+        subtitle.textContent = count === 1 
+            ? "Finde das perfekte Ziel für dich." 
+            : "Finde das perfekte Ziel für euch.";
+    }
+
     container.innerHTML = ''; 
 
     for (let i = 1; i <= count; i++) {
         const div = document.createElement('div');
         div.className = 'card';
         div.innerHTML = `
-            <h3>Reisende(r) ${i}</h3>
+            <h3>${count === 1 ? 'Reisende(r)' : `Reisende(r) ${i}`}</h3>
             <label>Sternzeichen:</label>
             <select class="participant-zodiac">
                 ${ZODIACS.map(z => `<option value="${z}">${z}</option>`).join('')}
@@ -40,17 +46,14 @@ function renderCards() {
     }
 }
 
-// Die eigentliche Logik beim Klick
 async function startMatching() {
     const btn = document.querySelector('button');
     const resultDiv = document.getElementById('result');
-    
-    // Felder aus dem HTML lesen
     const emailField = document.getElementById('userEmail');
     const vibeField = document.getElementById('vibeRange');
+    const budgetField = document.getElementById('budgetRange'); // NEU
     const hobbiesField = document.getElementById('hobbiesInput');
 
-    // Validierung
     const email = emailField ? emailField.value : '';
     if (!email || !email.includes('@')) {
         alert("Bitte gib eine gültige Email-Adresse ein.");
@@ -58,17 +61,15 @@ async function startMatching() {
         return;
     }
 
-    // Daten sammeln
     const participants = Array.from(document.querySelectorAll('.participant-zodiac')).map((z, i) => ({
         zodiac: z.value,
         age: document.querySelectorAll('.participant-age')[i].value
     }));
 
-    // UI Feedback
     btn.disabled = true;
     btn.innerHTML = "🚀 Wird gesendet...";
+    resultDiv.style.color = "#333"; 
     resultDiv.innerHTML = "Verbindung wird aufgebaut...";
-    resultDiv.style.color = "#333"; // Dunkle Schrift für Lesbarkeit
 
     try {
         const response = await fetch('/api/match', {
@@ -77,6 +78,7 @@ async function startMatching() {
             body: JSON.stringify({ 
                 participants, 
                 vibe: vibeField ? vibeField.value : 50, 
+                budget: budgetField ? budgetField.value : 50, // NEU gesendet
                 hobbies: hobbiesField ? hobbiesField.value : '', 
                 email 
             })
@@ -103,6 +105,5 @@ async function startMatching() {
     }
 }
 
-// Globale Verfügbarkeit für den HTML-Button
 window.renderCards = renderCards;
 window.startMatching = startMatching;
