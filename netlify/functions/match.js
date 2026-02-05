@@ -274,17 +274,100 @@ async function sendToAPI(data) {
 }
 
 /**
- * Loading-State
+ * Loading-State mit animierten Matching-Texten
  */
+const LOADING_MESSAGES = [
+    { text: 'Sterne werden ausgerichtet...', icon: '✨' },
+    { text: 'Konstellationen analysieren...', icon: '🌌' },
+    { text: 'Elemente harmonisieren...', icon: '🔮' },
+    { text: 'Euer Match wird berechnet...', icon: '💫' },
+    { text: 'Reiseziele durchsuchen...', icon: '🌍' },
+    { text: 'Kosmische Verbindung herstellen...', icon: '⭐' },
+];
+
+let loadingInterval = null;
+let messageIndex = 0;
+
 function setLoading(isLoading) {
     if (isLoading) {
         form.style.display = 'none';
         loadingDiv.classList.add('active');
         submitBtn.disabled = true;
+
+        // Animierte Loading-Texte starten
+        messageIndex = 0;
+        updateLoadingMessage();
+        loadingInterval = setInterval(() => {
+            messageIndex = (messageIndex + 1) % LOADING_MESSAGES.length;
+            updateLoadingMessage();
+        }, 2500);
     } else {
         form.style.display = 'block';
         loadingDiv.classList.remove('active');
         submitBtn.disabled = false;
+
+        // Interval stoppen
+        if (loadingInterval) {
+            clearInterval(loadingInterval);
+            loadingInterval = null;
+        }
+    }
+}
+
+function updateLoadingMessage() {
+    const messageEl = document.getElementById('loading-message');
+    const iconEl = document.getElementById('loading-icon');
+
+    if (messageEl && iconEl) {
+        const msg = LOADING_MESSAGES[messageIndex];
+
+        // Fade-out
+        messageEl.style.opacity = '0';
+        iconEl.style.transform = 'scale(0.8) rotate(-10deg)';
+
+        setTimeout(() => {
+            messageEl.textContent = msg.text;
+            iconEl.textContent = msg.icon;
+
+            // Fade-in
+            messageEl.style.opacity = '1';
+            iconEl.style.transform = 'scale(1) rotate(0deg)';
+        }, 300);
+    }
+}
+
+/**
+ * Erstellt das Loading-Overlay dynamisch
+ */
+function createLoadingOverlay() {
+    const loadingHTML = `
+        <div class="matching-animation">
+            <div class="zodiac-orbit">
+                <span class="orbit-icon">♈</span>
+                <span class="orbit-icon">♉</span>
+                <span class="orbit-icon">♊</span>
+                <span class="orbit-icon">♋</span>
+                <span class="orbit-icon">♌</span>
+                <span class="orbit-icon">♍</span>
+                <span class="orbit-icon">♎</span>
+                <span class="orbit-icon">♏</span>
+                <span class="orbit-icon">♐</span>
+                <span class="orbit-icon">♑</span>
+                <span class="orbit-icon">♒</span>
+                <span class="orbit-icon">♓</span>
+            </div>
+            <div class="loading-center">
+                <span id="loading-icon" class="loading-emoji">✨</span>
+            </div>
+        </div>
+        <h3 id="loading-message" class="loading-text">Sterne werden ausgerichtet...</h3>
+        <div class="loading-progress">
+            <div class="progress-bar"></div>
+        </div>
+    `;
+
+    if (loadingDiv) {
+        loadingDiv.innerHTML = loadingHTML;
     }
 }
 
@@ -361,11 +444,143 @@ style.textContent = `
         from { opacity: 1; transform: translateX(-50%) translateY(0); }
         to { opacity: 0; transform: translateX(-50%) translateY(20px); }
     }
+
+    /* Matching Animation Styles */
+    .matching-animation {
+        position: relative;
+        width: 160px;
+        height: 160px;
+        margin: 0 auto 2rem;
+    }
+
+    .zodiac-orbit {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        animation: orbit 20s linear infinite;
+    }
+
+    .orbit-icon {
+        position: absolute;
+        font-size: 1.2rem;
+        opacity: 0.6;
+        transition: opacity 0.3s, transform 0.3s;
+    }
+
+    .orbit-icon:nth-child(1)  { top: 0; left: 50%; transform: translateX(-50%); }
+    .orbit-icon:nth-child(2)  { top: 6%; right: 20%; }
+    .orbit-icon:nth-child(3)  { top: 25%; right: 3%; }
+    .orbit-icon:nth-child(4)  { top: 50%; right: 0; transform: translateY(-50%); }
+    .orbit-icon:nth-child(5)  { bottom: 25%; right: 3%; }
+    .orbit-icon:nth-child(6)  { bottom: 6%; right: 20%; }
+    .orbit-icon:nth-child(7)  { bottom: 0; left: 50%; transform: translateX(-50%); }
+    .orbit-icon:nth-child(8)  { bottom: 6%; left: 20%; }
+    .orbit-icon:nth-child(9)  { bottom: 25%; left: 3%; }
+    .orbit-icon:nth-child(10) { top: 50%; left: 0; transform: translateY(-50%); }
+    .orbit-icon:nth-child(11) { top: 25%; left: 3%; }
+    .orbit-icon:nth-child(12) { top: 6%; left: 20%; }
+
+    @keyframes orbit {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .loading-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #6366f1, #a855f7);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 40px rgba(99, 102, 241, 0.5);
+        animation: pulse-glow 2s ease-in-out infinite;
+    }
+
+    .loading-emoji {
+        font-size: 2.5rem;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    @keyframes pulse-glow {
+        0%, 100% {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+            transform: translate(-50%, -50%) scale(1);
+        }
+        50% {
+            box-shadow: 0 0 50px rgba(168, 85, 247, 0.6);
+            transform: translate(-50%, -50%) scale(1.05);
+        }
+    }
+
+    .loading-text {
+        color: #1e1b4b;
+        font-size: 1.25rem;
+        font-weight: 500;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        transition: opacity 0.3s ease;
+        min-height: 1.5em;
+    }
+
+    .loading-progress {
+        width: 200px;
+        height: 6px;
+        background: rgba(99, 102, 241, 0.2);
+        border-radius: 3px;
+        margin: 0 auto;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        width: 30%;
+        background: linear-gradient(90deg, #6366f1, #a855f7, #6366f1);
+        background-size: 200% 100%;
+        border-radius: 3px;
+        animation: progress-slide 1.5s ease-in-out infinite;
+    }
+
+    @keyframes progress-slide {
+        0% {
+            transform: translateX(-100%);
+            background-position: 0% 0%;
+        }
+        50% {
+            background-position: 100% 0%;
+        }
+        100% {
+            transform: translateX(400%);
+            background-position: 0% 0%;
+        }
+    }
+
+    /* Loading Container */
+    .loading {
+        display: none;
+        padding: 3rem 2rem;
+        text-align: center;
+    }
+
+    .loading.active {
+        display: block;
+        animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
 `;
 document.head.appendChild(style);
 
 // Init
 document.addEventListener('DOMContentLoaded', () => {
     renderTeilnehmer();
+    createLoadingOverlay();
     budgetValue.textContent = formatNumber(budgetSlider.value);
 });
