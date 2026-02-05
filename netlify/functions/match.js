@@ -1,6 +1,5 @@
 const https = require('https');
 
-// Hilfsfunktion: Stabil & Schnell (mit Timeout-Notbremse)
 function httpRequest(options, postData) {
     return new Promise((resolve, reject) => {
         const req = https.request(options, (res) => {
@@ -15,15 +14,8 @@ function httpRequest(options, postData) {
                 }
             });
         });
-
         req.on('error', (e) => reject(e));
-        
-        // Timeout-Schutz
-        req.on('timeout', () => { 
-            req.destroy(); 
-            reject(new Error("Timeout")); 
-        });
-        
+        req.on('timeout', () => { req.destroy(); reject(new Error("Timeout")); });
         if (postData) req.write(postData);
         req.end();
     });
@@ -39,25 +31,39 @@ exports.handler = async (event) => {
     if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
 
     try {
-        const { participants, vibe, hobbies, email } = JSON.parse(event.body);
+        const { participants, vibe, budget, hobbies, email } = JSON.parse(event.body);
         const TIMEOUT_LIMIT = 6000; 
 
-        // --- PROMPT (Stilvoll & Familienfreundlich) ---
+        // --- SINGULAR / PLURAL LOGIK ---
+        const isSingle = participants.length === 1;
+        const anredeInstruktion = isSingle 
+            ? "Sprich den Nutzer im Singular an ('Du', 'Lieber Reisender')." 
+            : "Sprich die Gruppe im Plural an ('Ihr', 'Liebe Reisende').";
+
+        // --- BUDGET LOGIK ---
+        // Wir übersetzen die Zahl 0-100 in Text für die KI
+        let budgetText = "ausgewogenes Preis-Leistungs-Verhältnis";
+        if (budget < 30) budgetText = "sehr günstig, Low-Budget, Backpacker-Stil";
+        if (budget > 70) budgetText = "luxuriös, gehoben, exklusiv";
+
         const prompt = `
-        Du bist ein renommierter astrologischer Reise-Experte. Stil: Elegant, herzlich, familienfreundlich.
+        Du bist ein astrologischer Reise-Experte.
+        Schreibe direkt den Inhalt einer Email.
         
-        Gruppe: ${JSON.stringify(participants)}.
-        Präferenzen: Vibe ${vibe}% (0=Ruhe, 100=Action), Wünsche: ${hobbies}.
+        Zielgruppe: ${JSON.stringify(participants)}.
+        ${anredeInstruktion}
+        
+        Präferenzen:
+        - Vibe: ${vibe}% Action (0=Ruhe, 100=Action).
+        - Budget: ${budgetText}.
+        - Wünsche: ${hobbies}.
         
         Aufgabe:
-        1. Empfiehl EIN konkretes, sicheres Ferienziel (Stadt, Land). PRÜFE DIE GEOGRAFIE!
-        2. Begründe die Wahl charmant mit der Sternzeichen-Konstellation.
-        3. Schreibe eine stilvolle Email.
-        
-        Regeln:
-        - Nutze IMMER "Ferien" (nie "Urlaub").
-        - Keine Jugendsprache.
-        - Maximal 4 Sätze.
+        1. Empfiehl EIN konkretes Ferienziel (Stadt, Land). PRÜFE GEOGRAFIE.
+        2. Begründe astrologisch.
+        3. Nutze Wort "Ferien".
+        4. Keine Markdown-Formatierung (**).
+        5. Keine Platzhalter.
         `;
 
         const mistralKey = process.env.MISTRAL_API_KEY;
@@ -65,7 +71,6 @@ exports.handler = async (event) => {
 
         if(!mistralKey || !resendKey) throw new Error("API Keys fehlen.");
 
-        // --- SCHRITT A: MISTRAL (KI) ---
         const mistralRequest = {
             hostname: 'api.mistral.ai',
             path: '/v1/chat/completions',
@@ -77,21 +82,22 @@ exports.handler = async (event) => {
         const mistralBody = JSON.stringify({
             model: "mistral-tiny", 
             messages: [{ role: "user", content: prompt }],
-            max_tokens: 200, 
+            max_tokens: 250, 
             temperature: 0.4 
         });
 
-        let aiText = "Die Sterne empfehlen harmonische Ferien im sonnigen Süden.";
+        let aiText = "Die Sterne empfehlen Ferien.";
         
         try {
             const aiResponse = await httpRequest(mistralRequest, mistralBody);
             aiText = aiResponse.choices?.[0]?.message?.content || aiText;
+            aiText = aiText.replace(/\*\*/g, ""); 
+            aiText = aiText.replace(/Betreff:.*?\n/i, "").trim();
         } catch (e) {
             console.error("KI-Fallback:", e);
-            aiText = `Aufgrund der aktuellen Sternen-Konstellation empfehlen wir Ihnen für Ihren Wunsch nach ${vibe > 50 ? 'Erlebnissen' : 'Erholung'} wunderbare Ferien an der Algarve in Portugal. Dort finden Sie die perfekte Balance.`;
+            aiText = `Liebe Reisende,\n\naufgrund technischer Sternen-Interferenzen senden wir Ihnen hiermit manuell die Empfehlung: Portugal (Algarve). Perfekt für Ihr Budget und Ihre Wünsche.`;
         }
 
-        // --- SCHRITT B: EMAIL VERSAND (RESEND) ---
         const emailRequest = {
             hostname: 'api.resend.com',
             path: '/emails',
@@ -101,20 +107,16 @@ exports.handler = async (event) => {
         };
 
         const emailBody = JSON.stringify({
-            // WICHTIG: Hier steht jetzt deine verifizierte Domain!
-            // Falls du eine andere Adresse als 'info' willst, ändere es hier einfach.
             from: 'Kosmische Ferien <info@ki-ferien.de>', 
-            
-            to: [email], // Jetzt darf hier JEDE Email stehen
-            subject: 'Ihre persönliche Ferien-Empfehlung ✨',
+            to: [email],
+            subject: 'Deine persönliche Ferien-Empfehlung ✨',
             html: `
-                <div style="font-family: 'Georgia', serif; color: #2c3e50; padding: 30px; line-height: 1.6; background-color: #fdfbf7;">
-                    <h2 style="color: #d35400; border-bottom: 1px solid #e0e0e0; padding-bottom: 10px;">Die Sterne haben gesprochen</h2>
-                    <p style="font-size: 1.1rem;">${aiText.replace(/\n/g, '<br>')}</p>
-                    <div style="margin-top: 30px; font-style: italic; color: #7f8c8d; font-size: 0.9rem;">
-                        Wir wünschen Ihnen magische Momente.<br>
-                        Herzlichst,<br>
-                        Ihr Team von KI-Ferien.de
+                <div style="font-family: 'Georgia', serif; color: #333; padding: 30px; line-height: 1.6; background-color: #fffaf0; border: 1px solid #eee;">
+                    <div style="text-align:center; margin-bottom:20px; color:#d35400; font-size:1.5em;">✨ KI-Ferien.de</div>
+                    <div style="font-size: 1.1rem; white-space: pre-line;">${aiText}</div>
+                    <hr style="border:0; border-top:1px solid #ddd; margin:30px 0;">
+                    <div style="text-align:center; font-style: italic; color: #7f8c8d; font-size: 0.9rem;">
+                        Magische Grüße,<br>Michael & das KI-Team
                     </div>
                 </div>
             `
@@ -129,11 +131,6 @@ exports.handler = async (event) => {
         };
 
     } catch (error) {
-        console.error("Critical Error:", error);
-        return {
-            statusCode: 500, 
-            headers,
-            body: JSON.stringify({ error: error.message })
-        };
+        return { statusCode: 500, headers, body: JSON.stringify({ error: error.message }) };
     }
 };
