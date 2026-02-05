@@ -1,11 +1,11 @@
-[build]
-  # Falls deine index.html im Root liegt, bleibt "."
-  publish = "." 
-  # Der Pfad zu deinen Funktionen
+[[build]
+  # Der Punkt bedeutet, dass index.html und match.js im Hauptordner liegen
+  publish = "."
+  # Hier liegen deine Backend-Dateien (match.js und gruppen-match.js)
   functions = "netlify/functions"
 
 [[redirects]]
-  # Damit du im JavaScript einfach /api/ aufrufen kannst
+  # Leitet Anfragen von /api/match an die Serverless Function weiter
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
@@ -13,4 +13,5 @@
 [[headers]]
   for = "/*"
   [headers.values]
+    # Erlaubt die Kommunikation zwischen Frontend und Backend
     Access-Control-Allow-Origin = "*"
