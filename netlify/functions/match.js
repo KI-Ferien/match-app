@@ -1,129 +1,371 @@
-const { Resend } = require('resend');
+/**
+ * KI-FERIEN Premium Gruppen-Matching
+ * Mit elegantem Sternzeichen-Picker und Element-Visualisierung
+ */
+
+const CONFIG = {
+    minTeilnehmer: 2,
+    maxTeilnehmer: 8,
+    apiEndpoint: '/api/gruppen-match',
+};
+
+// Sternzeichen mit Icons und Elementen
+const STERNZEICHEN = [
+    { value: 'widder',     icon: '♈', name: 'Widder',     element: 'feuer' },
+    { value: 'stier',      icon: '♉', name: 'Stier',      element: 'erde' },
+    { value: 'zwillinge',  icon: '♊', name: 'Zwillinge',  element: 'luft' },
+    { value: 'krebs',      icon: '♋', name: 'Krebs',      element: 'wasser' },
+    { value: 'loewe',      icon: '♌', name: 'Löwe',       element: 'feuer' },
+    { value: 'jungfrau',   icon: '♍', name: 'Jungfrau',   element: 'erde' },
+    { value: 'waage',      icon: '♎', name: 'Waage',      element: 'luft' },
+    { value: 'skorpion',   icon: '♏', name: 'Skorpion',   element: 'wasser' },
+    { value: 'schuetze',   icon: '♐', name: 'Schütze',    element: 'feuer' },
+    { value: 'steinbock',  icon: '♑', name: 'Steinbock',  element: 'erde' },
+    { value: 'wassermann', icon: '♒', name: 'Wassermann', element: 'luft' },
+    { value: 'fische',     icon: '♓', name: 'Fische',     element: 'wasser' },
+];
+
+let teilnehmerAnzahl = 2;
+
+// DOM Elements
+const form = document.getElementById('gruppen-form');
+const container = document.getElementById('teilnehmer-container');
+const countDisplay = document.getElementById('count-display');
+const btnMinus = document.getElementById('btn-minus');
+const btnPlus = document.getElementById('btn-plus');
+const budgetSlider = document.getElementById('budget');
+const budgetValue = document.getElementById('budget-value');
+const submitBtn = document.getElementById('submit-btn');
+const loadingDiv = document.getElementById('loading');
 
 /**
- * Erzeugt einen Affiliate-Link über die Travelpayouts API v1
+ * Erzeugt den Sternzeichen-Picker HTML
  */
-async function generateAffiliateLink(targetUrl, linkName = "Unbekannt") {
-    const token = process.env.TRAVELPAYOUTS_TOKEN;
-    if (!token) return targetUrl;
-    try {
-        const response = await fetch('https://api.travelpayouts.com/links/v1/create', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-Access-Token': token },
-            body: JSON.stringify({
-                "trs": 492044,
-                "marker": "698672",
-                "shorten": true,
-                "links": [{ "url": targetUrl }]
-            })
+function createZodiacPicker(index) {
+    return STERNZEICHEN.map(sz => `
+        <label class="zodiac-option" data-element="${sz.element}">
+            <input type="radio" name="sternzeichen-${index}" value="${sz.value}" required>
+            <span class="zodiac-btn">
+                <span class="zodiac-icon">${sz.icon}</span>
+                <span class="zodiac-name">${sz.name}</span>
+            </span>
+        </label>
+    `).join('');
+}
+
+/**
+ * Erstellt eine Teilnehmer-Karte
+ */
+function createTeilnehmerCard(index) {
+    const card = document.createElement('div');
+    card.className = 'teilnehmer-card';
+    card.dataset.index = index;
+
+    card.innerHTML = `
+        <div class="card-header">
+            <div class="card-number">${index + 1}</div>
+            <span class="card-title">Reisende${index === 0 ? 'r' : '(r)'} ${index + 1}</span>
+        </div>
+
+        <div class="sternzeichen-picker">
+            <label>Sternzeichen wählen</label>
+            <div class="zodiac-grid">
+                ${createZodiacPicker(index)}
+            </div>
+        </div>
+
+        <div class="alter-group">
+            <label for="alter-${index}">Gefühltes Alter</label>
+            <input type="number" id="alter-${index}" name="alter-${index}"
+                   class="alter-input" min="18" max="99" placeholder="35" required>
+        </div>
+    `;
+
+    // Event Listener für Element-Visualisierung
+    const radioInputs = card.querySelectorAll('input[type="radio"]');
+    radioInputs.forEach(radio => {
+        radio.addEventListener('change', () => {
+            const selectedSz = STERNZEICHEN.find(sz => sz.value === radio.value);
+            if (selectedSz) {
+                card.dataset.element = selectedSz.element;
+            }
         });
-        const data = await response.json();
-        return data?.result?.links?.[0]?.partner_url || targetUrl;
-    } catch (error) {
-        console.error(`Fehler bei ${linkName}:`, error);
-        return targetUrl;
+    });
+
+    return card;
+}
+
+/**
+ * Rendert alle Teilnehmer-Karten
+ */
+function renderTeilnehmer() {
+    // Bestehende Daten sichern
+    const existingData = [];
+    container.querySelectorAll('.teilnehmer-card').forEach((card, i) => {
+        const selectedRadio = card.querySelector(`input[name="sternzeichen-${i}"]:checked`);
+        const alter = card.querySelector(`#alter-${i}`)?.value;
+        existingData.push({
+            sternzeichen: selectedRadio?.value || null,
+            alter: alter || null
+        });
+    });
+
+    container.innerHTML = '';
+
+    for (let i = 0; i < teilnehmerAnzahl; i++) {
+        const card = createTeilnehmerCard(i);
+        container.appendChild(card);
+
+        // Daten wiederherstellen
+        if (existingData[i]) {
+            if (existingData[i].sternzeichen) {
+                const radio = card.querySelector(`input[value="${existingData[i].sternzeichen}"]`);
+                if (radio) {
+                    radio.checked = true;
+                    const selectedSz = STERNZEICHEN.find(sz => sz.value === existingData[i].sternzeichen);
+                    if (selectedSz) card.dataset.element = selectedSz.element;
+                }
+            }
+            if (existingData[i].alter) {
+                card.querySelector(`#alter-${i}`).value = existingData[i].alter;
+            }
+        }
+
+        // Verzögerte Animation für gestaffelten Effekt
+        card.style.animationDelay = `${i * 0.1}s`;
+    }
+
+    // Button-States
+    btnMinus.disabled = teilnehmerAnzahl <= CONFIG.minTeilnehmer;
+    btnPlus.disabled = teilnehmerAnzahl >= CONFIG.maxTeilnehmer;
+    countDisplay.textContent = teilnehmerAnzahl;
+}
+
+/**
+ * Sammelt Formulardaten
+ */
+function collectFormData() {
+    const teilnehmer = [];
+
+    for (let i = 0; i < teilnehmerAnzahl; i++) {
+        const selectedRadio = document.querySelector(`input[name="sternzeichen-${i}"]:checked`);
+        const sternzeichen = selectedRadio?.value;
+        const gefuehltesAlter = parseInt(document.getElementById(`alter-${i}`).value, 10);
+
+        const szData = STERNZEICHEN.find(sz => sz.value === sternzeichen);
+
+        teilnehmer.push({
+            index: i + 1,
+            sternzeichen,
+            sternzeichenIcon: szData?.icon || '',
+            sternzeichenName: szData?.name || '',
+            element: szData?.element || 'unbekannt',
+            gefuehltesAlter,
+        });
+    }
+
+    return {
+        email: document.getElementById('email').value,
+        teilnehmerAnzahl,
+        teilnehmer,
+        praeferenzen: {
+            budgetProPerson: parseInt(budgetSlider.value, 10),
+            energieLevel: parseInt(document.getElementById('energie').value, 10),
+            interessen: document.getElementById('interessen').value,
+        },
+        meta: {
+            timestamp: new Date().toISOString(),
+            version: '2.0-premium',
+        }
+    };
+}
+
+/**
+ * Validierung
+ */
+function validateForm() {
+    const email = document.getElementById('email').value;
+    if (!email || !email.includes('@')) {
+        showToast('Bitte gib eine gültige E-Mail-Adresse ein.');
+        return false;
+    }
+
+    for (let i = 0; i < teilnehmerAnzahl; i++) {
+        const selectedRadio = document.querySelector(`input[name="sternzeichen-${i}"]:checked`);
+        const alter = document.getElementById(`alter-${i}`).value;
+
+        if (!selectedRadio) {
+            showToast(`Bitte wähle ein Sternzeichen für Reisende(r) ${i + 1}.`);
+            highlightCard(i);
+            return false;
+        }
+
+        if (!alter || alter < 18 || alter > 99) {
+            showToast(`Bitte gib ein gültiges Alter für Reisende(r) ${i + 1} ein.`);
+            highlightCard(i);
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/**
+ * Hebt eine Karte bei Fehler hervor
+ */
+function highlightCard(index) {
+    const card = container.querySelector(`.teilnehmer-card[data-index="${index}"]`);
+    if (card) {
+        card.style.animation = 'none';
+        card.offsetHeight; // Reflow
+        card.style.animation = 'shake 0.5s ease';
     }
 }
 
-exports.handler = async (event) => {
-    // 1. Sicherheit: Nur POST zulassen
-    if (event.httpMethod !== "POST") {
-        return { statusCode: 302, headers: { 'Location': '/' } };
+/**
+ * Einfache Toast-Nachricht
+ */
+function showToast(message) {
+    // Entferne bestehenden Toast
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1e1b4b;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        z-index: 1000;
+        animation: toastIn 0.3s ease;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    `;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.animation = 'toastOut 0.3s ease forwards';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+/**
+ * API-Aufruf
+ */
+async function sendToAPI(data) {
+    const response = await fetch(CONFIG.apiEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+        throw new Error(`API-Fehler: ${response.status}`);
     }
 
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
+    return await response.json();
+}
+
+/**
+ * Loading-State
+ */
+function setLoading(isLoading) {
+    if (isLoading) {
+        form.style.display = 'none';
+        loadingDiv.classList.add('active');
+        submitBtn.disabled = true;
+    } else {
+        form.style.display = 'block';
+        loadingDiv.classList.remove('active');
+        submitBtn.disabled = false;
+    }
+}
+
+/**
+ * Formatierung
+ */
+function formatNumber(num) {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+// Event Listeners
+btnMinus.addEventListener('click', () => {
+    if (teilnehmerAnzahl > CONFIG.minTeilnehmer) {
+        teilnehmerAnzahl--;
+        renderTeilnehmer();
+    }
+});
+
+btnPlus.addEventListener('click', () => {
+    if (teilnehmerAnzahl < CONFIG.maxTeilnehmer) {
+        teilnehmerAnzahl++;
+        renderTeilnehmer();
+    }
+});
+
+budgetSlider.addEventListener('input', () => {
+    budgetValue.textContent = formatNumber(budgetSlider.value);
+});
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) return;
+
+    const formData = collectFormData();
+    console.log('Formulardaten:', formData);
+
+    setLoading(true);
 
     try {
-        const params = new URLSearchParams(event.body);
-        const email = params.get('email');
-        const vorname = params.get('vorname') || "Entdecker";
-        const zodiac = params.get('q_zodiac') || "Sternzeichen";
-        const hobbys = params.get('hobbys') || "Ferien genießen";
-        const budget = params.get('q_budget') || "1500"; 
+        const result = await sendToAPI(formData);
+        console.log('API-Antwort:', result);
 
-        if (!email) {
-            return { statusCode: 302, headers: { 'Location': '/success.html?error=noemail' } };
+        if (result.redirectUrl) {
+            window.location.href = result.redirectUrl;
+        } else {
+            showToast('Die Sterne haben gesprochen! Check deine E-Mails.');
+            setLoading(false);
         }
-
-        // 2. Mistral KI-Analyse mit Timeout-Schutz
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8500);
-
-        let zielName = "Mittelmeer";
-        let analyseText = "Deine Sterne deuten auf eine wunderbare Zeit hin. Genieße deine Ferien!";
-
-        try {
-            const aiResponse = await fetch("https://api.mistral.ai/v1/chat/completions", {
-                method: "POST",
-                signal: controller.signal,
-                headers: { 
-                    "Content-Type": "application/json", 
-                    "Authorization": `Bearer ${MISTRAL_API_KEY}` 
-                },
-                body: JSON.stringify({
-                    model: "mistral-tiny",
-                    messages: [{
-                        role: "user", 
-                        content: `Reiseberater. Empfiehl ${vorname} ein Ferienziel. Daten: Sternzeichen ${zodiac}, Hobbys: ${hobbys}, Budget: ${budget}€. Antworte NUR in REINEM TEXT, KEINE Sternchen. Format: ZIEL: [Ort] ANALYSE: [Text]`
-                    }],
-                    temperature: 0.9
-                })
-            });
-
-            const kiData = await aiResponse.json();
-            const fullText = kiData.choices?.[0]?.message?.content || "";
-
-            const matchZiel = fullText.match(/ZIEL:\s*([^\n]*)/i);
-            const matchAnalyse = fullText.match(/ANALYSE:\s*([\s\S]*?)$/i);
-
-            if (matchZiel) zielName = matchZiel[1].replace(/\*/g, '').trim();
-            if (matchAnalyse) analyseText = matchAnalyse[1].trim();
-
-        } catch (aiError) {
-            console.error("KI-Fehler:", aiError);
-        } finally {
-            clearTimeout(timeoutId);
-        }
-
-        // 3. Affiliate Links
-        const marker = "698672";
-        const klookLink = await generateAffiliateLink(`https://www.klook.com/de/search?query=${encodeURIComponent(zielName)}`, "Klook");
-        const transferLink = `https://www.welcomepickups.com/?tap_a=23245-77987a&tap_s=${marker}-698672`;
-        const flightLink = `https://www.aviasales.com/?marker=${marker}`;
-
-        // 4. E-Mail Versand
-        const emailHtml = `
-            <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #D4AF37; border-radius: 20px; overflow: hidden; background: #ffffff;">
-                <div style="background: #fdfbf7; padding: 40px 20px; text-align: center; border-bottom: 1px solid #eee;">
-                    <h1 style="color: #1e293b; margin:0;">Hallo ${vorname},</h1>
-                    <p style="color: #64748b;">Dein Budget: ${budget} € | Dein Match ist da.</p>
-                </div>
-                <div style="padding: 40px 30px; text-align: center;">
-                    <h2 style="color: #D4AF37; font-size: 30px; margin: 0 0 25px 0;">${zielName}</h2>
-                    <div style="background: #f8fafc; padding: 25px; border-radius: 15px; text-align: left; line-height: 1.7; color: #334155; border-left: 5px solid #D4AF37; margin-bottom: 35px;">
-                        ${analyseText}
-                    </div>
-                    <div style="margin-top: 20px;">
-                        <a href="${klookLink}" style="background: #D4AF37; color: white; padding: 18px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; margin-bottom: 15px;">✨ Erlebnisse in ${zielName}</a>
-                        <a href="${transferLink}" style="background: #1e293b; color: white; padding: 18px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; margin-bottom: 15px;">🚗 Privat-Transfer vor Ort</a>
-                        <a href="${flightLink}" style="background: #ffffff; color: #1e293b; padding: 18px 25px; text-decoration: none; border-radius: 12px; display: block; font-weight: bold; border: 1px solid #cbd5e1;">✈️ Flug-Angebote</a>
-                    </div>
-                </div>
-            </div>`;
-
-        await resend.emails.send({
-            from: 'KI-FERIEN <info@ki-ferien.de>',
-            to: email,
-            bcc: 'mikostro@web.de', 
-            subject: `Dein Ferien-Match: ${zielName} 🌴`,
-            html: emailHtml
-        });
-
-        return { statusCode: 302, headers: { 'Location': '/success.html' } };
-
     } catch (error) {
-        console.error("Kritischer Fehler:", error);
-        return { statusCode: 302, headers: { 'Location': '/success.html?error=true' } };
+        console.error('Fehler:', error);
+        showToast('Etwas ist schiefgelaufen. Bitte versuche es erneut.');
+        setLoading(false);
     }
-};
+});
+
+// CSS für Animationen dynamisch hinzufügen
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20% { transform: translateX(-8px); }
+        40% { transform: translateX(8px); }
+        60% { transform: translateX(-4px); }
+        80% { transform: translateX(4px); }
+    }
+
+    @keyframes toastIn {
+        from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+        to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    @keyframes toastOut {
+        from { opacity: 1; transform: translateX(-50%) translateY(0); }
+        to { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    }
+`;
+document.head.appendChild(style);
+
+// Init
+document.addEventListener('DOMContentLoaded', () => {
+    renderTeilnehmer();
+    budgetValue.textContent = formatNumber(budgetSlider.value);
+});
