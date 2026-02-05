@@ -1,77 +1,108 @@
-/**
- * Backend-Funktion: match.js
- * Pfad: netlify/functions/match.js
- */
-
 const https = require('https');
 
+// Hilfsfunktion: Führt einen HTTPS Request aus (ersetzt fetch/axios für Stabilität)
+function httpRequest(options, postData) {
+    return new Promise((resolve, reject) => {
+        const req = https.request(options, (res) => {
+            let body = '';
+            res.on('data', chunk => body += chunk);
+            res.on('end', () => {
+                try {
+                    resolve(JSON.parse(body));
+                } catch (e) {
+                    resolve(body); // Falls kein JSON zurückkommt
+                }
+            });
+        });
+        req.on('error', (e) => reject(e));
+        req.on('timeout', () => { req.destroy(); reject(new Error("Timeout")); });
+        if (postData) req.write(postData);
+        req.end();
+    });
+}
+
 exports.handler = async (event) => {
-    // CORS-Header für die Kommunikation mit dem Frontend
     const headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Content-Type': 'application/json'
     };
 
-    if (event.httpMethod === 'OPTIONS') {
-        return { statusCode: 200, headers, body: '' };
-    }
+    if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
 
     try {
-        const { participants } = JSON.parse(event.body);
-        const apiKey = process.env.MISTRAL_API_KEY;
+        const data = JSON.parse(event.body);
+        const { participants, vibe, hobbies, email } = data;
 
-        if (!apiKey) {
-            throw new Error("MISTRAL_API_KEY ist nicht in Netlify konfiguriert.");
-        }
+        const mistralKey = process.env.MISTRAL_API_KEY;
+        const resendKey = process.env.RESEND_API_KEY;
 
-        // Prompt-Erstellung (Ferien statt Urlaub)
-        const userPrompt = `Erstelle eine kurze, inspirierende Empfehlung für ein Ferien-Ziel basierend auf diesen Teilnehmern: ${JSON.stringify(participants)}. Antworte in 3-4 Sätzen auf Deutsch. Verwende das Wort 'Ferien'.`;
+        if (!mistralKey || !resendKey) throw new Error("API Keys fehlen (Mistral oder Resend).");
 
-        const postData = JSON.stringify({
+        // --- SCHRITT 1: MISTRAL FRAGEN ---
+        const prompt = `
+        Rolle: Du bist ein astrologischer Reiseexperte, der Sicherheit sehr ernst nimmt (Auswärtiges Amt Standards).
+        
+        Input Daten:
+        - Teilnehmer: ${JSON.stringify(participants)}
+        - Stimmung (0=Relax, 100=Action): ${vibe}
+        - Hobbies/Wünsche: ${hobbies}
+        
+        Aufgabe:
+        1. Analysiere die Sternzeichen-Konstellation.
+        2. Wähle ein konkretes Ferien-Ziel (Sicherheitslage beachten!).
+        3. Schreibe eine persönliche Email an die Gruppe.
+        
+        Regeln:
+        - Nutze NUR das Wort "Ferien" (nie "Urlaub").
+        - Sei charmant, mystisch aber sicherheitsbewusst.
+        - Format: Betreffzeile, dann der Text.
+        - Länge: Max 200 Wörter.
+        `;
+
+        const mistralResponse = await httpRequest({
+            hostname: 'api.mistral.ai',
+            path: '/v1/chat/completions',
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${mistralKey}`, 'Content-Type': 'application/json' }
+        }, JSON.stringify({
             model: "mistral-tiny",
-            messages: [{ role: "user", content: userPrompt }]
-        });
+            messages: [{ role: "user", content: prompt }]
+        }));
 
-        // Wir nutzen das eingebaute 'https' Modul, um 502-Fehler durch fehlende Pakete zu vermeiden
-        const request = () => new Promise((resolve, reject) => {
-            const options = {
-                hostname: 'api.mistral.ai',
-                path: '/v1/chat/completions',
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${apiKey}`,
-                    'Content-Type': 'application/json',
-                    'Content-Length': Buffer.byteLength(postData)
-                }
-            };
+        const aiText = mistralResponse.choices?.[0]?.message?.content || "Keine Analyse möglich.";
 
-            const req = https.request(options, (res) => {
-                let data = '';
-                res.on('data', (chunk) => data += chunk);
-                res.on('end', () => resolve(JSON.parse(data)));
-            });
-
-            req.on('error', (e) => reject(e));
-            req.write(postData);
-            req.end();
-        });
-
-        const result = await request();
-        const recommendation = result.choices[0].message.content;
+        // --- SCHRITT 2: EMAIL SENDEN (RESEND) ---
+        // Hinweis: 'from' muss eine verifizierte Domain bei Resend sein oder 'onboarding@resend.dev' zum Testen
+        const emailResponse = await httpRequest({
+            hostname: 'api.resend.com',
+            path: '/emails',
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${resendKey}`, 'Content-Type': 'application/json' }
+        }, JSON.stringify({
+            from: 'Kosmische Ferien <onboarding@resend.dev>', 
+            to: [email],
+            subject: 'Dein kosmisches Ferien-Ziel ist da! ✨',
+            html: `<div style="font-family: sans-serif; padding: 20px; background: #f9f9f9;">
+                    <h2 style="color: #ff6b6b;">Eure Sterne haben gesprochen</h2>
+                    <p style="white-space: pre-wrap;">${aiText}</p>
+                    <hr>
+                    <small>Erstellt von KI-Ferien.de</small>
+                   </div>`
+        }));
 
         return {
             statusCode: 200,
             headers,
-            body: JSON.stringify({ recommendation })
+            body: JSON.stringify({ message: "Email versendet!", preview: aiText })
         };
 
     } catch (error) {
-        console.error("Backend Fehler:", error);
+        console.error("Fehler:", error);
         return {
             statusCode: 500,
             headers,
-            body: JSON.stringify({ error: "Fehler: " + error.message })
+            body: JSON.stringify({ error: error.message })
         };
     }
 };
