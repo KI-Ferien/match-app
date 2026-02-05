@@ -1,6 +1,6 @@
 /**
  * match.js - KI-Ferien.de
- * Steuert die dynamische UI und die kosmische Ferien-Analyse
+ * Vollständige Logik für die Kosmische Ferien-Analyse
  */
 
 const ZODIACS = [
@@ -8,106 +8,114 @@ const ZODIACS = [
     "Waage", "Skorpion", "Schütze", "Steinbock", "Wassermann", "Fische"
 ];
 
-// Initialisierung bei Seitenstart
+// Initialisierung
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("Kosmische Analyse geladen...");
+    
     const personCountSelect = document.getElementById('personCount');
-    if (personCountSelect) {
-        // Erzeuge initiale Karten (Standard: 2 Personen)
+    const matchButton = document.getElementById('matchButton');
+    const grid = document.getElementById('participants-grid');
+
+    // 1. Initialer Check & Aufbau
+    if (personCountSelect && grid) {
         renderParticipantCards(personCountSelect.value);
         
-        // Event Listener für Änderungen der Personenanzahl
         personCountSelect.addEventListener('change', (e) => {
             renderParticipantCards(e.target.value);
         });
     }
 
-    const matchButton = document.getElementById('matchButton');
+    // 2. Button-Event verknüpfen
     if (matchButton) {
         matchButton.addEventListener('click', startCosmicAnalysis);
+    } else {
+        console.error("Button mit ID 'matchButton' nicht gefunden!");
     }
 });
 
 /**
- * Erzeugt die Eingabekarten für die Teilnehmer basierend auf der Auswahl
+ * Erzeugt die Eingabekarten (Glassmorphism Style)
  */
 function renderParticipantCards(count) {
     const container = document.getElementById('participants-grid');
     if (!container) return;
 
-    container.innerHTML = ''; // Container leeren
+    container.innerHTML = ''; 
 
     for (let i = 1; i <= count; i++) {
         const card = document.createElement('div');
-        card.className = 'card aura-card';
+        card.style.cssText = `
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 10px;
+            color: white;
+            min-width: 200px;
+        `;
+        
         card.innerHTML = `
-            <h3>Reisende(r) ${i}</h3>
-            <div class="input-group">
-                <label>Sternzeichen:</label>
-                <select class="participant-zodiac">
-                    ${ZODIACS.map(z => `<option value="${z}">${z}</option>`).join('')}
-                </select>
-            </div>
-            <div class="input-group">
-                <label>Gefühltes Alter:</label>
-                <input type="number" class="participant-age" value="25" min="1" max="120">
-            </div>
+            <h3 style="margin-top:0">Reisende(r) ${i}</h3>
+            <label style="display:block; margin-bottom:5px;">Sternzeichen</label>
+            <select class="participant-zodiac" style="width:100%; padding:8px; border-radius:5px; margin-bottom:15px;">
+                ${ZODIACS.map(z => `<option value="${z}">${z}</option>`).join('')}
+            </select>
+            <label style="display:block; margin-bottom:5px;">Gefühltes Alter</label>
+            <input type="number" class="participant-age" value="25" min="1" max="100" style="width:100%; padding:8px; border-radius:5px;">
         `;
         container.appendChild(card);
     }
 }
 
 /**
- * Sammelt die Daten und startet die Analyse über die Netlify Function
+ * Sendet die Daten an die Netlify Function
  */
 async function startCosmicAnalysis() {
     const btn = document.getElementById('matchButton');
     const resultDiv = document.getElementById('result');
     
-    // Daten aus den Karten sammeln
-    const zodiacElements = document.querySelectorAll('.participant-zodiac');
-    const ageElements = document.querySelectorAll('.participant-age');
-    
+    if (!btn || !resultDiv) return;
+
+    // Daten sammeln
     const participants = [];
-    zodiacElements.forEach((el, index) => {
+    const zodiacs = document.querySelectorAll('.participant-zodiac');
+    const ages = document.querySelectorAll('.participant-age');
+
+    zodiacs.forEach((z, i) => {
         participants.push({
-            zodiac: el.value,
-            age: ageElements[index].value
+            zodiac: z.value,
+            age: ages[i].value
         });
     });
 
-    // UI-Feedback für die Analyse
+    // Feedback geben
     btn.disabled = true;
     const originalText = btn.innerHTML;
     btn.innerHTML = "✨ Analyse läuft...";
-    resultDiv.innerHTML = `<p class="loading">Die KI berechnet eure kosmischen Feriensynergien...</p>`;
+    resultDiv.innerHTML = "<p style='color: white;'>Die Sterne werden befragt... Bitte warten.</p>";
 
     try {
         const response = await fetch('/api/gruppen-match', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ participants })
         });
 
-        if (!response.ok) throw new Error('Netzwerk-Antwort war nicht ok');
+        if (!response.ok) throw new Error('API Fehler');
 
         const data = await response.json();
 
-        // Ergebnis anzeigen
         resultDiv.innerHTML = `
-            <div class="analysis-box">
-                <h2>Eure Kosmische Ferien-Analyse</h2>
-                <div class="recommendation-text">${data.recommendation}</div>
+            <div style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 15px; color: white; margin-top: 20px;">
+                <h2 style="color: #ffd700;">Eure Kosmische Analyse</h2>
+                <p style="line-height: 1.6;">${data.recommendation}</p>
             </div>
         `;
-        
-        // Zum Ergebnis scrollen
-        resultDiv.scrollIntoView({ behavior: 'smooth' });
 
     } catch (error) {
-        console.error('Fehler bei der Analyse:', error);
-        resultDiv.innerHTML = `<p class="error">Der Kosmos ist gerade getrübt. (Fehler: ${error.message})</p>`;
+        console.error(error);
+        resultDiv.innerHTML = "<p style='color: #ff6b6b;'>Verbindung zum Kosmos unterbrochen. Prüfe deine Netlify Functions!</p>";
     } finally {
         btn.disabled = false;
         btn.innerHTML = originalText;
