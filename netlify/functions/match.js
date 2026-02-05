@@ -18,7 +18,7 @@ function httpRequest(options, postData) {
 
         req.on('error', (e) => reject(e));
         
-        // Timeout-Schutz: Bricht ab, bevor Netlify den Stecker zieht
+        // Timeout-Schutz
         req.on('timeout', () => { 
             req.destroy(); 
             reject(new Error("Timeout")); 
@@ -40,26 +40,24 @@ exports.handler = async (event) => {
 
     try {
         const { participants, vibe, hobbies, email } = JSON.parse(event.body);
-        
-        // Timeout Limit (6 Sek für die KI, Rest für Email)
         const TIMEOUT_LIMIT = 6000; 
 
-        // --- DER STILVOLLE & FAMILIENFREUNDLICHE PROMPT ---
+        // --- PROMPT (Stilvoll & Familienfreundlich) ---
         const prompt = `
-        Du bist ein renommierter astrologischer Reise-Experte. Dein Stil ist elegant, herzlich und familienfreundlich.
+        Du bist ein renommierter astrologischer Reise-Experte. Stil: Elegant, herzlich, familienfreundlich.
         
-        Die Reisegruppe: ${JSON.stringify(participants)}.
+        Gruppe: ${JSON.stringify(participants)}.
         Präferenzen: Vibe ${vibe}% (0=Ruhe, 100=Action), Wünsche: ${hobbies}.
         
-        Deine Aufgabe:
-        1. Empfiehl EIN konkretes, sicheres Ferienziel (Stadt, Land). Achte penibel auf korrekte Geografie!
-        2. Begründe die Wahl charmant mit der Konstellation der Sternzeichen.
-        3. Schreibe den Text als stilvolle Email an die Familie/Gruppe.
+        Aufgabe:
+        1. Empfiehl EIN konkretes, sicheres Ferienziel (Stadt, Land). PRÜFE DIE GEOGRAFIE!
+        2. Begründe die Wahl charmant mit der Sternzeichen-Konstellation.
+        3. Schreibe eine stilvolle Email.
         
-        Wichtige Regeln:
-        - Nutze IMMER das Wort "Ferien" (niemals "Urlaub").
-        - Vermeide Jugendsprache. Sei inspirierend und warmherzig.
-        - Fasse dich kurz (maximal 4 Sätze).
+        Regeln:
+        - Nutze IMMER "Ferien" (nie "Urlaub").
+        - Keine Jugendsprache.
+        - Maximal 4 Sätze.
         `;
 
         const mistralKey = process.env.MISTRAL_API_KEY;
@@ -79,8 +77,8 @@ exports.handler = async (event) => {
         const mistralBody = JSON.stringify({
             model: "mistral-tiny", 
             messages: [{ role: "user", content: prompt }],
-            max_tokens: 200, // Genug Platz für stilvolle Sätze
-            temperature: 0.4 // Balance zwischen Kreativität und Faktentreue
+            max_tokens: 200, 
+            temperature: 0.4 
         });
 
         let aiText = "Die Sterne empfehlen harmonische Ferien im sonnigen Süden.";
@@ -89,9 +87,8 @@ exports.handler = async (event) => {
             const aiResponse = await httpRequest(mistralRequest, mistralBody);
             aiText = aiResponse.choices?.[0]?.message?.content || aiText;
         } catch (e) {
-            console.error("KI-Fallback aktiv:", e);
-            // Fallback-Text im gleichen stilvollen Tonfall
-            aiText = `Auch wenn der Blick in die Sterne kurz verschleiert war: Für Ihre Konstellation und den Wunsch nach ${vibe > 50 ? 'Erlebnissen' : 'Erholung'} empfehlen wir wunderbare Ferien an der Algarve in Portugal. Dort finden Sie die perfekte Balance für alle Generationen.`;
+            console.error("KI-Fallback:", e);
+            aiText = `Aufgrund der aktuellen Sternen-Konstellation empfehlen wir Ihnen für Ihren Wunsch nach ${vibe > 50 ? 'Erlebnissen' : 'Erholung'} wunderbare Ferien an der Algarve in Portugal. Dort finden Sie die perfekte Balance.`;
         }
 
         // --- SCHRITT B: EMAIL VERSAND (RESEND) ---
@@ -104,8 +101,11 @@ exports.handler = async (event) => {
         };
 
         const emailBody = JSON.stringify({
-            from: 'Kosmische Ferien <onboarding@resend.dev>',
-            to: [email],
+            // WICHTIG: Hier steht jetzt deine verifizierte Domain!
+            // Falls du eine andere Adresse als 'info' willst, ändere es hier einfach.
+            from: 'Kosmische Ferien <info@ki-ferien.de>', 
+            
+            to: [email], // Jetzt darf hier JEDE Email stehen
             subject: 'Ihre persönliche Ferien-Empfehlung ✨',
             html: `
                 <div style="font-family: 'Georgia', serif; color: #2c3e50; padding: 30px; line-height: 1.6; background-color: #fdfbf7;">
@@ -133,7 +133,7 @@ exports.handler = async (event) => {
         return {
             statusCode: 500, 
             headers,
-            body: JSON.stringify({ error: error.message || "Ein unerwarteter Fehler ist aufgetreten." })
+            body: JSON.stringify({ error: error.message })
         };
     }
 };
