@@ -3,164 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KI-Ferien.de | Kosmische Ferien-Analyse</title>
+    <title>KI-Ferien.de | Kosmische Ferien</title>
     <style>
-        /* Grundlegendes Design */
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            /* Hintergrundbild bleibt, aber wir machen es im Overlay ruhiger */
             background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
             background-size: cover;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
+            align-items: flex-start; /* Oben anfangen, besser für Handy */
+        }
+
+        .main-container {
+            background: rgba(255, 255, 255, 0.95); /* Fast komplett weiß für Lesbarkeit */
+            padding: 30px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 700px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            margin-top: 20px;
+            color: #333; /* Dunkle Schrift! */
+        }
+
+        h1 { color: #2c3e50; margin-bottom: 5px; font-size: 2.2rem; }
+        p.subtitle { color: #7f8c8d; font-size: 1.2rem; margin-top: 0; }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            text-align: left;
+            font-size: 1rem;
+            color: #2c3e50;
+        }
+
+        /* Große, gut lesbare Eingabefelder */
+        select, input, textarea {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px; /* Wichtig für Handy, damit es nicht zoomt */
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fff;
+            box-sizing: border-box;
             color: #333;
         }
-
-        /* Der Haupt-Container (Glas-Effekt) */
-        .glass-container {
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            border-radius: 20px;
-            padding: 40px;
-            width: 90%;
-            max-width: 800px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            text-align: center;
+        
+        select:focus, input:focus, textarea:focus {
+            border-color: #ff6b6b;
+            outline: none;
         }
 
-        h1 { color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); margin-bottom: 5px; }
-        p.subtitle { color: #f0f0f0; margin-top: 0; margin-bottom: 30px; font-size: 1.1rem; }
-
-        /* Teilnehmer-Karten Grid */
+        /* Das Grid für die Teilnehmer */
         .participants-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            margin: 20px 0;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Breitere Karten */
+            gap: 15px;
+            margin: 25px 0;
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.5);
-            padding: 20px;
-            border-radius: 15px;
+            background: #f8f9fa; /* Hellgrau für Kontrast */
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 12px;
             text-align: left;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
+        .card h3 { margin-top: 0; color: #ff6b6b; }
 
-        .card h3 { margin-top: 0; color: #444; font-size: 1rem; }
-
-        /* Eingabefelder allgemein */
-        select, input[type="number"], input[type="text"], input[type="email"], textarea {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.5);
-            background: rgba(255,255,255,0.9);
-            box-sizing: border-box; /* Wichtig für Padding */
-            font-family: inherit;
-        }
-
-        /* Der Bereich für die Zusatz-Optionen (Email, Slider etc.) */
-        .extra-options {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 25px;
+        /* Zusatz-Box */
+        .extra-box {
+            background: #fff3e0; /* Ganz leichtes Orange für Hervorhebung */
+            border: 2px solid #ffe0b2;
+            padding: 20px;
             border-radius: 15px;
             margin: 30px 0;
             text-align: left;
+        }
+        
+        button.cta-btn {
+            background: #ff6b6b;
             color: white;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .extra-options label { font-weight: bold; font-size: 0.9rem; display: block; margin-bottom: 5px; }
-
-        /* Slider Styling */
-        input[type="range"] {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 10px;
-            border-radius: 5px;
-            background: #ddd;
-            outline: none;
-            margin: 10px 0 20px 0;
-        }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #ffd700;
-            cursor: pointer;
-        }
-
-        /* Der Action Button */
-        button.main-btn {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5253 100%);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 30px;
-            font-size: 1.1em;
+            font-size: 1.3rem;
             font-weight: bold;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 50px;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 15px rgba(238, 82, 83, 0.4);
             width: 100%;
-            max-width: 400px;
+            transition: background 0.2s;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
         }
-        button.main-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(238, 82, 83, 0.6); }
-        button.main-btn:disabled { background: #ccc; cursor: wait; transform: none; box-shadow: none; }
+        button.cta-btn:hover { background: #ee5253; }
+        button.cta-btn:disabled { background: #ccc; box-shadow: none; }
 
-        /* Ergebnis-Box */
-        #result { margin-top: 30px; }
     </style>
 </head>
 <body>
 
-    <div class="glass-container">
-        <h1>KI-Ferien.de</h1>
-        <p class="subtitle">Deine kosmische Ferien-Analyse</p>
+<div class="main-container">
+    <h1>KI-Ferien.de</h1>
+    <p class="subtitle">Finde das perfekte Ziel für euch.</p>
+
+    <label>Wie viele Personen reisen?</label>
+    <select id="personCount" onchange="renderCards()">
+        <option value="1">1 Person</option>
+        <option value="2">2 Personen</option>
+        <option value="3">3 Personen</option>
+        <option value="4">4 Personen</option>
+        <option value="5">5 Personen</option>
+    </select>
+
+    <div id="participants-grid" class="participants-grid"></div>
+
+    <div class="extra-box">
+        <h3 style="margin-top:0; color:#e67e22;">Eure Wünsche</h3>
         
-        <label style="color:white; font-weight:bold;">Wie viele Personen reisen?</label>
-        <select id="personCount" onchange="renderCards()" style="max-width: 200px; margin: 10px auto; display:block;">
-            <option value="1">1 Person</option>
-            <option value="2">2 Personen</option>
-            <option value="3">3 Personen</option>
-            <option value="4">4 Personen</option>
-            <option value="5">5 Personen</option>
-        </select>
-
-        <div id="participants-grid" class="participants-grid"></div>
-
-        <div class="extra-options">
-            <h3 style="margin-top:0; color:#ffd700; border-bottom:1px solid rgba(255,255,255,0.3); padding-bottom:10px;">Reise-Details</h3>
-            
-            <label>Urlaubs-Vibe:</label>
-            <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:5px;">
-                <span>🧘 Entspannt</span>
-                <span>🧗 Action</span>
-            </div>
-            <input type="range" id="vibeRange" min="0" max="100" value="50">
-
-            <label>Wünsche & Hobbies:</label>
-            <textarea id="hobbiesInput" rows="3" placeholder="z.B. Wandern, Veganes Essen, bloß keine Hitze..."></textarea>
-
-            <label style="color:#ffd700;">Deine Email für das Ergebnis (Pflicht):</label>
-            <input type="email" id="userEmail" placeholder="name@beispiel.de" style="border: 2px solid #ffd700;">
+        <label>Ferien-Vibe:</label>
+        <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.9rem;">
+            <span>Entspannt 🏖️</span>
+            <span>Action 🧗</span>
         </div>
+        <input type="range" id="vibeRange" min="0" max="100" value="50">
 
-        <button id="matchButton" class="main-btn" onclick="startMatching()">Kosmische Analyse per Email anfordern</button>
-        
-        <div id="result"></div>
+        <label>Besondere Hobbies / Wünsche:</label>
+        <textarea id="hobbiesInput" rows="3" placeholder="z.B. Vegan, Surfen, Nachtleben..."></textarea>
+
+        <label style="color:#d35400;">Wohin soll die Empfehlung geschickt werden?</label>
+        <input type="email" id="userEmail" placeholder="deine@email.de" style="border: 2px solid #e67e22;">
     </div>
 
-    <script src="match.js"></script>
+    <button onclick="startMatching()" class="cta-btn">Kostenlose Analyse starten</button>
+    
+    <div id="result" style="margin-top:20px;"></div>
+</div>
+
+<script src="match.js"></script>
 
 </body>
 </html>
