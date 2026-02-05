@@ -1,47 +1,115 @@
-const zodiacs = ["Widder", "Stier", "Zwillinge", "Krebs", "Löwe", "Jungfrau", "Waage", "Skorpion", "Schütze", "Steinbock", "Wassermann", "Fische"];
+/**
+ * match.js - KI-Ferien.de
+ * Steuert die dynamische UI und die kosmische Ferien-Analyse
+ */
 
-function renderCards() {
-    const count = document.getElementById('personCount').value;
-    const grid = document.getElementById('participants-grid');
-    grid.innerHTML = '';
+const ZODIACS = [
+    "Widder", "Stier", "Zwillinge", "Krebs", "Löwe", "Jungfrau", 
+    "Waage", "Skorpion", "Schütze", "Steinbock", "Wassermann", "Fische"
+];
+
+// Initialisierung bei Seitenstart
+document.addEventListener('DOMContentLoaded', () => {
+    const personCountSelect = document.getElementById('personCount');
+    if (personCountSelect) {
+        // Erzeuge initiale Karten (Standard: 2 Personen)
+        renderParticipantCards(personCountSelect.value);
+        
+        // Event Listener für Änderungen der Personenanzahl
+        personCountSelect.addEventListener('change', (e) => {
+            renderParticipantCards(e.target.value);
+        });
+    }
+
+    const matchButton = document.getElementById('matchButton');
+    if (matchButton) {
+        matchButton.addEventListener('click', startCosmicAnalysis);
+    }
+});
+
+/**
+ * Erzeugt die Eingabekarten für die Teilnehmer basierend auf der Auswahl
+ */
+function renderParticipantCards(count) {
+    const container = document.getElementById('participants-grid');
+    if (!container) return;
+
+    container.innerHTML = ''; // Container leeren
 
     for (let i = 1; i <= count; i++) {
-        grid.innerHTML += `
-            <div class="card">
-                <h3>Teilnehmer ${i}</h3>
-                <select class="zodiac">
-                    ${zodiacs.map(z => `<option value="${z}">${z}</option>`).join('')}
+        const card = document.createElement('div');
+        card.className = 'card aura-card';
+        card.innerHTML = `
+            <h3>Reisende(r) ${i}</h3>
+            <div class="input-group">
+                <label>Sternzeichen:</label>
+                <select class="participant-zodiac">
+                    ${ZODIACS.map(z => `<option value="${z}">${z}</option>`).join('')}
                 </select>
-                <input type="number" class="age" placeholder="Gefühltes Alter" min="1" max="100" value="25">
+            </div>
+            <div class="input-group">
+                <label>Gefühltes Alter:</label>
+                <input type="number" class="participant-age" value="25" min="1" max="120">
             </div>
         `;
+        container.appendChild(card);
     }
 }
 
-async function startMatching() {
+/**
+ * Sammelt die Daten und startet die Analyse über die Netlify Function
+ */
+async function startCosmicAnalysis() {
+    const btn = document.getElementById('matchButton');
     const resultDiv = document.getElementById('result');
-    resultDiv.innerHTML = "KI analysiert eure Sternzeichen...";
-
-    const zodiacsSelected = document.querySelectorAll('.zodiac');
-    const agesSelected = document.querySelectorAll('.age');
+    
+    // Daten aus den Karten sammeln
+    const zodiacElements = document.querySelectorAll('.participant-zodiac');
+    const ageElements = document.querySelectorAll('.participant-age');
     
     const participants = [];
-    zodiacsSelected.forEach((z, i) => {
-        participants.push({ zodiac: z.value, age: agesSelected[i].value });
+    zodiacElements.forEach((el, index) => {
+        participants.push({
+            zodiac: el.value,
+            age: ageElements[index].value
+        });
     });
+
+    // UI-Feedback für die Analyse
+    btn.disabled = true;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = "✨ Analyse läuft...";
+    resultDiv.innerHTML = `<p class="loading">Die KI berechnet eure kosmischen Feriensynergien...</p>`;
 
     try {
         const response = await fetch('/api/gruppen-match', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ participants })
         });
+
+        if (!response.ok) throw new Error('Netzwerk-Antwort war nicht ok');
+
         const data = await response.json();
-        resultDiv.innerHTML = `Das ideale Ziel für euch: <br><span style="color:#ff6b6b; font-size: 1.5em;">${data.recommendation}</span>`;
+
+        // Ergebnis anzeigen
+        resultDiv.innerHTML = `
+            <div class="analysis-box">
+                <h2>Eure Kosmische Ferien-Analyse</h2>
+                <div class="recommendation-text">${data.recommendation}</div>
+            </div>
+        `;
+        
+        // Zum Ergebnis scrollen
+        resultDiv.scrollIntoView({ behavior: 'smooth' });
+
     } catch (error) {
-        resultDiv.innerHTML = "Fehler beim Matching. Prüfe die Konsole!";
+        console.error('Fehler bei der Analyse:', error);
+        resultDiv.innerHTML = `<p class="error">Der Kosmos ist gerade getrübt. (Fehler: ${error.message})</p>`;
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
     }
 }
-
-// Initialer Aufruf
-renderCards();
