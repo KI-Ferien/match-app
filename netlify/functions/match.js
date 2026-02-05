@@ -1,7 +1,6 @@
 /**
  * match.js - KI-Ferien.de
- * Version: 2.0 (Post-TOML-Fix)
- * Fokus: Maximale Fehlertoleranz und Feedback
+ * Version: 2.1 (Titel-Fix & Kosmische Analyse)
  */
 
 const ZODIACS = [
@@ -9,34 +8,31 @@ const ZODIACS = [
     "Waage", "Skorpion", "Schütze", "Steinbock", "Wassermann", "Fische"
 ];
 
-// Sicherstellen, dass das Skript erst läuft, wenn das HTML bereit ist
+// Initialisierung
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("🚀 Kosmische Analyse: Skript geladen.");
+    // FIX: Korrigiert den fehlerhaften Tab-Titel "Puppen-Matching"
+    document.title = "KI-Ferien.de | Kosmische Ferien-Analyse";
+    
+    console.log("🚀 Kosmische Analyse gestartet. Tab-Titel korrigiert.");
     
     const personCountSelect = document.getElementById('personCount');
     const matchButton = document.getElementById('matchButton');
     const grid = document.getElementById('participants-grid');
 
-    // 1. Initialer Aufbau der Karten
+    // Teilnehmer-Karten initial aufbauen
     if (personCountSelect && grid) {
         renderParticipantCards(personCountSelect.value);
         personCountSelect.addEventListener('change', (e) => renderParticipantCards(e.target.value));
-        console.log("✅ Teilnehmer-Karten bereit.");
-    } else {
-        console.warn("⚠️ HTML-Elemente für Karten fehlen. Prüfe IDs 'personCount' und 'participants-grid'.");
     }
 
-    // 2. Button-Event verknüpfen
+    // Analyse-Button verknüpfen
     if (matchButton) {
         matchButton.addEventListener('click', startCosmicAnalysis);
-        console.log("✅ Analyse-Button verknüpft.");
-    } else {
-        console.error("❌ Button mit ID 'matchButton' fehlt im HTML!");
     }
 });
 
 /**
- * Erzeugt die Eingabe-Karten dynamisch
+ * Erzeugt die Eingabe-Karten für das Gruppen-Matching
  */
 function renderParticipantCards(count) {
     const container = document.getElementById('participants-grid');
@@ -50,25 +46,24 @@ function renderParticipantCards(count) {
         card.innerHTML = `
             <h3 style="margin:0 0 10px 0;">Reisende(r) ${i}</h3>
             <label style="font-size: 0.8rem; opacity: 0.8;">Sternzeichen</label>
-            <select class="participant-zodiac" style="width:100%; padding:10px; margin:5px 0 15px 0; border-radius:8px; border:none;">
+            <select class="participant-zodiac" style="width:100%; padding:10px; margin:5px 0 15px 0; border-radius:8px; border:none; background: white;">
                 ${ZODIACS.map(z => `<option value="${z}">${z}</option>`).join('')}
             </select>
             <label style="font-size: 0.8rem; opacity: 0.8;">Gefühltes Alter</label>
-            <input type="number" class="participant-age" value="25" min="1" max="100" style="width:100%; padding:10px; border-radius:8px; border:none;">
+            <input type="number" class="participant-age" value="25" min="1" max="100" style="width:100%; padding:10px; border-radius:8px; border:none; background: white;">
         `;
         container.appendChild(card);
     }
 }
 
 /**
- * Kernfunktion: Kommunikation mit der Netlify Function
+ * Kommunikation mit der Netlify Function (Mistral KI)
  */
 async function startCosmicAnalysis() {
     const btn = document.getElementById('matchButton');
     const resultDiv = document.getElementById('result');
     if (!btn || !resultDiv) return;
 
-    // Daten aus UI sammeln
     const participants = [];
     const zodiacs = document.querySelectorAll('.participant-zodiac');
     const ages = document.querySelectorAll('.participant-age');
@@ -80,53 +75,36 @@ async function startCosmicAnalysis() {
         });
     });
 
-    // UI-Zustand: Laden
+    // Button-Feedback
     btn.disabled = true;
     const originalText = btn.innerHTML;
-    btn.innerHTML = "⏳ Analyse wird erstellt...";
-    resultDiv.innerHTML = "<p style='color: #ffd700; font-style: italic;'>Verbinde mit dem KI-Orakel...</p>";
+    btn.innerHTML = "✨ Analyse läuft...";
+    resultDiv.innerHTML = "<p style='color: #ffd700; font-style: italic;'>Verbinde mit dem KI-Orakel für eure Ferien...</p>";
 
     try {
-        console.log("📡 Sende Daten an /api/gruppen-match...");
-        
-        // Nutzt den Pfad, der durch netlify.toml /api/* definiert wurde
+        // Nutzt den Pfad aus der netlify.toml
         const response = await fetch('/api/gruppen-match', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ participants })
         });
 
-        if (!response.ok) {
-            const errorInfo = await response.text();
-            throw new Error(`Status ${response.status}: ${errorInfo}`);
-        }
+        if (!response.ok) throw new Error(`Status ${response.status}`);
 
         const data = await response.json();
-        console.log("✅ Antwort empfangen.");
 
-        // Ergebnis präsentieren
         resultDiv.innerHTML = `
-            <div style="background:rgba(255,255,255,0.15); padding:25px; border-radius:20px; color:white; margin-top:30px; border:1px solid #ffd700; animation: fadeIn 0.5s ease-in;">
+            <div style="background:rgba(255,255,255,0.15); padding:25px; border-radius:20px; color:white; margin-top:30px; border:1px solid #ffd700;">
                 <h2 style="color:#ffd700; margin-top:0;">Eure Kosmische Analyse</h2>
-                <div style="font-size:1.1rem; line-height:1.6; white-space: pre-wrap;">${data.recommendation}</div>
+                <div style="font-size:1.1rem; line-height:1.6;">${data.recommendation}</div>
             </div>
         `;
 
     } catch (error) {
-        console.error("❌ Analyse-Fehler:", error);
-        resultDiv.innerHTML = `
-            <div style="color:#ff6b6b; padding:20px; border: 1px solid #ff6b6b; border-radius:10px; background:rgba(255,0,0,0.1);">
-                <strong>Analyse unterbrochen.</strong><br>
-                Grund: ${error.message}<br><br>
-                <em>Tipp: Prüfe, ob die Netlify Function im Ordner 'netlify/functions/' liegt.</em>
-            </div>`;
+        console.error("Fehler:", error);
+        resultDiv.innerHTML = `<p style="color:#ff6b6b;">Die Sterne sind getrübt. Fehler: ${error.message}</p>`;
     } finally {
         btn.disabled = false;
         btn.innerHTML = originalText;
     }
 }
-
-// Kleine Animation für das Ergebnis
-const style = document.createElement('style');
-style.innerHTML = `@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }`;
-document.head.appendChild(style);
