@@ -1,6 +1,6 @@
 const ZODIACS = [
     "Widder", "Stier", "Zwillinge", "Krebs", "Löwe", "Jungfrau", 
-    "Waage", "Skorpion", "Schütze", "Steinbock", "Wassermann", "Fische"
+    "Waage", "Skorpion", "Schütze", "Steinbock", "Wassermann", "Fische" 
 ];
 
 function renderCards() {
