@@ -1,6 +1,6 @@
 /**
  * match.js - KI-Ferien.de
- * Version: 3.0 - Fehler-Diagnose Edition
+ * Version: 4.0 - "Finden" statt "Berechnen" & Klick-Garantie
  */
 
 const ZODIACS = [
@@ -9,19 +9,23 @@ const ZODIACS = [
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.title = "KI-Ferien.de | Kosmische Ferien-Analyse";
-    
-    const personCountSelect = document.getElementById('personCount');
+    // Sofort-Check: Ändert die Button-Farbe ganz leicht, damit du weißt: JS läuft!
     const matchButton = document.getElementById('matchButton');
+    if (matchButton) {
+        matchButton.style.border = "2px solid #ffd700";
+        matchButton.innerHTML = "Ferien-Ziel finden"; // Text-Anpassung
+        matchButton.addEventListener('click', startCosmicAnalysis);
+        console.log("✅ Skript aktiv: Button 'Ferien-Ziel finden' ist bereit.");
+    } else {
+        console.error("❌ Fehler: Button mit ID 'matchButton' nicht im HTML gefunden!");
+    }
+
+    const personCountSelect = document.getElementById('personCount');
     const grid = document.getElementById('participants-grid');
 
     if (personCountSelect && grid) {
         renderParticipantCards(personCountSelect.value);
         personCountSelect.addEventListener('change', (e) => renderParticipantCards(e.target.value));
-    }
-
-    if (matchButton) {
-        matchButton.addEventListener('click', startCosmicAnalysis);
     }
 });
 
@@ -48,49 +52,51 @@ function renderParticipantCards(count) {
 async function startCosmicAnalysis() {
     const btn = document.getElementById('matchButton');
     const resultDiv = document.getElementById('result');
-    if (!btn || !resultDiv) return;
+    
+    if (!resultDiv) {
+        alert("Fehler: Das Feld für das Ergebnis (ID: result) fehlt im HTML!");
+        return;
+    }
 
+    // Daten sammeln
     const participants = Array.from(document.querySelectorAll('.participant-zodiac')).map((z, i) => ({
         zodiac: z.value,
         age: document.querySelectorAll('.participant-age')[i].value
     }));
 
+    // Visuelles Feedback beim Klick
     btn.disabled = true;
-    btn.innerHTML = "✨ Analyse läuft...";
-    resultDiv.innerHTML = "<p style='color:#ffd700;'>Verbindung wird geprüft...</p>";
+    btn.innerHTML = "✨ Suche läuft...";
+    resultDiv.innerHTML = "<div style='text-align:center; padding:20px; color:#ffd700;'>Die KI befragt die Sterne für eure Ferien...</div>";
 
     try {
-        // Pfad-Check: Wir rufen /api/match auf
         const response = await fetch('/api/match', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ participants })
         });
 
-        if (response.status === 404) {
-            throw new Error("Die API-Schnittstelle wurde nicht gefunden (404). Prüfe, ob die Datei 'netlify/functions/match.js' existiert.");
-        }
-
         if (!response.ok) {
-            const errorMsg = await response.text();
-            throw new Error(`Server-Fehler (${response.status}): ${errorMsg}`);
+            throw new Error(`Server meldet Fehler ${response.status}. Prüfe die Netlify Functions.`);
         }
 
         const data = await response.json();
+        
         resultDiv.innerHTML = `
-            <div style="background:rgba(255,255,255,0.15); padding:25px; border-radius:20px; color:white; border:1px solid #ffd700;">
-                <h2 style="color:#ffd700;">Eure Analyse</h2>
-                <p>${data.recommendation}</p>
-            </div>`;
+            <div style="background:rgba(255,255,255,0.15); padding:25px; border-radius:20px; color:white; border:1px solid #ffd700; margin-top:20px; animation: fadeIn 0.5s;">
+                <h2 style="color:#ffd700; margin-top:0;">Euer Ferien-Ziel</h2>
+                <p style="line-height:1.6; font-size:1.1rem;">${data.recommendation}</p>
+            </div>
+        `;
 
     } catch (error) {
-        console.error("Detail-Fehler:", error);
+        console.error("Analyse-Fehler:", error);
         resultDiv.innerHTML = `
-            <div style="color:#ff6b6b; padding:20px; background:rgba(0,0,0,0.3); border-radius:15px; border:1px solid #ff6b6b;">
-                <strong>Diagnose:</strong><br>${error.message}
+            <div style="color:#ff6b6b; padding:20px; border:1px solid #ff6b6b; border-radius:15px; background:rgba(255,0,0,0.1);">
+                <strong>Hoppla!</strong><br>${error.message}
             </div>`;
     } finally {
         btn.disabled = false;
-        btn.innerHTML = "Ferien-Ziel berechnen";
+        btn.innerHTML = "Ferien-Ziel finden";
     }
 }
