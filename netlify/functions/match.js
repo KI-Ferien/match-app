@@ -1,11 +1,11 @@
 /**
  * match.js - KI-Ferien.de
- * VERSION: 7.0 - CACHE-BREAKER & TITLE-FIX
+ * VERSION: 10.0 - VIRTUAL API SYNC
  */
 
-// Dieser Befehl wird ausgeführt, sobald die Datei geladen wird - noch vor dem HTML!
-document.title = "KI-Ferien.de | Kosmische Ferien-Analyse";
-console.log("🚀 Version 7.0: Falls du das hier in der Konsole siehst, ist die NEUE Datei aktiv.");
+// Sofortige Kontrolle, ob die Datei geladen wurde
+document.title = "V10: Kosmische Ferien-Analyse";
+console.log("🚀 Version 10.0 aktiv: Nutzt virtuellen /api Pfad.");
 
 const ZODIACS = [
     "Widder", "Stier", "Zwillinge", "Krebs", "Löwe", "Jungfrau", 
@@ -13,8 +13,7 @@ const ZODIACS = [
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Sicherheitshalber nochmal setzen
-    document.title = "KI-Ferien.de | Kosmische Ferien-Analyse";
+    document.title = "V10: Kosmische Ferien-Analyse";
     
     const personCountSelect = document.getElementById('personCount');
     const matchButton = document.getElementById('matchButton');
@@ -40,7 +39,7 @@ function renderParticipantCards(count) {
         card.style.cssText = "background:rgba(255,255,255,0.1); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.2); padding:20px; border-radius:15px; margin:10px; color:white; flex: 1 1 200px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);";
         
         card.innerHTML = `
-            <h3 style="margin:0 0 10px 0;">Teilnehmer ${i}</h3>
+            <h3 style="margin:0 0 10px 0;">Reisende(r) ${i}</h3>
             <label style="font-size: 0.8rem; opacity: 0.8; display:block;">Sternzeichen</label>
             <select class="participant-zodiac" style="width:100%; padding:10px; margin:5px 0 15px 0; border-radius:8px; border:none; background:white; color:black;">
                 ${ZODIACS.map(z => `<option value="${z}">${z}</option>`).join('')}
@@ -66,18 +65,18 @@ async function startCosmicAnalysis() {
     });
 
     btn.disabled = true;
-    btn.innerHTML = "✨ Analyse läuft...";
-    resultDiv.innerHTML = "<p style='color: #ffd700; font-style: italic; text-align:center;'>Die KI berechnet eure kosmischen Ferien...</p>";
+    btn.innerHTML = "✨ Kosmos wird befragt...";
+    resultDiv.innerHTML = "<p style='color: #ffd700; text-align:center;'>Verbindung zum KI-Orakel wird hergestellt...</p>";
 
     try {
-        // Nutzt den Pfad /api/match (Redirect via netlify.toml)
+        // Dieser Pfad ist VIRTUELL (wird durch netlify.toml umgeleitet)
         const response = await fetch('/api/match', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ participants })
         });
 
-        if (!response.ok) throw new Error(`Fehler: ${response.status}`);
+        if (!response.ok) throw new Error(`Server-Fehler: ${response.status}`);
 
         const data = await response.json();
 
@@ -90,8 +89,8 @@ async function startCosmicAnalysis() {
 
     } catch (error) {
         console.error("Fehler:", error);
-        resultDiv.innerHTML = `<div style="color:#ff6b6b; text-align:center; padding:20px;">
-            <strong>Analyse unterbrochen.</strong><br>Grund: ${error.message}</div>`;
+        resultDiv.innerHTML = `<div style="color:#ff6b6b; text-align:center; padding:20px; border:1px solid #ff6b6b; border-radius:10px; margin-top:20px;">
+            <strong>Analyse fehlgeschlagen.</strong><br>Grund: ${error.message}</div>`;
     } finally {
         btn.disabled = false;
         btn.innerHTML = "Kosmische Ferien-Analyse starten";
