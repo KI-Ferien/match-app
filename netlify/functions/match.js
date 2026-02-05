@@ -1,10 +1,11 @@
 /**
  * match.js - KI-Ferien.de
- * VERSION: 6.0 - TAB-TITLE-FIX & API-SYNC
+ * VERSION: 7.0 - CACHE-BREAKER & TITLE-FIX
  */
 
-// 1. Sofortige Titel-Korrektur (noch vor dem DOM-Load)
+// Dieser Befehl wird ausgeführt, sobald die Datei geladen wird - noch vor dem HTML!
 document.title = "KI-Ferien.de | Kosmische Ferien-Analyse";
+console.log("🚀 Version 7.0: Falls du das hier in der Konsole siehst, ist die NEUE Datei aktiv.");
 
 const ZODIACS = [
     "Widder", "Stier", "Zwillinge", "Krebs", "Löwe", "Jungfrau", 
@@ -12,9 +13,8 @@ const ZODIACS = [
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Doppelte Absicherung für den Titel
+    // Sicherheitshalber nochmal setzen
     document.title = "KI-Ferien.de | Kosmische Ferien-Analyse";
-    console.log("🚀 Version 6.0 geladen. Tab-Titel wurde korrigiert.");
     
     const personCountSelect = document.getElementById('personCount');
     const matchButton = document.getElementById('matchButton');
@@ -22,9 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (personCountSelect && grid) {
         renderParticipantCards(personCountSelect.value);
-        personCountSelect.addEventListener('change', (e) => {
-            renderParticipantCards(e.target.value);
-        });
+        personCountSelect.addEventListener('change', (e) => renderParticipantCards(e.target.value));
     }
 
     if (matchButton) {
@@ -72,19 +70,19 @@ async function startCosmicAnalysis() {
     resultDiv.innerHTML = "<p style='color: #ffd700; font-style: italic; text-align:center;'>Die KI berechnet eure kosmischen Ferien...</p>";
 
     try {
-        // Pfad-Check: Greift auf netlify/functions/match.js zu
+        // Nutzt den Pfad /api/match (Redirect via netlify.toml)
         const response = await fetch('/api/match', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ participants })
         });
 
-        if (!response.ok) throw new Error(`Server-Status: ${response.status}`);
+        if (!response.ok) throw new Error(`Fehler: ${response.status}`);
 
         const data = await response.json();
 
         resultDiv.innerHTML = `
-            <div style="background:rgba(255,255,255,0.15); padding:25px; border-radius:20px; color:white; margin-top:30px; border:1px solid #ffd700; box-shadow: 0 0 20px rgba(255,215,0,0.2);">
+            <div style="background:rgba(255,255,255,0.15); padding:25px; border-radius:20px; color:white; margin-top:30px; border:1px solid #ffd700;">
                 <h2 style="color:#ffd700; margin-top:0; text-align:center;">Eure Kosmische Analyse</h2>
                 <div style="font-size:1.1rem; line-height:1.6; white-space:pre-wrap;">${data.recommendation}</div>
             </div>
@@ -92,7 +90,7 @@ async function startCosmicAnalysis() {
 
     } catch (error) {
         console.error("Fehler:", error);
-        resultDiv.innerHTML = `<div style="color:#ff6b6b; text-align:center; padding:20px; border:1px solid #ff6b6b; border-radius:10px; margin-top:20px;">
+        resultDiv.innerHTML = `<div style="color:#ff6b6b; text-align:center; padding:20px;">
             <strong>Analyse unterbrochen.</strong><br>Grund: ${error.message}</div>`;
     } finally {
         btn.disabled = false;
