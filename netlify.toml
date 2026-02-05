@@ -1,8 +1,16 @@
 [build]
-  command = "npm install"
-  publish = "."
+  # Falls deine index.html im Root liegt, bleibt "."
+  publish = "." 
+  # Der Pfad zu deinen Funktionen
   functions = "netlify/functions"
 
-[functions]
-  node_bundler = "esbuild"
-  external_node_modules = ["resend"]
+[[redirects]]
+  # Damit du im JavaScript einfach /api/ aufrufen kannst
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
