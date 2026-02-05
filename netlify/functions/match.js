@@ -34,23 +34,23 @@ exports.handler = async (event) => {
         const { participants, vibe, budget, hobbies, email } = JSON.parse(event.body);
         const TIMEOUT_LIMIT = 6000; 
 
-        // --- SINGULAR / PLURAL LOGIK ---
+        // Singular / Plural Check
         const isSingle = participants.length === 1;
         const anredeInstruktion = isSingle 
-            ? "Sprich den Nutzer im Singular an ('Du', 'Lieber Reisender')." 
-            : "Sprich die Gruppe im Plural an ('Ihr', 'Liebe Reisende').";
+            ? "Sprich den Nutzer persönlich an ('Du')." 
+            : "Sprich die Gruppe an ('Ihr').";
 
-        // --- BUDGET LOGIK ---
-        // Wir übersetzen die Zahl 0-100 in Text für die KI
-        let budgetText = "ausgewogenes Preis-Leistungs-Verhältnis";
-        if (budget < 30) budgetText = "sehr günstig, Low-Budget, Backpacker-Stil";
-        if (budget > 70) budgetText = "luxuriös, gehoben, exklusiv";
+        // Budget Text
+        let budgetText = "ausgewogen";
+        if (budget < 30) budgetText = "sehr günstig / Low-Budget";
+        if (budget > 70) budgetText = "gehoben / Luxus";
 
+        // Prompt mit Hinweis auf "Gefühltes Alter"
         const prompt = `
         Du bist ein astrologischer Reise-Experte.
         Schreibe direkt den Inhalt einer Email.
         
-        Zielgruppe: ${JSON.stringify(participants)}.
+        Zielgruppe (Alter = GEFÜHLTES Alter!): ${JSON.stringify(participants)}.
         ${anredeInstruktion}
         
         Präferenzen:
@@ -60,7 +60,7 @@ exports.handler = async (event) => {
         
         Aufgabe:
         1. Empfiehl EIN konkretes Ferienziel (Stadt, Land). PRÜFE GEOGRAFIE.
-        2. Begründe astrologisch.
+        2. Begründe astrologisch und beziehe dich auf das gefühlte Alter (Energielevel).
         3. Nutze Wort "Ferien".
         4. Keine Markdown-Formatierung (**).
         5. Keine Platzhalter.
@@ -95,7 +95,7 @@ exports.handler = async (event) => {
             aiText = aiText.replace(/Betreff:.*?\n/i, "").trim();
         } catch (e) {
             console.error("KI-Fallback:", e);
-            aiText = `Liebe Reisende,\n\naufgrund technischer Sternen-Interferenzen senden wir Ihnen hiermit manuell die Empfehlung: Portugal (Algarve). Perfekt für Ihr Budget und Ihre Wünsche.`;
+            aiText = `Liebe Reisende,\n\ntechnische Sternen-Interferenz. Wir empfehlen manuell: Portugal (Algarve). Perfekt für euer Energielevel.`;
         }
 
         const emailRequest = {
