@@ -1,75 +1,60 @@
-/**
- * match.js - KI-Ferien.de
- * Frontend-Logik im Root
- */
+const fetch = require('node-fetch');
 
-const ZODIACS = [
-    "Widder", "Stier", "Zwillinge", "Krebs", "Löwe", "Jungfrau", 
-    "Waage", "Skorpion", "Schütze", "Steinbock", "Wassermann", "Fische"
-];
+exports.handler = async (event) => {
+  // CORS-Header, damit das Frontend reden darf
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Content-Type': 'application/json'
+  };
 
-// Wird von onchange="renderCards()" im HTML gerufen
-function renderCards() {
-    const select = document.getElementById('personCount');
-    const container = document.getElementById('participants-grid');
-    if (!select || !container) return;
-    
-    const count = select.value;
-    container.innerHTML = ''; 
+  // Vorab-Check für Browser-Anfragen (Preflight)
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
+  }
 
-    for (let i = 1; i <= count; i++) {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-            <h3 style="margin:0 0 10px 0;">Reisende(r) ${i}</h3>
-            <label style="font-size:0.8rem;">Sternzeichen:</label>
-            <select class="participant-zodiac" style="width:100%; padding:8px; border-radius:5px; margin-bottom:10px;">
-                ${ZODIACS.map(z => `<option value="${z}">${z}</option>`).join('')}
-            </select>
-            <label style="font-size:0.8rem; display:block;">Gefühltes Alter:</label>
-            <input type="number" class="participant-age" value="25" min="1" max="100" style="width:100%; padding:8px; border-radius:5px;">
-        `;
-        container.appendChild(card);
+  try {
+    const { participants } = JSON.parse(event.body);
+    const apiKey = process.env.MISTRAL_API_KEY;
+
+    if (!apiKey) {
+      return { 
+        statusCode: 500, 
+        headers, 
+        body: JSON.stringify({ error: 'API-Key fehlt in den Netlify-Einstellungen.' }) 
+      };
     }
-}
 
-// Wird von onclick="startMatching()" im HTML gerufen
-async function startMatching() {
-    const resultDiv = document.getElementById('result');
-    const btn = document.querySelector('button');
-    if (!resultDiv || !btn) return;
+    // Den Prompt für die KI erstellen
+    const prompt = `Erstelle eine kurze, inspirierende Empfehlung für ein Ferien-Ziel (bitte das Wort Ferien statt Urlaub verwenden) basierend auf diesen Teilnehmern: ${JSON.stringify(participants)}. Antworte in 3-4 Sätzen.`;
 
-    const participants = Array.from(document.querySelectorAll('.participant-zodiac')).map((z, i) => ({
-        zodiac: z.value,
-        age: document.querySelectorAll('.participant-age')[i].value
-    }));
+    const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'mistral-tiny',
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
 
-    btn.disabled = true;
-    btn.innerHTML = "✨ Suche läuft...";
-    resultDiv.innerHTML = "Die Sterne werden befragt...";
+    const data = await response.json();
+    const recommendation = data.choices[0].message.content;
 
-    try {
-        const response = await fetch('/api/match', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ participants })
-        });
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({ recommendation })
+    };
 
-        if (!response.ok) throw new Error(`API-Fehler: ${response.status}`);
-
-        const data = await response.json();
-        resultDiv.innerHTML = `
-            <div style="background:rgba(255,255,255,0.25); padding:25px; border-radius:15px; margin-top:20px; color:white; text-align:left;">
-                <h2 style="margin-top:0; color:#ffd700;">Eure Ferien-Empfehlung</h2>
-                <p style="line-height:1.6;">${data.recommendation}</p>
-            </div>`;
-    } catch (e) {
-        resultDiv.innerHTML = `<div style="color:#ff6b6b; padding:15px; background:white; border-radius:10px;">Fehler: ${e.message}</div>`;
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = "Ferien-Ziel finden";
-    }
-}
-
-// Initialisierung
-document.addEventListener('DOMContentLoaded', renderCards);
+  } catch (error) {
+    console.error('Fehler im Backend:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: 'Fehler bei der KI-Analyse: ' + error.message })
+    };
+  }
+};
