@@ -1,90 +1,101 @@
 /**
- * netlify/functions/match.js
- * Backend-Logik für KI-Ferien.de
- * VERSION: 5.0 - Vollständige Mistral-Integration
+ * match.js - KI-Ferien.de
+ * VERSION: 6.0 - TAB-TITLE-FIX & API-SYNC
  */
 
-const fetch = require('node-fetch');
+// 1. Sofortige Titel-Korrektur (noch vor dem DOM-Load)
+document.title = "KI-Ferien.de | Kosmische Ferien-Analyse";
 
-exports.handler = async (event) => {
-    // CORS-Header für die Kommunikation mit dem Frontend
-    const headers = {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type",
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Content-Type": "application/json"
-    };
+const ZODIACS = [
+    "Widder", "Stier", "Zwillinge", "Krebs", "Löwe", "Jungfrau", 
+    "Waage", "Skorpion", "Schütze", "Steinbock", "Wassermann", "Fische"
+];
 
-    // Preflight-Anfrage (OPTIONS) abfangen
-    if (event.httpMethod === "OPTIONS") {
-        return { statusCode: 200, headers, body: "" };
+document.addEventListener('DOMContentLoaded', () => {
+    // Doppelte Absicherung für den Titel
+    document.title = "KI-Ferien.de | Kosmische Ferien-Analyse";
+    console.log("🚀 Version 6.0 geladen. Tab-Titel wurde korrigiert.");
+    
+    const personCountSelect = document.getElementById('personCount');
+    const matchButton = document.getElementById('matchButton');
+    const grid = document.getElementById('participants-grid');
+
+    if (personCountSelect && grid) {
+        renderParticipantCards(personCountSelect.value);
+        personCountSelect.addEventListener('change', (e) => {
+            renderParticipantCards(e.target.value);
+        });
     }
 
-    if (event.httpMethod !== "POST") {
-        return { 
-            statusCode: 405, 
-            headers, 
-            body: JSON.stringify({ error: "Nur POST-Anfragen erlaubt." }) 
-        };
+    if (matchButton) {
+        matchButton.addEventListener('click', startCosmicAnalysis);
     }
+});
+
+function renderParticipantCards(count) {
+    const container = document.getElementById('participants-grid');
+    if (!container) return;
+    container.innerHTML = ''; 
+
+    for (let i = 1; i <= count; i++) {
+        const card = document.createElement('div');
+        card.style.cssText = "background:rgba(255,255,255,0.1); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.2); padding:20px; border-radius:15px; margin:10px; color:white; flex: 1 1 200px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);";
+        
+        card.innerHTML = `
+            <h3 style="margin:0 0 10px 0;">Teilnehmer ${i}</h3>
+            <label style="font-size: 0.8rem; opacity: 0.8; display:block;">Sternzeichen</label>
+            <select class="participant-zodiac" style="width:100%; padding:10px; margin:5px 0 15px 0; border-radius:8px; border:none; background:white; color:black;">
+                ${ZODIACS.map(z => `<option value="${z}">${z}</option>`).join('')}
+            </select>
+            <label style="font-size: 0.8rem; opacity: 0.8; display:block;">Gefühltes Alter</label>
+            <input type="number" class="participant-age" value="25" min="1" max="100" style="width:100%; padding:10px; border-radius:8px; border:none; background:white; color:black;">
+        `;
+        container.appendChild(card);
+    }
+}
+
+async function startCosmicAnalysis() {
+    const btn = document.getElementById('matchButton');
+    const resultDiv = document.getElementById('result');
+    if (!btn || !resultDiv) return;
+
+    const participants = [];
+    const zodiacs = document.querySelectorAll('.participant-zodiac');
+    const ages = document.querySelectorAll('.participant-age');
+
+    zodiacs.forEach((z, i) => {
+        participants.push({ zodiac: z.value, age: ages[i].value });
+    });
+
+    btn.disabled = true;
+    btn.innerHTML = "✨ Analyse läuft...";
+    resultDiv.innerHTML = "<p style='color: #ffd700; font-style: italic; text-align:center;'>Die KI berechnet eure kosmischen Ferien...</p>";
 
     try {
-        const { participants } = JSON.parse(event.body);
-
-        if (!participants || !Array.isArray(participants)) {
-            throw new Error("Keine Teilnehmerdaten empfangen.");
-        }
-
-        const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
-        if (!MISTRAL_API_KEY) {
-            throw new Error("Mistral API Key fehlt in den Netlify Environment Variables.");
-        }
-
-        // Erstellung des astrologischen Prompts
-        const groupInfo = participants
-            .map((p, i) => `Person ${i + 1}: Sternzeichen ${p.zodiac}, gefühltes Alter ${p.age}`)
-            .join("; ");
-
-        const prompt = `Du bist ein KI-Astrologe für die Website KI-Ferien.de. 
-        Analysiere die folgende Reisegruppe: ${groupInfo}.
-        Basierend auf den Sternzeichen-Konstellationen und dem Alter, schlage ein harmonisches Ziel für ihre nächsten Ferien vor. 
-        Erkläre die Wahl kurz mit einem Hauch von Astrologie und KI-Logik. 
-        Wichtig: Benutze das Wort 'Ferien' statt 'Urlaub'. Antworte kurz und begeisternd auf Deutsch.`;
-
-        // Aufruf der Mistral API
-        const mistralResponse = await fetch("https://api.mistral.ai/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${MISTRAL_API_KEY}`
-            },
-            body: JSON.stringify({
-                model: "mistral-medium",
-                messages: [{ role: "user", content: prompt }],
-                temperature: 0.7
-            })
+        // Pfad-Check: Greift auf netlify/functions/match.js zu
+        const response = await fetch('/api/match', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ participants })
         });
 
-        const data = await mistralResponse.json();
+        if (!response.ok) throw new Error(`Server-Status: ${response.status}`);
 
-        if (!data.choices || data.choices.length === 0) {
-            throw new Error("Ungültige Antwort von der Mistral API.");
-        }
+        const data = await response.json();
 
-        return {
-            statusCode: 200,
-            headers,
-            body: JSON.stringify({
-                recommendation: data.choices[0].message.content
-            })
-        };
+        resultDiv.innerHTML = `
+            <div style="background:rgba(255,255,255,0.15); padding:25px; border-radius:20px; color:white; margin-top:30px; border:1px solid #ffd700; box-shadow: 0 0 20px rgba(255,215,0,0.2);">
+                <h2 style="color:#ffd700; margin-top:0; text-align:center;">Eure Kosmische Analyse</h2>
+                <div style="font-size:1.1rem; line-height:1.6; white-space:pre-wrap;">${data.recommendation}</div>
+            </div>
+        `;
 
     } catch (error) {
-        console.error("Fehler in der Function:", error);
-        return {
-            statusCode: 500,
-            headers,
-            body: JSON.stringify({ error: error.message })
-        };
+        console.error("Fehler:", error);
+        resultDiv.innerHTML = `<div style="color:#ff6b6b; text-align:center; padding:20px; border:1px solid #ff6b6b; border-radius:10px; margin-top:20px;">
+            <strong>Analyse unterbrochen.</strong><br>Grund: ${error.message}</div>`;
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = "Kosmische Ferien-Analyse starten";
     }
-};
+}
