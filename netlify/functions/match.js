@@ -31,39 +31,41 @@ exports.handler = async (event) => {
     if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
 
     try {
-        const { participants, vibe, budget, hobbies, email } = JSON.parse(event.body);
-        const TIMEOUT_LIMIT = 6000; 
+        const { participants, vibe, budget, hobbies, origin, email } = JSON.parse(event.body);
+        const TIMEOUT_LIMIT = 9000; 
 
-        // Singular / Plural Check
+        // Startort für den Link (nicht für den KI Text)
+        const startort = origin || "Deutschland";
+
         const isSingle = participants.length === 1;
-        const anredeInstruktion = isSingle 
-            ? "Sprich den Nutzer persönlich an ('Du')." 
-            : "Sprich die Gruppe an ('Ihr').";
+        const anredeInstruktion = isSingle ? "Anrede: 'Du'" : "Anrede: 'Ihr'";
 
-        // Budget Text
-        let budgetText = "ausgewogen";
-        if (budget < 30) budgetText = "sehr günstig / Low-Budget";
-        if (budget > 70) budgetText = "gehoben / Luxus";
+        let budgetText = "normal";
+        if (budget < 30) budgetText = "günstig (Studenten/Backpacker)";
+        if (budget > 70) budgetText = "gehoben (Luxus)";
 
-        // Prompt mit Hinweis auf "Gefühltes Alter"
+        // --- DER NEUE PROMPT: Fokus auf ZIEL & HIGHLIGHTS ---
         const prompt = `
-        Du bist ein astrologischer Reise-Experte.
-        Schreibe direkt den Inhalt einer Email.
-        
-        Zielgruppe (Alter = GEFÜHLTES Alter!): ${JSON.stringify(participants)}.
+        Rolle: Astrologischer Reiseführer.
+        Aufgabe: Erstelle eine inspirierende Email für: ${JSON.stringify(participants)}.
         ${anredeInstruktion}
         
-        Präferenzen:
-        - Vibe: ${vibe}% Action (0=Ruhe, 100=Action).
+        Input-Daten:
+        - Vibe: ${vibe}% Action (0=Ruhe/Kultur, 100=Sport/Party).
         - Budget: ${budgetText}.
-        - Wünsche: ${hobbies}.
+        - Hobbies/Wünsche: ${hobbies}.
+        - Alter = Gefühltes Alter / Energielevel.
         
-        Aufgabe:
-        1. Empfiehl EIN konkretes Ferienziel (Stadt, Land). PRÜFE GEOGRAFIE.
-        2. Begründe astrologisch und beziehe dich auf das gefühlte Alter (Energielevel).
-        3. Nutze Wort "Ferien".
-        4. Keine Markdown-Formatierung (**).
-        5. Keine Platzhalter.
+        STRUKTUR DER ANTWORT (Halte dich genau daran!):
+        1. Starte SOFORT mit dem Ziel: "Euer Seelenort ist: [Stadt, Land]!"
+        2. Die Highlights: Nenne 3 konkrete Tipps für vor Ort, die GENAU zu den Hobbies passen (z.B. ein spezielles Café, ein Museum, ein Strand, eine Aktivität). Sei spezifisch!
+        3. Die Magie: Erkläre kurz, warum dieses Ziel astrologisch perfekt zur Energie der Gruppe passt.
+        
+        Regeln:
+        - Nutze Wort "Ferien".
+        - Keine Markdown-Sternchen (*).
+        - Keine Betreffzeile.
+        - Länge: ca. 100 Wörter.
         `;
 
         const mistralKey = process.env.MISTRAL_API_KEY;
@@ -82,21 +84,32 @@ exports.handler = async (event) => {
         const mistralBody = JSON.stringify({
             model: "mistral-tiny", 
             messages: [{ role: "user", content: prompt }],
-            max_tokens: 250, 
-            temperature: 0.4 
+            max_tokens: 400, // Etwas mehr Platz für die Tipps
+            temperature: 0.6 // Etwas kreativer für coole Tipps
         });
 
-        let aiText = "Die Sterne empfehlen Ferien.";
+        let aiText = "";
         
         try {
             const aiResponse = await httpRequest(mistralRequest, mistralBody);
-            aiText = aiResponse.choices?.[0]?.message?.content || aiText;
-            aiText = aiText.replace(/\*\*/g, ""); 
-            aiText = aiText.replace(/Betreff:.*?\n/i, "").trim();
+            aiText = aiResponse.choices?.[0]?.message?.content || "";
+            aiText = aiText.replace(/\*\*/g, "").replace(/Betreff:.*?\n/i, "").trim();
         } catch (e) {
-            console.error("KI-Fallback:", e);
-            aiText = `Liebe Reisende,\n\ntechnische Sternen-Interferenz. Wir empfehlen manuell: Portugal (Algarve). Perfekt für euer Energielevel.`;
+            console.error("KI-Fehler:", e);
+            aiText = isSingle 
+                ? `Euer Seelenort ist: Lissabon, Portugal!\n\nHighlights für dich: Schlendere durch die Alfama, genieße Pastéis de Nata und fahre zum Surfen an die Costa da Caparica. Astrologisch perfekt für deine Abenteuerlust.` 
+                : `Euer Seelenort ist: Lissabon, Portugal!\n\nHighlights für euch: Schlendert durch die Alfama, genießt Pastéis de Nata und fahrt zum Surfen an die Costa da Caparica. Astrologisch perfekt für eure Abenteuerlust.`;
         }
+        
+        if (!aiText) aiText = "Die Sterne sortieren sich noch neu. Bitte versuche es gleich noch einmal.";
+
+        // Wir erstellen einen "Teaser" für die Webseite (Die ersten 120 Zeichen der Antwort)
+        // Meistens ist das: "Euer Seelenort ist: Wien, Österreich! Highlights: ..."
+        let previewText = aiText.length > 100 ? aiText.substring(0, 97) + "..." : aiText;
+
+        // Link für Google Maps (Route vom Startort zum Ziel - Ziel muss der User eintragen, oder wir lassen Maps das Ziel raten, aber Start ist fix)
+        // Da wir das Ziel im Code nicht isoliert haben (es steckt im aiText), öffnen wir Maps mit dem Startort.
+        const mapsLink = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(startort)}`;
 
         const emailRequest = {
             hostname: 'api.resend.com',
@@ -109,13 +122,23 @@ exports.handler = async (event) => {
         const emailBody = JSON.stringify({
             from: 'Kosmische Ferien <info@ki-ferien.de>', 
             to: [email],
-            subject: 'Deine persönliche Ferien-Empfehlung ✨',
+            subject: 'Dein kosmischer Reiseplan ist da 🗺️',
             html: `
-                <div style="font-family: 'Georgia', serif; color: #333; padding: 30px; line-height: 1.6; background-color: #fffaf0; border: 1px solid #eee;">
-                    <div style="text-align:center; margin-bottom:20px; color:#d35400; font-size:1.5em;">✨ KI-Ferien.de</div>
-                    <div style="font-size: 1.1rem; white-space: pre-line;">${aiText}</div>
-                    <hr style="border:0; border-top:1px solid #ddd; margin:30px 0;">
-                    <div style="text-align:center; font-style: italic; color: #7f8c8d; font-size: 0.9rem;">
+                <div style="font-family: 'Georgia', serif; color: #333; padding: 30px; background-color: #fffaf0; border: 1px solid #eee; max-width: 600px; margin: 0 auto;">
+                    <div style="text-align:center; margin-bottom:20px; color:#e67e22; font-size:1.6em; font-weight:bold;">✨ KI-Ferien.de</div>
+                    
+                    <div style="font-size: 1.15rem; white-space: pre-line; line-height: 1.6;">${aiText}</div>
+                    
+                    <div style="text-align:center; margin-top: 35px; margin-bottom: 15px;">
+                        <a href="${mapsLink}" style="background-color: #27ae60; color: white; padding: 14px 30px; text-decoration: none; border-radius: 30px; font-family: sans-serif; font-weight: bold; font-size: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                           🚗 Route von ${startort} berechnen
+                        </a>
+                    </div>
+                    <div style="text-align:center; font-size: 0.8rem; color: #999;">(Klicke auf den Button und gib das Ziel aus der Email ein)</div>
+
+                    <hr style="border:0; border-top:1px solid #e0d4b8; margin:30px 0;">
+                    
+                    <div style="text-align:center; font-style: italic; color: #7f8c8d; font-size: 0.95rem;">
                         Magische Grüße,<br>Michael & das KI-Team
                     </div>
                 </div>
@@ -127,7 +150,7 @@ exports.handler = async (event) => {
         return {
             statusCode: 200,
             headers,
-            body: JSON.stringify({ message: "Gesendet", preview: aiText })
+            body: JSON.stringify({ message: "Gesendet", preview: previewText })
         };
 
     } catch (error) {
