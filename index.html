@@ -74,6 +74,9 @@
             text-align: left;
         }
         
+        /* Hilfsklasse für größere Emojis */
+        .big-icon { font-size: 1.5em; vertical-align: middle; }
+
         button.cta-btn {
             background: #ff6b6b;
             color: white;
@@ -112,16 +115,16 @@
         <h3 style="margin-top:0; color:#e67e22;">Eure Wünsche</h3>
         
         <label>Ferien-Vibe:</label>
-        <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.9rem;">
-            <span>Entspannt 🏖️</span>
-            <span>Action 🧗</span>
+        <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.9rem; align-items: center;">
+            <span>Entspannt <span class="big-icon">🏖️</span></span>
+            <span>Action <span class="big-icon">🧗</span></span>
         </div>
         <input type="range" id="vibeRange" min="0" max="100" value="50">
 
         <label>Budget:</label>
-        <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.9rem;">
-            <span>Sparsam 💶</span>
-            <span>Luxus 💎</span>
+        <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.9rem; align-items: center;">
+            <span>Sparsam <span class="big-icon">💶</span></span>
+            <span>Luxus <span class="big-icon">💎</span></span>
         </div>
         <input type="range" id="budgetRange" min="0" max="100" value="50">
 
