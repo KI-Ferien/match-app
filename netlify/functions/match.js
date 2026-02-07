@@ -129,7 +129,7 @@ exports.handler = async (event) => {
         const zielEncoded = encodeURIComponent(zielOrt);
         
         // DEINE ID (Hier kannst du wechseln zwischen 492044 und 698672)
-        const tpId = '698672'; 
+        const tpId = '492044'; 
 
         // Link 1: Klook (Dynamisch + Deutsch /de/)
         const linkKlook = `https://www.klook.com/de/search?query=${zielEncoded}&aid=${tpId}`;
