@@ -120,7 +120,7 @@ exports.handler = async (event) => {
         const tpId = '492044'; // Deine Travelpayouts ID
 
         // Link 1: Klook (Dynamisch: Sucht nach dem gefundenen Ort)
-        const linkKlook = `https://www.klook.com/search?query=${zielEncoded}&aid=${tpId}`;
+        const linkKlook = `https://www.klook.com/de/search?query=${zielEncoded}&aid=${tpId}`;
         
         // Link 2: GetTransfer (Statisch wie gewünscht)
         const linkTransfer = "https://gettransfer.tpk.lv/mPE1eDIa";
