@@ -107,9 +107,78 @@ exports.handler = async (event) => {
         // Meistens ist das: "Euer Seelenort ist: Wien, Österreich! Highlights: ..."
         let previewText = aiText.length > 100 ? aiText.substring(0, 97) + "..." : aiText;
 
-        // Link für Google Maps (Route vom Startort zum Ziel - Ziel muss der User eintragen, oder wir lassen Maps das Ziel raten, aber Start ist fix)
-        // Da wir das Ziel im Code nicht isoliert haben (es steckt im aiText), öffnen wir Maps mit dem Startort.
-        const mapsLink = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(startort)}`;
+        // --- ÄNDERUNG START: Ziel auslesen & Links bauen ---
+
+        // Wir versuchen, das Ziel aus dem KI-Text zu "fischen" (steht meist nach "Seelenort ist:")
+        let zielOrt = "Urlaub"; // Fallback, falls die KI komisch antwortet
+        const zielMatch = aiText.match(/ist:\s*(.*?)[!.]/);
+        if (zielMatch && zielMatch[1]) {
+            zielOrt = zielMatch[1].trim();
+        }
+
+        const zielEncoded = encodeURIComponent(zielOrt);
+        const tpId = '492044'; // Deine ID
+
+        // Link 1: Klook (sucht nach dem KI-Ziel)
+        const linkKlook = `https://www.klook.com/search?query=${zielEncoded}&aid=${tpId}`;
+        // Link 2: GetTransfer (statisch)
+        const linkTransfer = "https://gettransfer.tpk.lv/mPE1eDIa";
+        // Link 3: Dein dritter Link (statisch)
+        const linkGeneric = "https://tpk.lv/pXm2idkE";
+
+        // --- ÄNDERUNG ENDE ---
+
+        const emailRequest = {
+            hostname: 'api.resend.com',
+            path: '/emails',
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+            timeout: 3000 
+        };
+
+        // Hier bauen wir die E-Mail OHNE Maps, aber MIT deinen Links
+        const emailBody = JSON.stringify({
+            from: 'Kosmische Ferien <info@ki-ferien.de>', 
+            to: [email],
+            subject: `Dein Seelenort ist: ${zielOrt} ✨`,
+            html: `
+                <div style="font-family: 'Georgia', serif; color: #333; padding: 30px; background-color: #fffaf0; border: 1px solid #eee; max-width: 600px; margin: 0 auto;">
+                    <div style="text-align:center; margin-bottom:20px; color:#e67e22; font-size:1.6em; font-weight:bold;">✨ KI-Ferien.de</div>
+                    
+                    <div style="font-size: 1.15rem; white-space: pre-line; line-height: 1.6;">${aiText}</div>
+                    
+                    <hr style="border:0; border-top:1px solid #e0d4b8; margin:30px 0;">
+                    
+                    <div style="text-align:center;">
+                        <h3 style="color: #2c3e50; margin-bottom: 20px;">Deine Angebote für ${zielOrt}:</h3>
+
+                        <div style="margin-bottom: 15px;">
+                            <a href="${linkKlook}" style="background-color: #ff5722; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+                                🎡 Aktivitäten in ${zielOrt} entdecken
+                            </a>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <a href="${linkTransfer}" style="background-color: #27ae60; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+                                🚕 Transfer zum Hotel buchen
+                            </a>
+                        </div>
+
+                        <div>
+                            <a href="${linkGeneric}" style="background-color: #2980b9; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+                                💎 Zum Top-Angebot
+                            </a>
+                        </div>
+                    </div>
+
+                    <hr style="border:0; border-top:1px solid #e0d4b8; margin:30px 0;">
+                    
+                    <div style="text-align:center; font-style: italic; color: #7f8c8d; font-size: 0.95rem;">
+                        Magische Grüße,<br>Michael & das KI-Team
+                    </div>
+                </div>
+            `
+        });
 
         const emailRequest = {
             hostname: 'api.resend.com',
