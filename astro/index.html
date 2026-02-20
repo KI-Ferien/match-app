@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KI-Ferien.de | Dein Astro-Planer</title>
+    <title>KI-Ferien.de | Astro-Planer</title>
     <style>
         :root {
             --glow-color: rgba(0, 150, 255, 0.8);
@@ -23,157 +23,112 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
+            overflow: hidden; /* Wichtig wegen des großen Schleiers */
             position: relative;
         }
 
-        /* --- LAYER 1: TIEFER WELTRAUM --- */
-        .space-bg {
+        /* --- EBENE 1: DER TIEFE HINTERGRUND --- */
+        .magic-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle at center, #0a1e3b 0%, #02040a 100%);
-            z-index: -3;
+            z-index: -10;
         }
 
-        /* --- LAYER 2: FUNKELNDE STERNE --- */
-        .stars {
+        /* --- EBENE 2: DER MAGISCHE SCHLEIER (NEU!) --- */
+        .nebula-veil {
+            position: fixed;
+            top: 50%; left: 50%;
+            width: 200vmax; height: 200vmax; /* Sehr groß, damit er beim Drehen alles füllt */
+            transform: translate(-50%, -50%);
+            z-index: -5;
+            /* Ein subtiler Mix aus transparentem Blau und Violett */
+            background: radial-gradient(circle at center, rgba(0, 100, 255, 0.08) 0%, rgba(120, 0, 255, 0.05) 30%, transparent 60%);
+            animation: rotate-veil 150s linear infinite; /* Dreht sich sehr langsam */
+            pointer-events: none; /* Klicks gehen durch */
+        }
+
+        @keyframes rotate-veil {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* --- EBENE 3: STERNE (CSS ONLY) --- */
+        .stars-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: -2;
-            background: transparent url('https://www.transparenttextures.com/patterns/stardust.png') repeat;
+            background-image: 
+                radial-gradient(1px 1px at 10% 10%, #fff, transparent),
+                radial-gradient(1px 1px at 20% 50%, #fff, transparent),
+                radial-gradient(2px 2px at 40% 80%, #fff, transparent),
+                radial-gradient(1px 1px at 60% 20%, #fff, transparent),
+                radial-gradient(2px 2px at 80% 40%, #fff, transparent),
+                radial-gradient(1px 1px at 90% 70%, #fff, transparent);
+            background-size: 300px 300px;
             opacity: 0.5;
-            animation: twinkle 8s infinite alternate ease-in-out;
+            animation: twinkle 6s infinite alternate;
         }
 
         @keyframes twinkle {
-            0% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(1.02); }
-            100% { opacity: 0.4; transform: scale(1); }
+            from { opacity: 0.3; }
+            to { opacity: 0.6; }
         }
 
-        /* --- LAYER 3: ZIEHENDER NEBULA-NEBEL --- */
-        .nebula {
-            position: fixed;
-            top: -50%; left: -50%; width: 200%; height: 200%;
-            z-index: -1;
-            background: radial-gradient(circle at center, rgba(0, 100, 255, 0.1) 0%, rgba(100, 0, 255, 0.05) 40%, transparent 70%);
-            animation: drift 60s infinite linear;
-            filter: blur(50px);
-        }
-
-        @keyframes drift {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* --- LAYOUT --- */
+        /* --- EBENE 4: VORDERGRUND INHALT --- */
         .main-container {
             display: flex;
             flex-direction: row;
             align-items: center;
             justify-content: center;
-            gap: 50px;
+            gap: 40px;
             width: 100%;
-            max-width: 1300px;
+            max-width: 1200px;
             padding: 20px;
-            z-index: 10;
+            z-index: 100; /* Sicher ganz vorne */
+            position: relative;
         }
 
         .zodiac-column {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            width: 190px;
+            gap: 12px;
+            width: 180px;
         }
 
         .zodiac-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             padding: 12px;
             text-align: center;
-            border-radius: 15px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            backdrop-filter: blur(10px);
+            transition: 0.3s;
+            backdrop-filter: blur(8px); /* Milchglas-Effekt verstärkt */
         }
 
         .zodiac-card:hover, .zodiac-card.active {
             border-color: var(--glow-color);
             background: rgba(0, 150, 255, 0.15);
-            box-shadow: 0 0 20px var(--glow-color), inset 0 0 10px rgba(0, 150, 255, 0.2);
-            transform: scale(1.1) translateX(5px);
+            box-shadow: 0 0 20px var(--glow-color);
+            transform: scale(1.05);
         }
 
-        .zodiac-column:last-child .zodiac-card:hover { transform: scale(1.1) translateX(-5px); }
+        .zodiac-symbol { font-size: 2rem; color: var(--text-gold); display: block; text-shadow: 0 0 10px rgba(255,204,0,0.5); }
+        .zodiac-name { font-weight: bold; display: block; margin-top: 5px; font-size: 0.9rem; }
+        .zodiac-date { font-size: 0.7rem; opacity: 0.7; }
 
-        .zodiac-symbol { 
-            font-size: 2.2rem; 
-            color: var(--text-gold); 
-            display: block; 
-            filter: drop-shadow(0 0 8px rgba(255, 204, 0, 0.5));
-        }
-        .zodiac-name { font-weight: bold; display: block; font-size: 1rem; margin-top: 5px; letter-spacing: 1px; }
-        .zodiac-date { font-size: 0.75rem; opacity: 0.6; }
-
-        /* --- MAGISCHE GLASKUGEL --- */
+        /* --- DIE RUNDE GLASKUGEL --- */
         .crystal-ball-container {
-            width: 420px;
-            height: 420px;
+            width: 380px;
+            height: 380px;
+            flex-shrink: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
         }
-
-        /* Äußerer Glow der Kugel */
-        .crystal-ball-container::after {
-            content: '';
-            position: absolute;
-            width: 110%; height: 110%;
-            background: radial-gradient(circle, rgba(0, 150, 255, 0.15) 0%, transparent 70%);
-            z-index: -1;
-            animation: breath 5s infinite ease-in-out;
-        }
-
-        .crystal-ball {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: radial-gradient(circle at 35% 35%, 
-                        rgba(255, 255, 255, 0.3) 0%, 
-                        rgba(0, 120, 255, 0.15) 40%, 
-                        rgba(0, 5, 20, 0.85) 90%);
-            box-shadow: 0 0 80px var(--glow-color), 
-                        inset 0 0 50px rgba(255, 255, 255, 0.1),
-                        inset -20px -20px 80px rgba(0, 0, 0, 0.8);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 50px;
-            position: relative;
-            animation: float 6s infinite ease-in-out;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-15px) scale(1.02); }
-        }
-
-        @keyframes breath {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.2); opacity: 0.8; }
-        }
-
-        .ball-content h1 { 
-            font-size: 2rem; 
-            margin: 0; 
-            color: #fff; 
-            text-shadow: 0 0 20px var(--glow-color);
-            letter-spacing: 2px;
-        }
-        .ball-content p { font-size: 1.05rem; margin: 20px 0; line-height: 1.5; min-height: 3em; }
-
-        .btn-astro {
+        
+        /* Leichter Schein hinter der Kugel */
+        .crystal-ball-container::before {
+             content: ''; position
