@@ -3,40 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KI-Ferien | Deine Sternen-Inspiration</title>
+    <title>Deine Analyse | KI-Ferien.de</title>
     <style>
-        :root {
-            --glow: #0096ff;
-            --gold: #ffcc00;
-            --bg: #02050a;
+        body { background: #02050a; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; background: radial-gradient(circle at center, #0a1e3b 0%, #02040a 100%); }
+        .result-card { max-width: 700px; background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; border: 1px solid rgba(0, 150, 255, 0.3); text-align: center; }
+        h1 { color: #ffcc00; }
+        .highlight { color: #0096ff; font-weight: bold; font-size: 1.2rem; }
+        .widget-box { background: white; color: #333; padding: 15px; border-radius: 10px; margin: 20px 0; }
+        .back-link { color: #0096ff; text-decoration: none; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="result-card">
+        <h1 id="z-title">Deine Sterne</h1>
+        <p class="highlight" id="z-destination"></p>
+        <p id="z-text" style="line-height:1.6;"></p>
+        
+        <div class="widget-box">
+            <strong>Passende Flüge & Hotels für dich</strong>
+            <p style="font-size:0.8rem;">Angebote werden basierend auf deiner Analyse geladen...</p>
+        </div>
+
+        <div style="text-align:left; margin-top:20px;">
+            <p><strong>Beste Reisezeit:</strong> <span id="z-time"></span></p>
+            <p><strong>Kosmischer Vibe:</strong> <span id="z-vibe"></span></p>
+        </div>
+
+        <a href="index.html" class="back-link">← Zurück zur Auswahl</a>
+    </div>
+
+    <script>
+        const data = {
+            krebs: { d: "Cornwall: Romantik am Meer", t: "Die Gezeiten spiegeln deine Seele. Entspanne in kuscheligen Cottages an der Steilküste.", time: "Juni bis August", vibe: "Geborgenheit & Wasser" },
+            widder: { d: "Island: Feuer & Eis", t: "Action pur! Entdecke Geysire und Vulkane.", time: "März bis Juni", vibe: "Energie & Dynamik" }
+            // Hier weitere Zeichen wie zuvor ergänzen...
+        };
+
+        const sign = new URLSearchParams(window.location.search).get('sign');
+        if (sign && data[sign]) {
+            document.getElementById('z-title').innerText = `Deine Reise für ${sign.toUpperCase()}`;
+            document.getElementById('z-destination').innerText = data[sign].d;
+            document.getElementById('z-text').innerText = data[sign].t;
+            document.getElementById('z-time').innerText = data[sign].time;
+            document.getElementById('z-vibe').innerText = data[sign].vibe;
         }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            background-color: var(--bg);
-            color: white;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 40px 20px;
-            background: radial-gradient(circle at center, #0a1e3b 0%, #02040a 100%);
-            min-height: 100vh;
-        }
-
-        .content-box {
-            max-width: 900px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 40px;
-            border-radius: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-        }
-
-        h1 {
-            color: var(--gold);
-            text-shadow: 0 0 15px rgba(255, 204, 0, 0.4);
-            margin-bottom: 10px;
+    </script>
+</body>
+</html>
