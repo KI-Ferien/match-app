@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deine Kosmische Reise | KI-Ferien.de</title>
+    <style>
+        :root {
+            --glow-color: #0096ff;
+            --text-gold: #ffcc00;
+            --bg-deep: #02050a;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-deep);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            background: radial-gradient(circle at center, #0a1e3b 0%, #02040a 100%);
+        }
+
+        /* Hintergrund-Effekte (identisch zur Hauptseite) */
+        .stars {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background-image: 
+                radial-gradient(1px 1px at 20px 30px, #fff, transparent),
+                radial-gradient(1.5px 1.5px at 100px 250px, #fff, transparent),
+                radial-gradient(2px 2px at 300px 150px, #fff, transparent);
+            background-size: 300px 300px;
+            opacity: 0.3;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 40px 20px;
+            z-index: 10;
+        }
+
+        /* Header Sektion */
+        .header-box {
+            background: var(--glass-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            backdrop-filter: blur(15px);
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            color: var(--text-gold);
+            font-size: 2.5rem;
+            margin: 0 0 10px 0;
+            text-shadow: 0 0 20px rgba(255, 204, 0, 0.4);
+        }
+
+        .destination-name {
+            font-size: 1.4rem;
+            color: var(--glow-color);
+            font-weight: bold;
+            display: block;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+
+        /* Widget Bereich */
+        .booking-card {
+            background: rgba(255, 255, 255, 0.95); /* Hellerer Kontrast für Widgets */
+            border-radius: 20px;
+            padding: 25px;
+            color: #333;
+            box-shadow: 0 0 40px var(--glow-color);
+            margin-bottom: 40px;
+        }
+
+        .booking-card h3 {
+            margin-top: 0;
+            color: #0056b3;
+            text-align: center;
+            font-size: 1.2rem;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Info Karten */
+        .astro-tips {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .tip-card {
+            background: var(--glass-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .tip-card h4 {
+            color: var(--text-gold);
+            margin: 0 0 10px 0;
+        }
+
+        .nav-footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn-back {
+            color: white;
+            text-decoration: none;
+            font-size: 1rem;
+            opacity: 0.6;
+            transition: 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 20px;
+        }
+
+        .btn-back:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-gold);
+            border-color: var(--text-gold);
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; }
+            .header-box { padding: 25px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="stars"></div>
+
+    <div class="container">
+        <section class="header-box">
+            <h1 id="zodiac-header">Deine Sterne</h1>
+            <span class="destination-name" id="dest-name">Suche Ferienziel...</span>
+            <p class="description" id="dest-desc">
+                Warte einen Moment, während wir die Planetenkonstellationen für deine Ferien auswerten.
+            </p>
+        </section>
+
+        <section class="booking-card">
+            <h3>Flüge & Unterkünfte vergleichen</h3>
+            <div id="tp-widget-container">
+                </div>
+        </section>
+
+        <section class="astro-tips">
+            <div class="tip-card">
+                <h4>Beste Reisezeit</h4>
+                <p id="tip-time">Wird berechnet...</p>
+            </div>
+            <div class
