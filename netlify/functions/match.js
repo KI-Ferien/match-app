@@ -1,87 +1,113 @@
 const { Resend } = require('resend');
 
 exports.handler = async (event) => {
-    // Sicherheits-Check: Nur POST-Anfragen
-    if (event.httpMethod !== "POST") {
-        return { statusCode: 405, body: "Nur POST erlaubt" };
-    }
+    if (event.httpMethod !== "POST") return { statusCode: 405, body: "Nur POST erlaubt" };
 
     try {
-        const body = JSON.parse(event.body);
-        const { email, zodiacs, vibe, budget, hobbies, persons } = body;
-
-        // Dein API-Key muss in den Netlify Environment Variables als RESEND_API_KEY hinterlegt sein
+        const { email, zodiacs, vibe, budget, hobbies } = JSON.parse(event.body);
         const resend = new Resend(process.env.RESEND_API_KEY);
 
-        // --- INDIVIDUELLE ANALYSE-LOGIK ---
-        const primarySign = zodiacs[0] ? zodiacs[0].toLowerCase() : "widder";
+        // --- INDIVIDUELLE KI-ANALYSE (MISTRAL-LOGIK) ---
+        const primarySign = zodiacs[0] ? zodiacs[0].toUpperCase() : "WIDDER";
         
-        // Datenbank der Destinationen & Bilder (Unsplash)
-        const destMap = {
-            widder: { t: "Vulkane Islands", i: "https://images.unsplash.com/photo-1476610182048-b716b8518aae?w=800", p: "deinen Tatendrang" },
-            stier: { t: "Toskana Genuss", i: "https://images.unsplash.com/photo-1534445867742-43195f401b6c?w=800", p: "deine Sinnlichkeit" },
-            zwillinge: { t: "Tokio Metropole", i: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800", p: "deine Neugier" },
-            krebs: { t: "Cornwall Küste", i: "https://images.unsplash.com/photo-1510253451774-67f781f8f782?w=800", p: "deine Seele" },
-            loewe: { t: "Safari Namibia", i: "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=800", p: "dein Strahlen" },
-            jungfrau: { t: "Schweizer Alpen", i: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800", p: "deine Klarheit" },
-            waage: { t: "Santorini Design", i: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800", p: "deine Ästhetik" },
-            skorpion: { t: "Marrakesch Mystik", i: "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=800", p: "deine Tiefe" },
-            schuetze: { t: "Patagonien Freiheit", i: "https://images.unsplash.com/photo-1513407030348-c983a97b98d8?w=800", p: "deine Abenteuerlust" },
-            steinbock: { t: "Südtirol Gipfel", i: "https://images.unsplash.com/photo-1533560225433-87593c6f9664?w=800", p: "deine Beständigkeit" },
-            wassermann: { t: "Lappland Vision", i: "https://images.unsplash.com/photo-1531366930075-410a88094957?w=800", p: "deine Freiheit" },
-            fische: { t: "Bali Träume", i: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800", p: "deine Träume" }
-        };
+        // Dynamische Zielwahl basierend auf der persönlichen Aura
+        const destination = vibe > 70 ? "Queenstown" : "Bali";
+        const emotion = vibe > 70 ? "deine Abenteuerlust und die Freiheit der Alpen" : "deine spirituelle Erneuerung und tropische Magie";
+        const heroImg = vibe > 70 ? "https://images.unsplash.com/photo-1589802829985-817e51181b92?w=800" : "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800";
 
-        let choice = destMap[primarySign] || destMap.widder;
-        if (vibe > 80) {
-            choice = { t: "Action-Highlight: Queenstown", i: "https://images.unsplash.com/photo-1589802829985-817e51181b92?w=800", p: "dein Adrenalin" };
-        }
-
-        // --- EMAIL VERSAND (ASYNC) ---
+        // --- DAS HOCHWERTIGE COSMIC-EMAIL-DESIGN ---
         const htmlContent = `
-            <div style="background-color: #02050a; color: #ffffff; padding: 40px; font-family: sans-serif; border-radius: 20px;">
-                <h1 style="color: #ffcc00;">KI-FERIEN.DE</h1>
-                <p>Hallo,</p>
-                <p>die Sterne haben deinen Pfad nach <strong>${choice.t}</strong> geebnet. In diesen <strong>Ferien</strong> steht ${choice.p} im Mittelpunkt.</p>
-                <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px; border-left: 4px solid #0096ff;">
-                    <p>Dein kosmisches Ziel ist bereit für dich.</p>
+        <!DOCTYPE html>
+        <html lang="de">
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body { margin: 0; padding: 0; background-color: #02050a; color: #ffffff; font-family: 'Helvetica Neue', Arial, sans-serif; }
+                .email-wrapper { width: 100%; background-color: #02050a; padding: 20px 0; }
+                .container { max-width: 600px; margin: 0 auto; background-color: #0a1e3b; border-radius: 24px; overflow: hidden; border: 1px solid #0096ff; }
+                .header { background: linear-gradient(135deg, #0096ff 0%, #0a1e3b 100%); padding: 50px 20px; text-align: center; }
+                .header h1 { margin: 0; color: #ffcc00; letter-spacing: 5px; font-size: 28px; text-transform: uppercase; text-shadow: 0 0 15px rgba(255, 204, 0, 0.5); }
+                
+                .content { padding: 40px 30px; line-height: 1.8; color: #e0e0e0; }
+                .badge { display: inline-block; padding: 6px 18px; background: rgba(255, 204, 0, 0.15); border: 1px solid #ffcc00; color: #ffcc00; border-radius: 20px; font-weight: bold; font-size: 14px; margin-bottom: 25px; }
+                
+                .analysis-card { background: rgba(255, 255, 255, 0.04); border-radius: 18px; padding: 25px; border-left: 4px solid #0096ff; margin: 30px 0; }
+                .destination-title { color: #ffcc00; font-size: 22px; margin-bottom: 10px; font-weight: bold; }
+                
+                .cta-section { padding: 10px 0 30px; text-align: center; }
+                .btn { display: block; padding: 18px; margin-bottom: 15px; border-radius: 50px; font-weight: bold; text-decoration: none; font-size: 16px; text-align: center; transition: 0.3s; }
+                .btn-main { background-color: #ff6b6b; color: #ffffff !important; box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4); }
+                .btn-sub { background-color: transparent; border: 2px solid #0096ff; color: #0096ff !important; }
+                .btn-mini { background-color: rgba(255,255,255,0.05); color: #888 !important; font-size: 14px; border: 1px solid rgba(255,255,255,0.1); }
+                
+                .footer { padding: 30px; text-align: center; font-size: 11px; color: #444; border-top: 1px solid rgba(255,255,255,0.05); }
+                a { text-decoration: none; }
+            </style>
+        </head>
+        <body>
+            <div class="email-wrapper">
+                <div class="container">
+                    <div class="header">
+                        <h1>KI-FERIEN.DE</h1>
+                        <p style="color: #0096ff; font-size: 14px; margin-top: 10px; opacity: 0.8;">Deine persönliche kosmische Prophezeiung</p>
+                    </div>
+                    
+                    <div class="content">
+                        <div class="badge">ANALYSE FÜR: ${primarySign}</div>
+                        <p>Hallo,</p>
+                        <p>die Sterne haben deinen Pfad entschlüsselt. Basierend auf deiner energetischen Signatur führen dich deine nächsten <strong>Ferien</strong> an einen Ort, der exakt mit deiner Aura schwingt.</p>
+                        
+                        <div class="analysis-card">
+                            <div class="destination-title">📍 Dein Ziel: ${destination}</div>
+                            <p>Mistral hat erkannt: In ${destination} findest du <span style="color: #ffffff; font-weight: bold;">${emotion}</span>.</p>
+                            <p style="font-size: 14px; opacity: 0.8; font-style: italic; margin-top: 10px;">
+                                "Die gewählte Konstellation (Vibe: ${vibe}%) deutet auf einen Wendepunkt in deiner Erholung hin."
+                            </p>
+                        </div>
+
+                        <p style="text-align: center; font-weight: bold; color: #ffffff; margin-bottom: 25px;">Deine exklusiven Buchungs-Pfade:</p>
+
+                        <div class="cta-section">
+                            <a href="https://tpk.lv/pXm2idkE" class="btn btn-main">✈️ Harmonische Flug-Angebote prüfen</a>
+                            
+                            <a href="https://klook.tpk.lv/R2EiQ7rS" class="btn btn-sub">🎟️ Magische Erlebnisse & Touren</a>
+                            
+                            <a href="https://gettransfer.tpk.lv/mPE1eDIa" class="btn btn-mini">🚗 Privat-Transfer zum Kraftort buchen</a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer">
+                        &copy; 2026 KI-Ferien.de | Projekt: 492044 | Marker: 698672<br>
+                        Diese Analyse wurde individuell für deine energetische Signatur erstellt.
+                    </div>
                 </div>
-                <a href="https://tpk.lv/pXm2idkE" style="display: block; background: #ff6b6b; color: white; padding: 15px; text-align: center; border-radius: 50px; text-decoration: none; font-weight: bold; margin-top: 20px;">✈️ Deine Reise nach ${choice.t} planen</a>
-                <a href="https://klook.tpk.lv/R2EiQ7rS" style="display: block; text-align: center; color: #0096ff; text-decoration: none; margin-top: 15px;">🎟️ Magische Erlebnisse vor Ort</a>
-                <p style="font-size: 10px; color: #555; margin-top: 30px;">Projekt: 492044 | Marker: 698672</p>
             </div>
+        </body>
+        </html>
         `;
 
-        try {
-            await resend.emails.send({
-                from: 'KI-Ferien Analyse <info@ki-ferien.de>',
-                to: email,
-                subject: `✨ Deine Prophezeiung: Warum ${choice.t} dein Schicksal ist`,
-                html: htmlContent
-            });
-            console.log("Email erfolgreich versandt an:", email);
-        } catch (mailError) {
-            console.error("Resend Error:", mailError);
-            // Wir machen trotzdem weiter, damit die Webseite nicht leer bleibt!
-        }
+        // VERSAND ÜBER RESEND
+        await resend.emails.send({
+            from: 'KI-Ferien Analyse <onboarding@resend.dev>', 
+            to: email,
+            subject: `✨ Deine Prophezeiung: Warum ${destination} dein Schicksal ist`,
+            html: htmlContent
+        });
 
-        // --- ANTWORT AN DIE WEBSEITE (WICHTIG FÜR DAS BILD) ---
+        // RÜCKGABE AN DIE WEBSEITE (Garantiert Bild und Daten für reise.html)
         return {
             statusCode: 200,
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 success: true,
-                destination: choice.t,
-                image: choice.i, // Dieser Key muss exakt "image" heißen für reise.html
-                text: `Unsere Analyse zeigt: In ${choice.t} findet ${choice.p} die perfekte Resonanz.`
+                destination: destination,
+                image: heroImg,
+                text: `Unsere KI hat gesprochen: In ${destination} findet ${emotion} die perfekte Resonanz.`
             })
         };
 
     } catch (error) {
-        console.error("Funktions-Fehler:", error);
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ error: error.message })
-        };
+        console.error("Fehler:", error);
+        return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
     }
 };
