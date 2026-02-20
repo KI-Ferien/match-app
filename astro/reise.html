@@ -3,50 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deine Analyse | KI-Ferien.de</title>
+    <title>KI-Analyse | KI-Ferien.de</title>
     <style>
-        body { background: #02050a; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; background: radial-gradient(circle at center, #0a1e3b 0%, #02040a 100%); }
-        .result-card { max-width: 700px; background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; border: 1px solid rgba(0, 150, 255, 0.3); text-align: center; }
-        h1 { color: #ffcc00; }
-        .highlight { color: #0096ff; font-weight: bold; font-size: 1.2rem; }
-        .widget-box { background: white; color: #333; padding: 15px; border-radius: 10px; margin: 20px 0; }
-        .back-link { color: #0096ff; text-decoration: none; margin-top: 20px; }
+        :root { --glow: #0096ff; --gold: #ffcc00; --bg: #02050a; }
+        body { 
+            background: #02050a; color: white; font-family: sans-serif; 
+            display: flex; flex-direction: column; align-items: center; padding: 40px 20px; 
+            background: radial-gradient(circle at center, #0a1e3b 0%, #02040a 100%); 
+        }
+        .result-card { 
+            max-width: 800px; width: 100%; background: rgba(255,255,255,0.05); 
+            padding: 40px; border-radius: 25px; border: 1px solid var(--glow); text-align: center; 
+        }
+        .ai-status { color: var(--gold); font-weight: bold; margin-bottom: 20px; font-size: 1.2rem; }
+        .dynamic-content { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 15px; margin: 20px 0; border-left: 4px solid var(--glow); text-align: left; }
+        .param-info { font-size: 0.8rem; opacity: 0.6; margin-top: 20px; }
+        .back-link { color: var(--glow); text-decoration: none; margin-top: 30px; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="result-card">
-        <h1 id="z-title">Deine Sterne</h1>
-        <p class="highlight" id="z-destination"></p>
-        <p id="z-text" style="line-height:1.6;"></p>
+        <h1>Deine KI-Ferien Analyse</h1>
+        <p class="ai-status" id="loading-text">KI-Engine (Mistral) generiert Ergebnisse...</p>
         
-        <div class="widget-box">
-            <strong>Passende Flüge & Hotels für dich</strong>
-            <p style="font-size:0.8rem;">Angebote werden basierend auf deiner Analyse geladen...</p>
+        <div class="dynamic-content">
+            <h2 id="res-title" style="color:var(--glow); margin-bottom:10px;">Lade Ziel...</h2>
+            <p id="res-desc">Deine individuellen Ferien werden basierend auf deinen Parametern berechnet.</p>
         </div>
 
-        <div style="text-align:left; margin-top:20px;">
-            <p><strong>Beste Reisezeit:</strong> <span id="z-time"></span></p>
-            <p><strong>Kosmischer Vibe:</strong> <span id="z-vibe"></span></p>
-        </div>
-
-        <a href="index.html" class="back-link">← Zurück zur Auswahl</a>
+        <div class="param-info" id="debug-params"></div>
+        <a href="index.html" class="back-link">← Neue Analyse starten</a>
     </div>
 
     <script>
-        const data = {
-            krebs: { d: "Cornwall: Romantik am Meer", t: "Die Gezeiten spiegeln deine Seele. Entspanne in kuscheligen Cottages an der Steilküste.", time: "Juni bis August", vibe: "Geborgenheit & Wasser" },
-            widder: { d: "Island: Feuer & Eis", t: "Action pur! Entdecke Geysire und Vulkane.", time: "März bis Juni", vibe: "Energie & Dynamik" }
-            // Hier weitere Zeichen wie zuvor ergänzen...
-        };
+        const params = new URLSearchParams(window.location.search);
+        const sign = params.get('sign');
+        const p = params.get('p');
+        const v = params.get('v');
+        const b = params.get('b');
 
-        const sign = new URLSearchParams(window.location.search).get('sign');
-        if (sign && data[sign]) {
-            document.getElementById('z-title').innerText = `Deine Reise für ${sign.toUpperCase()}`;
-            document.getElementById('z-destination').innerText = data[sign].d;
-            document.getElementById('z-text').innerText = data[sign].t;
-            document.getElementById('z-time').innerText = data[sign].time;
-            document.getElementById('z-vibe').innerText = data[sign].vibe;
-        }
+        // Simulation der dynamischen Zuweisung (da Mistral die Daten generiert)
+        setTimeout(() => {
+            document.getElementById('loading-text').innerText = "Analyse abgeschlossen!";
+            
+            // Beispielhafte Logik für die Anzeige
+            if(sign === 'krebs') {
+                document.getElementById('res-title').innerText = "Cornwall: Romantik am Meer";
+                document.getElementById('res-desc').innerText = "Basierend auf deinem Budget-Index von " + b + " und dem Vibe (" + v + ") empfehlen wir ein gemütliches Cottage an der Steilküste für " + p + " Personen.";
+            } else {
+                document.getElementById('res-title').innerText = "Dein kosmisches Ziel für " + sign.toUpperCase();
+                document.getElementById('res-desc').innerText = "Die KI hat ein Ziel gefunden, das perfekt zu deinem Vibe-Wert von " + v + " passt. Details folgen per Email.";
+            }
+            document.getElementById('debug-params').innerText = `Parameter: Sign=${sign}, Pers=${p}, Vibe=${v}, Budget=${b}`;
+        }, 1500);
     </script>
 </body>
 </html>
