@@ -120,11 +120,19 @@
 
             // Logik-Mapping für die visuelle Vorschau
             const presets = {
-                widder: { t: "Vulkane Islands", d: "Pure Action und Naturgewalten für deinen Tatendrang.", i: "https://images.unsplash.com/photo-1476610182048-b716b8518aae?w=800" },
-                loewe: { t: "Safari Namibia", d: "Majestätische Weite und Luxus unter afrikanischen Sternen.", i: "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=800" },
-                krebs: { t: "Cornwall Küste", d: "Romantische Cottages und Geborgenheit am wilden Meer.", i: "https://images.unsplash.com/photo-1510253451774-67f781f8f782?w=800" },
-                jungfrau: { t: "Schweizer Alpen", d: "Klarheit, Wandern und perfekte Bergstille.", i: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800" }
-            };
+    widder: { t: "Vulkane Islands", d: "Pure Action und Naturgewalten für deinen Tatendrang.", i: "https://images.unsplash.com/photo-1476610182048-b716b8518aae?w=800" },
+    stier: { t: "Toskana Genuss", d: "Sinnliche Hügellandschaften und erstklassige Wellness.", i: "https://images.unsplash.com/photo-1534445867742-43195f401b6c?w=800" },
+    zwillinge: { t: "Tokio Metropole", d: "Unendliche Inspiration und pulsierendes Stadtleben.", i: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800" },
+    krebs: { t: "Cornwall Küste", d: "Romantische Cottages und Geborgenheit am wilden Meer.", i: "https://images.unsplash.com/photo-1510253451774-67f781f8f782?w=800" },
+    loewe: { t: "Safari Namibia", d: "Majestätische Weite und Luxus unter afrikanischen Sternen.", i: "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=800" },
+    jungfrau: { t: "Schweizer Alpen", d: "Klarheit, Wandern und perfekte Bergstille.", i: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800" },
+    waage: { t: "Santorini Design", d: "Ästhetik pur zwischen azurblauem Meer und weißen Mauern.", i: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800" },
+    skorpion: { t: "Marrakesch Mystik", d: "Geheimnisvolle Gassen und intensive Sinneserlebnisse.", i: "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=800" },
+    schuetze: { t: "Patagonien Freiheit", d: "Grenzenlose Expeditionen am Ende der Welt.", i: "https://images.unsplash.com/photo-1513407030348-c983a97b98d8?w=800" },
+    steinbock: { t: "Südtirol Gipfel", d: "Beständigkeit und Erfolg in den höchsten Höhen.", i: "https://images.unsplash.com/photo-1533560225433-87593c6f9664?w=800" },
+    wassermann: { t: "Lappland Vision", d: "Unkonventionelle Nächte im Glas-Iglu unter Polarlichtern.", i: "https://images.unsplash.com/photo-1531366930075-410a88094957?w=800" },
+    fische: { t: "Bali Träume", d: "Spirituelle Heilung und Magie am Indischen Ozean.", i: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800" }
+};
 
             // Auswahl basierend auf erstem Zeichen oder Vibe
             let choice = presets[firstSign] || { t: "Dein kosmisches Ziel", d: "Mistral hat ein Ziel generiert, das perfekt zu eurer Konstellation passt.", i: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800" };
