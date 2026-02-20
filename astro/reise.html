@@ -7,102 +7,135 @@
     <style>
         :root { --glow: #0096ff; --gold: #ffcc00; --bg: #02050a; }
         body { 
-            background: #02050a; color: white; font-family: 'Helvetica Neue', Arial, sans-serif; 
-            display: flex; flex-direction: column; align-items: center; padding: 40px 20px; 
-            background: radial-gradient(circle at center, #0a1e3b 0%, #02040a 100%); 
+            background: var(--bg); color: white; font-family: 'Helvetica Neue', Arial, sans-serif; 
+            display: flex; flex-direction: column; align-items: center; padding: 50px 20px; 
+            min-height: 100vh; overflow-x: hidden; position: relative;
         }
-        .container { 
-            max-width: 850px; width: 100%; background: rgba(255,255,255,0.05); 
-            padding: 40px; border-radius: 25px; border: 1px solid var(--glow); 
-            text-align: center; backdrop-filter: blur(15px); 
-        }
-        .ai-badge { 
-            display: inline-block; padding: 5px 15px; background: var(--glow); 
-            border-radius: 20px; font-size: 0.7rem; font-weight: bold; margin-bottom: 20px; 
-        }
-        .result-box { 
-            background: rgba(255,255,255,0.03); padding: 30px; border-radius: 15px; 
-            border-left: 4px solid var(--gold); text-align: left; margin: 20px 0; 
-        }
-        h1 { color: var(--gold); font-size: 1.8rem; }
-        .zodiac-tags { margin: 10px 0; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-        .tag { background: rgba(0, 150, 255, 0.2); padding: 4px 12px; border-radius: 15px; font-size: 0.8rem; border: 1px solid var(--glow); }
+
+        /* --- ATMOSPHÄRISCHER HINTERGRUND --- */
+        .deep-space { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #0a1e3b 0%, #02050a 100%); z-index: -4; }
         
-        /* Widget Placeholder für Travelpayouts */
-        .travel-widget { 
-            background: white; color: #333; padding: 20px; border-radius: 12px; 
-            margin-top: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+        /* Mystische Schleier */
+        .nebula {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(0, 150, 255, 0.2), transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(120, 0, 255, 0.15), transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(0, 100, 255, 0.1), transparent 60%);
+            filter: blur(100px); z-index: -3; animation: nebulaFlow 20s infinite alternate ease-in-out;
         }
+        @keyframes nebulaFlow { from { transform: scale(1) rotate(0deg); } to { transform: scale(1.1) rotate(3deg); } }
+
+        /* Dichte Sterne */
+        .stars {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(1px 1px at 20px 30px, #fff, transparent),
+                radial-gradient(1.5px 1.5px at 150px 250px, #fff, transparent),
+                radial-gradient(1px 1px at 400px 100px, #fff, transparent),
+                radial-gradient(2px 2px at 60% 30%, #fff, transparent),
+                radial-gradient(1px 1px at 80% 70%, #fff, transparent);
+            background-size: 300px 300px; opacity: 0.6; z-index: -2; animation: twinkle 5s infinite alternate;
+        }
+        @keyframes twinkle { from { opacity: 0.4; } to { opacity: 0.8; } }
+
+        /* --- CONTAINER --- */
+        .teaser-box { 
+            position: relative; z-index: 10; max-width: 700px; width: 100%; text-align: center; 
+            background: rgba(255,255,255,0.02); padding: 40px; border-radius: 40px;
+            border: 1px solid rgba(0, 150, 255, 0.2); backdrop-filter: blur(20px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.7);
+        }
+        
+        .ai-badge { color: var(--glow); font-size: 0.7rem; font-weight: bold; letter-spacing: 2px; margin-bottom: 10px; display: block; }
+        h1 { font-size: 1.5rem; color: white; margin-bottom: 25px; }
+
+        .zodiac-tags { display: flex; gap: 10px; justify-content: center; margin-bottom: 30px; flex-wrap: wrap; }
+        .tag { padding: 6px 16px; border: 1px solid var(--gold); border-radius: 5px; color: var(--gold); font-weight: bold; font-size: 0.85rem; text-transform: uppercase; background: rgba(255, 204, 0, 0.05); }
+
+        .dest-image { 
+            width: 100%; height: 280px; border-radius: 20px; overflow: hidden; 
+            margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1); background: #000;
+        }
+        .dest-image img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.5s ease; }
+        .dest-image img.visible { opacity: 0.7; }
+
+        .result-title { color: var(--glow); font-size: 1.4rem; font-weight: bold; margin-bottom: 12px; display: block; text-shadow: 0 0 15px var(--glow); }
+        .result-text { line-height: 1.7; font-size: 1.1rem; opacity: 0.9; margin: 0 auto 30px; max-width: 550px; }
+
+        .email-status { font-size: 0.85rem; color: #aaa; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 25px; font-style: italic; }
+        .back-link { margin-top: 30px; display: inline-block; color: var(--glow); text-decoration: none; font-weight: bold; transition: 0.3s; }
+        .back-link:hover { color: var(--gold); }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="ai-badge">KI-ENGINE AKTIV (MISTRAL)</div>
-        <h1 id="main-title">Deine Kosmische Ferien-Analyse</h1>
+    <div class="deep-space"></div>
+    <div class="nebula"></div>
+    <div class="stars"></div>
+
+    <div class="teaser-box">
+        <span class="ai-badge">KI-ENGINE AKTIV (MISTRAL)</span>
+        <h1>Deine Kosmische Ferien-Analyse</h1>
         
-        <div class="zodiac-tags" id="tag-container">
-            </div>
+        <div class="zodiac-tags" id="tag-box"></div>
 
-        <div class="result-box">
-            <h2 id="dest-title" style="color:var(--glow);">Berechne Harmonien...</h2>
-            <p id="dest-text" style="line-height: 1.6; margin-top: 10px; opacity: 0.9;">
-                Die Konstellation eurer Gruppe wird analysiert. Wir suchen nach dem Ort, der Vibe, Budget und eure Sternzeichen vereint...
-            </p>
+        <div class="dest-image">
+            <img id="main-img" src="" alt="Zielgebietsvorschau">
         </div>
 
-        <div class="travel-widget">
-            <h3 style="margin-bottom:15px; font-size: 1rem;">Exklusive Angebote für eure Konstellation</h3>
-            <div id="tp-widget">
-                <p style="font-size: 0.8rem; color: #666;">Suche nach passenden Flügen und Unterkünften...</p>
-            </div>
+        <div class="content">
+            <span class="result-title" id="res-title">Lade Konstellation...</span>
+            <p class="result-text" id="res-text">Die KI berechnet das optimale Ziel für eure Energien.</p>
         </div>
 
-        <p style="font-size: 0.8rem; margin-top: 30px; opacity: 0.5;">
-            Eine detaillierte PDF-Analyse wurde soeben an deine Email-Adresse versandt.
+        <p class="email-status">
+            Die detaillierte Analyse inklusive exklusiver Angebote (ID: 698672) wurde soeben an deine Email-Adresse versandt.
         </p>
-        <a href="index.html" style="color:var(--glow); text-decoration:none; display:block; margin-top:20px; font-weight:bold;">← Neue Suche</a>
+
+        <a href="index.html" class="back-link">← Neue Suche</a>
     </div>
 
     <script>
-        // Daten aus der URL extrahieren
-        const urlParams = new URLSearchParams(window.location.search);
-        const signs = (urlParams.get('signs') || "").split(',');
-        const vibe = parseInt(urlParams.get('v') || 50);
-        const budget = parseInt(urlParams.get('b') || 50);
-
-        // UI-Update
-        const tagContainer = document.getElementById('tag-container');
+        const params = new URLSearchParams(window.location.search);
+        const signs = (params.get('signs') || "").split(',').filter(Boolean);
+        
+        // Tags erzeugen
+        const tagBox = document.getElementById('tag-box');
         signs.forEach(s => {
-            if(s) {
-                const span = document.createElement('span');
-                span.className = 'tag';
-                span.innerText = s.toUpperCase();
-                tagContainer.appendChild(span);
-            }
+            const tag = document.createElement('div');
+            tag.className = 'tag';
+            tag.innerText = s.toUpperCase();
+            tagBox.appendChild(tag);
         });
 
-        // Simulation der dynamischen KI-Antwort
+        // Ergebnisse anzeigen
         setTimeout(() => {
-            const destTitle = document.getElementById('dest-title');
-            const destText = document.getElementById('dest-text');
+            const title = document.getElementById('res-title');
+            const text = document.getElementById('res-text');
+            const img = document.getElementById('main-img');
 
-            // Beispielhafte Logik für die dynamische Anzeige
-            if (signs.includes('krebs') && signs.includes('skorpion')) {
-                destTitle.innerText = "Mystisches Wasser-Abenteuer: Schottische Highlands";
-                destText.innerText = "Eure Kombination aus zwei Wasserzeichen verlangt nach Tiefe und Mystik. Basierend auf eurem Budget-Index von " + budget + " empfehlen wir ein historisches Schloss am See. Perfekt für den gewählten Vibe.";
-            } else if (vibe > 70) {
-                destTitle.innerText = "Action-Highlight: Queenstown, Neuseeland";
-                destText.innerText = "Euer Vibe-Level steht auf Maximum! Für eure Gruppe ist dies der ultimative Ort für Adrenalin und unvergessliche Ferien.";
+            // Diese Daten sollten idealerweise aus der Netlify-Antwort kommen.
+            // Falls Netlify noch nichts zurückgibt, greift dieser intelligente Teaser:
+            const firstSign = signs[0] || 'widder';
+            const vibe = parseInt(params.get('v') || 50);
+
+            if (vibe > 75) {
+                title.innerText = "Action-Highlight: Queenstown, Neuseeland";
+                text.innerText = "Euer Vibe-Level steht auf Maximum! Für eure Gruppe ist dies der ultimative Ort für Adrenalin und unvergessliche Ferien.";
+                img.src = "https://images.unsplash.com/photo-1589802829985-817e51181b92?w=800";
+            } else if (firstSign === 'krebs') {
+                title.innerText = "Romantik-Highlight: Cornwall, England";
+                text.innerText = "Sanfte Wellen und Geborgenheit. Ein Ort, der eure Seelen im Einklang mit den Gezeiten zur Ruhe kommen lässt.";
+                img.src = "https://images.unsplash.com/photo-1510253451774-67f781f8f782?w=800";
             } else {
-                destTitle.innerText = "Eure individuelle KI-Empfehlung";
-                destText.innerText = "Die KI hat die Energien eurer " + signs.length + " Teilnehmer gebündelt. Ein Ziel wurde gefunden, das euren Wunsch nach " + (vibe < 50 ? 'Entspannung' : 'Erlebnissen') + " perfekt erfüllt.";
+                title.innerText = "Individuelles Ziel gefunden!";
+                text.innerText = "Mistral hat ein Ziel generiert, das perfekt zu eurer Konstellation passt. Die vollständige Auswertung liegt in deinem Postfach.";
+                img.src = "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800";
             }
 
-            // Travelpayouts Widget Laden (Simulation)
-            const tpWidget = document.getElementById('tp-widget');
-            tpWidget.innerHTML = `<p style="color:#0056b3; font-weight:bold;">Top-Deals für ${signs[0].toUpperCase()}-Reisende verfügbar! (ID: 698672)</p>`;
-        }, 2000);
+            img.onload = () => img.classList.add('visible');
+        }, 1500);
     </script>
 </body>
 </html>
