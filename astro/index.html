@@ -7,28 +7,60 @@
     <style>
         :root { --glow: #0096ff; --gold: #ffcc00; --bg: #02050a; --cta: #ff6b6b; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background-color: var(--bg); color: white; font-family: 'Helvetica Neue', Arial, sans-serif; min-height: 100vh; display: flex; justify-content: center; align-items: center; overflow-x: hidden; background: radial-gradient(circle at center, #0a1e3b 0%, #02040a 100%); padding: 20px; }
+        body { 
+            background-color: var(--bg); color: white; 
+            font-family: 'Helvetica Neue', Arial, sans-serif; 
+            min-height: 100vh; display: flex; justify-content: center; align-items: center; 
+            background: radial-gradient(circle at center, #0a1e3b 0%, #02040a 100%); padding: 20px; 
+        }
         
-        .main-grid { position: relative; z-index: 100; display: grid; grid-template-columns: 180px 1fr 180px; align-items: center; gap: 30px; width: 100%; max-width: 1200px; }
+        .main-grid { position: relative; z-index: 100; display: grid; grid-template-columns: 180px 1fr 180px; align-items: center; gap: 30px; width: 100%; max-width: 1250px; }
         
         .zodiac-column { display: flex; flex-direction: column; gap: 10px; }
-        .zodiac-card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 10px; text-align: center; border-radius: 12px; cursor: pointer; transition: 0.3s; backdrop-filter: blur(5px); }
-        .zodiac-card:hover, .zodiac-card.active { border-color: var(--glow); background: rgba(0, 150, 255, 0.2); box-shadow: 0 0 15px var(--glow); transform: scale(1.05); }
+        .zodiac-card { 
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); 
+            padding: 10px; text-align: center; border-radius: 12px; cursor: pointer; transition: 0.3s; 
+            backdrop-filter: blur(5px); 
+        }
+        .zodiac-card:hover, .zodiac-card.active { 
+            border-color: var(--glow); background: rgba(0, 150, 255, 0.2); 
+            box-shadow: 0 0 15px var(--glow); transform: scale(1.05); 
+        }
         .zodiac-symbol { font-size: 1.8rem; color: var(--gold); display: block; }
         .zodiac-name { font-weight: bold; display: block; font-size: 0.9rem; margin-top: 4px; }
 
-        /* Glaskugel & Formular */
-        .crystal-ball { width: 450px; height: 450px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.9) 90%); box-shadow: 0 0 60px var(--glow), inset 0 0 40px rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center; }
+        .crystal-ball { 
+            width: 500px; height: 500px; border-radius: 50%; 
+            background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.95) 90%); 
+            box-shadow: 0 0 60px var(--glow), inset 0 0 40px rgba(255,255,255,0.1); 
+            border: 2px solid rgba(255,255,255,0.2); display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; padding: 50px; text-align: center; 
+        }
         
-        .input-group { width: 80%; margin-bottom: 10px; text-align: left; }
-        label { font-size: 0.75rem; color: var(--gold); display: block; margin-bottom: 3px; }
-        select, input, textarea { width: 100%; padding: 8px; border-radius: 5px; border: none; background: rgba(255,255,255,0.1); color: white; font-size: 0.85rem; }
-        input[type="range"] { accent-color: var(--glow); }
+        .input-group { width: 90%; margin-bottom: 12px; text-align: left; }
+        label { font-size: 0.7rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 4px; }
         
-        .cta-btn { background: var(--cta); color: white; font-size: 1rem; font-weight: bold; padding: 12px 25px; border: none; border-radius: 30px; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4); width: 80%; }
-        .cta-btn:hover { background: #ee5253; transform: scale(1.03); }
+        select, input { 
+            width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); 
+            background: rgba(255,255,255,0.05); color: white; font-size: 0.9rem; 
+        }
+        input[type="range"] { accent-color: var(--cta); margin-top: 5px; }
 
-        @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } .zodiac-column { flex-direction: row; flex-wrap: wrap; justify-content: center; } .crystal-ball { width: 350px; height: 350px; } }
+        .cta-btn { 
+            background: var(--cta); color: white; font-size: 1.1rem; font-weight: bold; 
+            padding: 14px 30px; border: none; border-radius: 50px; cursor: pointer; 
+            margin-top: 15px; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4); width: 90%; 
+            transition: 0.3s;
+        }
+        .cta-btn:hover { background: #ee5253; transform: scale(1.03); }
+        
+        .instruction { font-size: 0.85rem; color: var(--glow); margin-top: 10px; font-weight: bold; }
+
+        @media (max-width: 900px) { 
+            .main-grid { grid-template-columns: 1fr; } 
+            .zodiac-column { flex-direction: row; flex-wrap: wrap; justify-content: center; } 
+            .crystal-ball { width: 380px; height: 380px; padding: 30px; } 
+        }
     </style>
 </head>
 <body>
@@ -45,27 +77,28 @@
 
     <div style="display:flex; justify-content:center;">
         <div class="crystal-ball">
-            <h2 id="ball-title" style="margin-bottom:10px; font-size:1.3rem;">KI-FERIEN ANALYSE</h2>
+            <h2 id="ball-title" style="color:var(--gold); margin-bottom:15px;">KI-FERIEN</h2>
             
             <div class="input-group">
                 <label>Personen & Email:</label>
-                <div style="display:flex; gap:5px;">
-                    <select id="personCount" style="width:40%;"><option value="1">1 Pers.</option><option value="2">2 Pers.</option><option value="3">3 Pers.</option></select>
+                <div style="display:flex; gap:8px;">
+                    <select id="personCount" style="width:35%;"><option value="1">1 Pers.</option><option value="2">2 Pers.</option><option value="3">3 Pers.</option><option value="4">4 Pers.</option></select>
                     <input type="email" id="userEmail" placeholder="Deine Email">
                 </div>
             </div>
 
             <div class="input-group">
-                <label>Vibe (Entspannt - Action):</label>
-                <input type="range" id="vibeRange" min="0" max="100">
+                <div style="display:flex; justify-content:space-between;"><label>Entspannt 🏖️</label><label>Action 🧗</label></div>
+                <input type="range" id="vibeRange" min="0" max="100" value="50">
             </div>
 
             <div class="input-group">
-                <label>Budget (Sparsam - Luxus):</label>
-                <input type="range" id="budgetRange" min="0" max="100">
+                <div style="display:flex; justify-content:space-between;"><label>Sparsam 💶</label><label>Luxus 💎</label></div>
+                <input type="range" id="budgetRange" min="0" max="100" value="50">
             </div>
 
-            <button class="cta-btn" onclick="startCosmicAnalysis()">Sternenreise planen</button>
+            <p class="instruction" id="status-text">Bitte wähle dein Sternzeichen...</p>
+            <button class="cta-btn" onclick="startAnalysis()">Sternenreise planen</button>
         </div>
     </div>
 
@@ -83,4 +116,31 @@
     let selectedSign = "";
     function selectSign(name, el) {
         selectedSign = name;
-        document.getElementById
+        document.getElementById('ball-title').innerText = name.toUpperCase();
+        document.getElementById('status-text').innerText = "Sternzeichen aktiviert!";
+        document.getElementById('status-text').style.color = "var(--gold)";
+        document.querySelectorAll('.zodiac-card').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    function startAnalysis() {
+        const email = document.getElementById('userEmail').value;
+        const persons = document.getElementById('personCount').value;
+        const vibe = document.getElementById('vibeRange').value;
+        const budget = document.getElementById('budgetRange').value;
+
+        if (!selectedSign) { alert("Bitte wähle zuerst ein Sternzeichen!"); return; }
+        if (!email) { alert("Bitte gib deine Email für die Analyse ein!"); return; }
+
+        const subject = encodeURIComponent(`KI-Ferien Analyse: ${selectedSign}`);
+        const body = encodeURIComponent(`Anfrage Details:\n- Sternzeichen: ${selectedSign}\n- Personen: ${persons}\n- Vibe: ${vibe}\n- Budget: ${budget}\n- Email: ${email}\n\nPartner-ID: 698672`);
+        
+        window.location.href = `mailto:info@ki-ferien.de?subject=${subject}&body=${body}`;
+
+        setTimeout(() => {
+            window.location.href = `reise.html?sign=${selectedSign}&p=${persons}&v=${vibe}&b=${budget}`;
+        }, 1000);
+    }
+</script>
+</body>
+</html>
