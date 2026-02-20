@@ -76,3 +76,32 @@ exports.handler = async (event) => {
                             🏨 Kraftorte & Unterkünfte in ${destination}
                         </a>
                     </div>
+
+                    <p style="font-size: 13px; opacity: 0.7; text-align: center; font-style: italic;">
+                        Die berechneten Angebote basieren auf eurem Budget-Index von ${budget}/100 und sind für begrenzte Zeit energetisch reserviert.
+                    </p>
+                </div>
+                
+                <div class="footer">
+                    &copy; 2026 KI-Ferien.de | Projekt-ID: ${project}<br>
+                    Du erhältst diese Analyse basierend auf deiner Anfrage bei unserer Astro-KI.<br>
+                    <a href="https://ki-ferien.de">Neue Analyse starten</a>
+                </div>
+            </div>
+        </body>
+        </html>
+        `;
+
+        // 3. VERSAND ÜBER RESEND
+        await resend.emails.send({
+            from: 'KI-Ferien Analyse <info@ki-ferien.de>',
+            to: email,
+            subject: `✨ Prophezeiung bereit: Warum ${destination} perfekt für euch ist`,
+            html: htmlContent
+        });
+
+        return { statusCode: 200, body: JSON.stringify({ message: "Analyse erfolgreich versandt" }) };
+    } catch (error) {
+        return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+    }
+};
