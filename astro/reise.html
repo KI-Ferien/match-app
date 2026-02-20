@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deine Kosmische Reise | KI-Ferien.de</title>
+    <title>KI-Ferien | Deine Sternen-Inspiration</title>
     <style>
         :root {
             --glow: #0096ff;
@@ -16,172 +16,27 @@
         body {
             background-color: var(--bg);
             color: white;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            min-height: 100vh;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding: 40px 20px;
             background: radial-gradient(circle at center, #0a1e3b 0%, #02040a 100%);
-            padding-bottom: 50px;
+            min-height: 100vh;
         }
 
-        /* HINTERGRUND STERNE */
-        .stars-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            background-image: 
-                radial-gradient(1px 1px at 20px 30px, #fff, transparent),
-                radial-gradient(1.5px 1.5px at 100px 250px, #fff, transparent);
-            background-size: 300px 300px;
-            opacity: 0.3;
-        }
-
-        .content-wrap {
-            width: 90%;
+        .content-box {
             max-width: 900px;
-            margin-top: 50px;
-            z-index: 10;
-        }
-
-        .header-card {
+            width: 100%;
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
             padding: 40px;
-            text-align: center;
-            backdrop-filter: blur(15px);
-            margin-bottom: 30px;
-        }
-
-        h1 { color: var(--gold); text-shadow: 0 0 15px rgba(255, 204, 0, 0.5); margin-bottom: 10px; }
-        .dest-title { font-size: 1.5rem; color: var(--glow); font-weight: bold; margin-bottom: 15px; display: block; }
-        .dest-desc { line-height: 1.6; font-size: 1.1rem; opacity: 0.9; }
-
-        /* WIDGET BOX */
-        .widget-container {
-            background: white; /* Weiß für bessere Widget-Sichtbarkeit */
-            border-radius: 20px;
-            padding: 20px;
-            color: #333;
-            box-shadow: 0 0 30px var(--glow);
-            margin-bottom: 30px;
-        }
-
-        .widget-header {
-            text-align: center;
-            font-weight: bold;
-            color: #0056b3;
-            margin-bottom: 15px;
-            font-size: 1rem;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .info-card {
-            background: rgba(255, 255, 255, 0.05);
+            border-radius: 25px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 15px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
         }
 
-        .info-card h4 { color: var(--gold); margin-bottom: 8px; }
-
-        .back-btn {
-            margin-top: 40px;
-            display: inline-block;
-            color: white;
-            text-decoration: none;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 10px 20px;
-            border-radius: 20px;
-            transition: 0.3s;
-        }
-        .back-btn:hover { background: rgba(255, 255, 255, 0.1); color: var(--gold); }
-
-        @media (max-width: 600px) {
-            .info-grid { grid-template-columns: 1fr; }
-        }
-    </style>
-</head>
-<body>
-
-    <div class="stars-bg"></div>
-
-    <div class="content-wrap">
-        <div class="header-card">
-            <h1 id="z-name">Deine Sterne</h1>
-            <span class="dest-title" id="d-title">Suche Ferienziel...</span>
-            <p class="dest-desc" id="d-desc">Analysiere die Planeten...</p>
-        </div>
-
-        <div class="widget-container">
-            <div class="widget-header">Passende Flüge & Hotels für dich</div>
-            <div id="tp-widget">
-                </div>
-        </div>
-
-        <div class="info-grid">
-            <div class="info-card">
-                <h4>Beste Reisezeit</h4>
-                <p id="i-time">Wird berechnet...</p>
-            </div>
-            <div class="info-card">
-                <h4>Kosmischer Vibe</h4>
-                <p id="i-vibe">Wird analysiert...</p>
-            </div>
-        </div>
-
-        <div style="text-align: center;">
-            <a href="index.html" class="back-btn">← Zurück zur Auswahl</a>
-        </div>
-    </div>
-
-    <script>
-        // Datenbank der Ziele
-        const astroDestinations = {
-            widder: { n: "Widder", t: "Island: Abenteuer im Feuerland", d: "Action pur! Entdecke brodelnde Geysire und einsame Vulkane. Perfekt für deinen feurigen Tatendrang.", time: "März bis Juni", vibe: "Dynamik & Freiheit" },
-            stier: { n: "Stier", t: "Toskana: Genuss für die Sinne", d: "Finde Erdung in den Weinbergen. Kulinarik und Erholung unter der Sonne Italiens.", time: "Mai bis September", vibe: "Sinnlichkeit & Ruhe" },
-            zwillinge: { n: "Zwillinge", t: "Tokio: Stadt der 1000 Lichter", d: "Deine Neugier braucht Reize. Erlebe die perfekte Mischung aus Tradition und Hightech.", time: "Oktober & April", vibe: "Inspiration & Tempo" },
-            krebs: { n: "Krebs", t: "Cornwall: Romantik am Meer", d: "Die Gezeiten spiegeln deine Seele. Entspanne in kuscheligen Cottages an der Steilküste.", time: "Juni bis August", vibe: "Geborgenheit & Wasser" },
-            loewe: { n: "Löwe", t: "Südfrankreich: Glanz & Gloria", p: "Zeig dich! Luxus-Ferien an der Côte d'Azur sind genau das Richtige für deinen Auftritt.", time: "Juli & August", vibe: "Pracht & Lebenslust" },
-            jungfrau: { n: "Jungfrau", t: "Schweizer Alpen: Purismus", d: "Klarheit und Fokus. Wandere durch unberührte Natur und finde deine innere Ordnung.", time: "September & Oktober", vibe: "Reinigung & Harmonie" },
-            waage: { n: "Waage", t: "Santorini: Ästhetik in Blau", d: "Harmonie pur. Die Architektur und das Licht der Kykladen schmeicheln deinem Schönheitssinn.", time: "Mai & Juni", vibe: "Balance & Eleganz" },
-            skorpion: { n: "Skorpion", t: "Marrakesch: Mystik der Wüste", d: "Geheimnisvoll und intensiv. Verliere dich in den Gassen der Medina und finde Magie.", time: "November bis März", vibe: "Transformation & Tiefe" },
-            schuetze: { n: "Schütze", t: "Patagonien: Das Ende der Welt", d: "Grenzenlose Freiheit. Deine Reiselust führt dich in die wildesten Weiten Südamerikas.", time: "Dezember bis Februar", vibe: "Optimismus & Weitblick" },
-            steinbock: { n: "Steinbock", t: "Südtirol: Gipfel der Stille", d: "Beständigkeit zahlt sich aus. Erreiche die höchsten Gipfel und genieße den Erfolg.", time: "Januar bis März", vibe: "Struktur & Erfolg" },
-            wassermann: { n: "Wassermann", t: "Lappland: Die Zukunft im Eis", d: "Unkonventionell reisen. Schlafe im Glas-Iglu und beobachte die Aurora Borealis.", time: "November bis Februar", vibe: "Vision & Freiheit" },
-            fische: { n: "Fische", t: "Bali: Traumreise zur Seele", d: "Lass die Realität hinter dir. Spirituelle Orte und das Rauschen des Ozeans heilen dich.", time: "Mai bis September", vibe: "Träumerei & Heilung" }
-        };
-
-        // URL-Parameter auslesen
-        const urlParams = new URLSearchParams(window.location.search);
-        const selected = urlParams.get('sign');
-
-        if (selected && astroDestinations[selected]) {
-            const data = astroDestinations[selected];
-            
-            // Seite füllen
-            document.getElementById('z-name').innerText = "Sternenreise für " + data.n;
-            document.getElementById('d-title').innerText = data.t;
-            document.getElementById('d-desc').innerText = data.d;
-            document.getElementById('i-time').innerText = data.time;
-            document.getElementById('i-vibe').innerText = data.vibe;
-            
-            // Travelpayouts Widget (Marker: 698672)
-            const widgetDiv = document.getElementById('tp-widget');
-            const script = document.createElement('script');
-            script.src = "https://tp.media/content?currency=eur&promo_id=4113&shmarker=698672&campaign_id=121&trs=12345&target_host=ki-ferien.de&locale=de&limit=6&powered_by=false";
-            script.async = true;
-            widgetDiv.appendChild(script);
-
-        } else {
-            // Notfall: Zurück zur Auswahl
-            window.location.href = "index.html";
-        }
-    </script>
-</body>
-</html>
+        h1 {
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(255, 204, 0, 0.4);
+            margin-bottom: 10px;
