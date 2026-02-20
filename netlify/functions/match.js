@@ -1,74 +1,86 @@
 const { Resend } = require('resend');
 
 exports.handler = async (event) => {
-    // 1. Initialisierung
     if (event.httpMethod !== "POST") return { statusCode: 405, body: "Nur POST erlaubt" };
 
     try {
-        const body = JSON.parse(event.body);
-        const { email, zodiacs, vibe, budget, hobbies } = body;
-        
-        // Netlify zieht den Key aus den Environment Variables
+        const { email, zodiacs, vibe, budget, hobbies } = JSON.parse(event.body);
         const resend = new Resend(process.env.RESEND_API_KEY);
+
+        // --- INDIVIDUELLE ANALYSE ---
         const primarySign = zodiacs[0] ? zodiacs[0].toUpperCase() : "WIDDER";
-        
-        // 2. Dynamische Inhaltswahl (Bild & Text)
         const destination = vibe > 70 ? "Queenstown" : "Bali";
         const emotion = vibe > 70 ? "deine Abenteuerlust und die Freiheit der Alpen" : "deine spirituelle Erneuerung und tropische Magie";
         const heroImg = vibe > 70 ? "https://images.unsplash.com/photo-1589802829985-817e51181b92?w=800" : "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800";
 
-        // 3. Das Cosmic-Email-Template (Optimierter Aufbau mit allen 3 Links)
+        // --- PREMIUM EMAIL DESIGN ---
         const htmlContent = `
-        <div style="background-color: #02050a; color: #ffffff; padding: 40px; font-family: 'Helvetica', Arial, sans-serif; border-radius: 20px; border: 1px solid #0096ff; max-width: 600px; margin: auto;">
-            <h1 style="color: #ffcc00; text-align: center; letter-spacing: 4px;">KI-FERIEN.DE</h1>
-            <p style="text-align: center; font-size: 14px; color: #0096ff;">Deine persönliche kosmische Analyse</p>
-            
-            <div style="margin: 25px 0; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 15px; border-left: 4px solid #ffcc00;">
-                <p>Hallo,</p>
-                <p>für dich als <strong>${primarySign}</strong> wurde ein Ziel identifiziert, das exakt mit deiner Aura schwingt: <span style="color: #ffcc00;"><strong>${destination}</strong></span>.</p>
-                <p>In ${destination} findest du <strong>${emotion}</strong>.</p>
+        <!DOCTYPE html>
+        <html lang="de">
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body { margin: 0; padding: 0; background-color: #02050a; color: #ffffff; font-family: 'Helvetica Neue', Arial, sans-serif; }
+                .container { max-width: 600px; margin: 20px auto; background-color: #0a1e3b; border-radius: 24px; overflow: hidden; border: 1px solid #0096ff; }
+                .header { background: linear-gradient(135deg, #0096ff 0%, #0a1e3b 100%); padding: 50px 20px; text-align: center; }
+                .header h1 { margin: 0; color: #ffcc00; letter-spacing: 5px; font-size: 28px; text-transform: uppercase; }
+                .content { padding: 40px 30px; line-height: 1.8; color: #e0e0e0; }
+                .badge { display: inline-block; padding: 6px 18px; background: rgba(255, 204, 0, 0.15); border: 1px solid #ffcc00; color: #ffcc00; border-radius: 20px; font-weight: bold; font-size: 14px; margin-bottom: 25px; }
+                .analysis-card { background: rgba(255, 255, 255, 0.04); border-radius: 18px; padding: 25px; border-left: 4px solid #0096ff; margin: 30px 0; }
+                .btn { display: block; padding: 18px; margin-bottom: 15px; border-radius: 50px; font-weight: bold; text-decoration: none; font-size: 16px; text-align: center; }
+                .btn-main { background-color: #ff6b6b; color: #ffffff !important; }
+                .btn-sub { background-color: transparent; border: 2px solid #0096ff; color: #0096ff !important; }
+                .btn-mini { background-color: rgba(255,255,255,0.05); color: #888 !important; font-size: 14px; border: 1px solid rgba(255,255,255,0.1); }
+                .footer { padding: 30px; text-align: center; font-size: 11px; color: #444; border-top: 1px solid rgba(255,255,255,0.05); }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>KI-FERIEN.DE</h1>
+                    <p style="color: #0096ff; font-size: 14px; margin-top: 10px;">Deine persönliche kosmische Prophezeiung</p>
+                </div>
+                <div class="content">
+                    <div class="badge">FÜR DICH: ${primarySign}</div>
+                    <p>Hallo,</p>
+                    <p>die Sterne haben deinen Pfad entschlüsselt. In deinen nächsten <strong>Ferien</strong> geht es um dich und deine Energie.</p>
+                    <div class="analysis-card">
+                        <p style="color: #ffcc00; font-size: 20px; margin-bottom: 10px; font-weight: bold;">📍 Ziel: ${destination}</p>
+                        <p>Hier findest du <strong>${emotion}</strong>. Deine Wahl (Vibe: ${vibe}%) harmoniert perfekt mit der Schwingung dieses Ortes.</p>
+                    </div>
+                    <p style="text-align: center; font-weight: bold; color: #ffffff; margin-bottom: 25px;">Deine exklusiven Buchungs-Pfade:</p>
+                    <a href="https://tpk.lv/pXm2idkE" class="btn btn-main">✈️ Harmonische Flug-Angebote prüfen</a>
+                    <a href="https://klook.tpk.lv/R2EiQ7rS" class="btn btn-sub">🎟️ Magische Erlebnisse & Touren</a>
+                    <a href="https://gettransfer.tpk.lv/mPE1eDIa" class="btn btn-mini">🚗 Privat-Transfer zum Kraftort buchen</a>
+                </div>
+                <div class="footer">
+                    &copy; 2026 KI-Ferien.de | Projekt: 492044 | Marker: 698672
+                </div>
             </div>
+        </body>
+        </html>
+        `;
 
-            <p style="font-weight: bold; text-align: center; margin-bottom: 20px;">Sichere dir jetzt deine Ferien-Angebote:</p>
+        // --- VERSAND ---
+        await resend.emails.send({
+            from: 'KI-Ferien Analyse <info@ki-ferien.de>', 
+            to: email,
+            subject: `✨ Deine Prophezeiung: Warum ${destination} dein Schicksal ist`,
+            html: htmlContent
+        });
 
-            <div style="text-align: center;">
-                <a href="https://tpk.lv/pXm2idkE" style="display: block; background: #ff6b6b; color: white; padding: 18px; border-radius: 50px; text-decoration: none; font-weight: bold; margin-bottom: 12px;">✈️ Passende Flüge nach ${destination}</a>
-                
-                <a href="https://klook.tpk.lv/R2EiQ7rS" style="display: block; border: 2px solid #0096ff; color: #0096ff; padding: 15px; border-radius: 50px; text-decoration: none; font-weight: bold; margin-bottom: 12px;">🎟️ Magische Erlebnisse vor Ort</a>
-                
-                <a href="https://gettransfer.tpk.lv/mPE1eDIa" style="display: block; color: #555; font-size: 13px; text-decoration: none; margin-top: 10px;">🚗 Privat-Transfer zum Kraftort buchen</a>
-            </div>
-            
-            <p style="font-size: 10px; color: #444; text-align: center; margin-top: 40px;">Projekt: 492044 | Marker: 698672</p>
-        </div>`;
-
-        // 4. Der Email-Versand-Prozess
-        try {
-            await resend.emails.send({
-                from: 'KI-Ferien Analyse <onboarding@resend.dev>', // WICHTIG: Teste hiermit!
-                to: email,
-                subject: `✨ Deine Prophezeiung für ${destination} ist da!`,
-                html: htmlContent
-            });
-        } catch (mailError) {
-            console.error("Resend Error:", mailError.message);
-            // Wir lassen die Funktion weiterlaufen, damit das Bild auf der Webseite erscheint!
-        }
-
-        // 5. Erfolgreiche Rückgabe an die Webseite (Bild-Garantie)
         return {
             statusCode: 200,
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 success: true,
                 destination: destination,
-                image: heroImg, // Hier wird das Bild für reise.html übergeben
-                text: `In ${destination} findet ${emotion} die perfekte Resonanz.`
+                image: heroImg,
+                text: "Analyse erfolgreich. Schau in dein Postfach!"
             })
         };
 
     } catch (error) {
-        console.error("Handler Error:", error.message);
         return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
     }
 };
