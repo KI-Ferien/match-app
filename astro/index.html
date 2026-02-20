@@ -8,10 +8,9 @@
         :root {
             --glow-color: rgba(0, 150, 255, 0.8);
             --text-gold: #ffcc00;
-            --bg-dark: #030712;
+            --bg-dark: #02040a;
         }
 
-        /* Verhindert das Verschwinden von Inhalten */
         * { box-sizing: border-box; }
 
         body {
@@ -24,36 +23,47 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow-x: hidden;
+            overflow: hidden;
             position: relative;
         }
 
-        /* --- STERNEN-HINTERGRUND (Direkt im CSS) --- */
-        body::before {
-            content: "";
+        /* --- LAYER 1: TIEFER WELTRAUM --- */
+        .space-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #0b1e3b 0%, #030712 100%);
-            z-index: -2;
+            background: radial-gradient(circle at center, #0a1e3b 0%, #02040a 100%);
+            z-index: -3;
         }
 
-        .stars-container {
+        /* --- LAYER 2: FUNKELNDE STERNE --- */
+        .stars {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            background-image: 
-                radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
-                radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
-                radial-gradient(2px 2px at 50px 160px, #fff, rgba(0,0,0,0)),
-                radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0));
-            background-size: 200px 200px;
-            opacity: 0.4;
-            animation: twinkle 5s infinite alternate;
+            z-index: -2;
+            background: transparent url('https://www.transparenttextures.com/patterns/stardust.png') repeat;
+            opacity: 0.5;
+            animation: twinkle 8s infinite alternate ease-in-out;
         }
 
         @keyframes twinkle {
-            from { opacity: 0.3; }
-            to { opacity: 0.6; }
+            0% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.02); }
+            100% { opacity: 0.4; transform: scale(1); }
+        }
+
+        /* --- LAYER 3: ZIEHENDER NEBULA-NEBEL --- */
+        .nebula {
+            position: fixed;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            z-index: -1;
+            background: radial-gradient(circle at center, rgba(0, 100, 255, 0.1) 0%, rgba(100, 0, 255, 0.05) 40%, transparent 70%);
+            animation: drift 60s infinite linear;
+            filter: blur(50px);
+        }
+
+        @keyframes drift {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         /* --- LAYOUT --- */
@@ -62,9 +72,9 @@
             flex-direction: row;
             align-items: center;
             justify-content: center;
-            gap: 40px;
+            gap: 50px;
             width: 100%;
-            max-width: 1200px;
+            max-width: 1300px;
             padding: 20px;
             z-index: 10;
         }
@@ -72,131 +82,98 @@
         .zodiac-column {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            width: 180px;
+            gap: 15px;
+            width: 190px;
         }
 
         .zodiac-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 10px;
+            padding: 12px;
             text-align: center;
-            border-radius: 12px;
+            border-radius: 15px;
             cursor: pointer;
-            transition: 0.3s;
-            backdrop-filter: blur(8px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(10px);
         }
 
         .zodiac-card:hover, .zodiac-card.active {
             border-color: var(--glow-color);
-            background: rgba(0, 150, 255, 0.1);
-            box-shadow: 0 0 15px var(--glow-color);
-            transform: scale(1.05);
+            background: rgba(0, 150, 255, 0.15);
+            box-shadow: 0 0 20px var(--glow-color), inset 0 0 10px rgba(0, 150, 255, 0.2);
+            transform: scale(1.1) translateX(5px);
         }
 
-        .zodiac-symbol { font-size: 1.8rem; color: var(--text-gold); display: block; }
-        .zodiac-name { font-weight: bold; display: block; font-size: 0.9rem; margin-top: 4px; }
-        .zodiac-date { font-size: 0.7rem; opacity: 0.7; }
+        .zodiac-column:last-child .zodiac-card:hover { transform: scale(1.1) translateX(-5px); }
 
-        /* --- GLASKUGEL (PERFEKT RUND) --- */
+        .zodiac-symbol { 
+            font-size: 2.2rem; 
+            color: var(--text-gold); 
+            display: block; 
+            filter: drop-shadow(0 0 8px rgba(255, 204, 0, 0.5));
+        }
+        .zodiac-name { font-weight: bold; display: block; font-size: 1rem; margin-top: 5px; letter-spacing: 1px; }
+        .zodiac-date { font-size: 0.75rem; opacity: 0.6; }
+
+        /* --- MAGISCHE GLASKUGEL --- */
         .crystal-ball-container {
-            width: 380px;
-            height: 380px;
-            flex-shrink: 0;
+            width: 420px;
+            height: 420px;
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
+        }
+
+        /* Äußerer Glow der Kugel */
+        .crystal-ball-container::after {
+            content: '';
+            position: absolute;
+            width: 110%; height: 110%;
+            background: radial-gradient(circle, rgba(0, 150, 255, 0.15) 0%, transparent 70%);
+            z-index: -1;
+            animation: breath 5s infinite ease-in-out;
         }
 
         .crystal-ball {
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            aspect-ratio: 1 / 1;
-            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3) 0%, rgba(0,100,255,0.1) 40%, rgba(0,0,0,0.7) 90%);
-            box-shadow: 0 0 60px var(--glow-color), inset 0 0 40px rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
+            background: radial-gradient(circle at 35% 35%, 
+                        rgba(255, 255, 255, 0.3) 0%, 
+                        rgba(0, 120, 255, 0.15) 40%, 
+                        rgba(0, 5, 20, 0.85) 90%);
+            box-shadow: 0 0 80px var(--glow-color), 
+                        inset 0 0 50px rgba(255, 255, 255, 0.1),
+                        inset -20px -20px 80px rgba(0, 0, 0, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.2);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 40px;
-            animation: pulse 4s infinite ease-in-out;
+            padding: 50px;
+            position: relative;
+            animation: float 6s infinite ease-in-out;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 60px var(--glow-color); }
-            50% { transform: scale(1.02); box-shadow: 0 0 90px var(--glow-color); }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.02); }
         }
 
-        .ball-content h1 { font-size: 1.6rem; margin: 0; text-shadow: 0 0 10px var(--glow-color); }
-        .ball-content p { font-size: 0.95rem; margin: 15px 0; min-height: 3em; }
+        @keyframes breath {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        .ball-content h1 { 
+            font-size: 2rem; 
+            margin: 0; 
+            color: #fff; 
+            text-shadow: 0 0 20px var(--glow-color);
+            letter-spacing: 2px;
+        }
+        .ball-content p { font-size: 1.05rem; margin: 20px 0; line-height: 1.5; min-height: 3em; }
 
         .btn-astro {
-            background: linear-gradient(45deg, #0078ff, #00c3ff);
-            border: none;
-            padding: 10px 25px;
-            color: white;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            text-transform: uppercase;
-            transition: 0.3s;
-        }
-
-        .btn-astro:hover { transform: translateY(-2px); filter: brightness(1.2); }
-
-        /* Mobile */
-        @media (max-width: 850px) {
-            .main-container { flex-direction: column; padding: 40px 10px; }
-            .zodiac-column { flex-direction: row; flex-wrap: wrap; justify-content: center; width: 100%; }
-            .crystal-ball-container { width: 300px; height: 300px; order: -1; }
-        }
-    </style>
-</head>
-<body>
-
-    <div class="stars-container"></div>
-
-    <main class="main-container">
-        <div class="zodiac-column">
-            <div class="zodiac-card" onclick="updateBall('widder')">
-                <span class="zodiac-symbol">♈</span><span class="zodiac-name">Widder</span><span class="zodiac-date">21.03.-20.04.</span>
-            </div>
-            <div class="zodiac-card" onclick="updateBall('stier')">
-                <span class="zodiac-symbol">♉</span><span class="zodiac-name">Stier</span><span class="zodiac-date">21.04.-20.05.</span>
-            </div>
-            <div class="zodiac-card" onclick="updateBall('zwillinge')">
-                <span class="zodiac-symbol">♊</span><span class="zodiac-name">Zwillinge</span><span class="zodiac-date">21.05.-21.06.</span>
-            </div>
-            <div class="zodiac-card" onclick="updateBall('krebs')">
-                <span class="zodiac-symbol">♋</span><span class="zodiac-name">Krebs</span><span class="zodiac-date">22.06.-22.07.</span>
-            </div>
-            <div class="zodiac-card" onclick="updateBall('loewe')">
-                <span class="zodiac-symbol">♌</span><span class="zodiac-name">Löwe</span><span class="zodiac-date">23.07.-23.08.</span>
-            </div>
-            <div class="zodiac-card" onclick="updateBall('jungfrau')">
-                <span class="zodiac-symbol">♍</span><span class="zodiac-name">Jungfrau</span><span class="zodiac-date">24.08.-23.09.</span>
-            </div>
-        </div>
-
-        <div class="crystal-ball-container">
-            <div class="crystal-ball">
-                <div class="ball-content">
-                    <h1 id="ball-title">KI-FERIEN</h1>
-                    <p id="ball-text">Wähle dein Sternzeichen für deine kosmische Reise.</p>
-                    <button class="btn-astro" id="astro-btn" onclick="startTravel()">Ferien finden</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="zodiac-column">
-            <div class="zodiac-card" onclick="updateBall('waage')">
-                <span class="zodiac-symbol">♎</span><span class="zodiac-name">Waage</span><span class="zodiac-date">24.09.-23.10.</span>
-            </div>
-            <div class="zodiac-card" onclick="updateBall('skorpion')">
-                <span class="zodiac-symbol">♏</span><span class="zodiac-name">Skorpion</span><span class="zodiac-date">24.10.-22.11.</span>
-            </div>
-            <div class="zodiac-card" onclick="updateBall('schuetze')">
-                <span class="zodiac-
