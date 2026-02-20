@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deine Analyse | KI-Ferien.de</title>
+    <style>
+        :root { --glow: #0096ff; --gold: #ffcc00; --bg: #02050a; }
+        body { background: var(--bg); color: white; font-family: 'Helvetica Neue', Arial, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 50px 20px; min-height: 100vh; overflow-x: hidden; position: relative; }
+        .deep-space { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #0a1e3b 0%, #02050a 100%); z-index: -4; }
+        .nebula { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 15% 25%, rgba(0, 150, 255, 0.2), transparent 45%), radial-gradient(circle at 85% 75%, rgba(120, 0, 255, 0.15), transparent 45%); filter: blur(110px); z-index: -3; animation: nebulaFlow 25s infinite alternate ease-in-out; }
+        @keyframes nebulaFlow { from { transform: scale(1); } to { transform: scale(1.15); } }
+        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(1px 1px at 25px 35px, #fff, transparent), radial-gradient(1.5px 1.5px at 160px 260px, #fff, transparent); background-size: 320px 320px; opacity: 0.65; z-index: -2; animation: twinkle 6s infinite alternate; }
+        .teaser-box { position: relative; z-index: 10; max-width: 720px; width: 100%; text-align: center; background: rgba(255,255,255,0.02); padding: 45px; border-radius: 40px; border: 1px solid rgba(0, 150, 255, 0.25); backdrop-filter: blur(25px); box-shadow: 0 35px 70px rgba(0,0,0,0.8); }
+        .ai-badge { color: var(--glow); font-size: 0.7rem; font-weight: bold; letter-spacing: 2px; margin-bottom: 12px; display: block; }
+        .zodiac-tags { display: flex; gap: 12px; justify-content: center; margin-bottom: 35px; flex-wrap: wrap; }
+        .tag { padding: 7px 18px; border: 1px solid var(--gold); border-radius: 5px; color: var(--gold); font-weight: bold; font-size: 0.85rem; background: rgba(255, 204, 0, 0.05); }
+        .dest-image { width: 100%; height: 300px; border-radius: 20px; overflow: hidden; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.12); background: #000; }
+        .dest-image img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.8s ease; }
+        .dest-image img.visible { opacity: 0.75; }
+        .result-title { color: var(--glow); font-size: 1.45rem; font-weight: bold; margin-bottom: 15px; display: block; text-shadow: 0 0 15px var(--glow); }
+        .result-text { line-height: 1.75; font-size: 1.1rem; opacity: 0.95; margin-bottom: 30px; }
+        .email-status { font-size: 0.9rem; color: #bbb; border-top: 1px solid rgba(255,255,255,0.12); padding-top: 30px; font-style: italic; }
+        .back-link { margin-top: 35px; display: inline-block; color: var(--glow); text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="deep-space"></div><div class="nebula"></div><div class="stars"></div>
+    <div class="teaser-box">
+        <span class="ai-badge">KI-ENGINE AKTIV (MISTRAL)</span>
+        <h1>Deine Kosmische Ferien-Analyse</h1>
+        <div class="zodiac-tags" id="tag-box"></div>
+        <div class="dest-image"><img id="main-img" src="" alt="Vorschau"></div>
+        <div class="content"><span class="result-title" id="res-title">Lade Konstellation...</span><p class="result-text" id="res-text">Berechne das optimale Ziel...</p></div>
+        <p class="email-status">Die detaillierte Analyse inklusive exklusiver Angebote wurde soeben an deine Email-Adresse versandt.</p>
+        <a href="index.html" class="back-link">← Neue Suche starten</a>
+    </div>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const signs = (params.get('signs') || "").split(',').filter(Boolean);
+        const vibe = parseInt(params.get('v') || 50);
+        const tagBox = document.getElementById('tag-box');
+        signs.forEach(s => { const tag = document.createElement('div'); tag.className = 'tag'; tag.innerText = s.toUpperCase(); tagBox.appendChild(tag); });
+        const presets = {
+            widder: { t: "Vulkane Islands", d: "Pure Action für deinen Tatendrang.", i: "https://images.unsplash.com/photo-1476610182048-b716b8518aae?w=800" },
+            stier: { t: "Toskana Genuss", d: "Sinnliche Wellness in den Hügeln.", i: "https://images.unsplash.com/photo-1534445867742-43195f401b6c?w=800" },
+            krebs: { t: "Cornwall Küste", d: "Geborgenheit am wilden Meer.", i: "https://images.unsplash.com/photo-1510253451774-67f781f8f782?w=800" },
+            loewe: { t: "Safari Namibia", d: "Luxus unter afrikanischen Sternen.", i: "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=800" },
+            jungfrau: { t: "Schweizer Alpen", d: "Klarheit und Bergstille.", i: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800" }
+        };
+        setTimeout(() => {
+            const first = signs[0] || 'widder';
+            let choice = presets[first] || { t: "Dein kosmisches Ziel", d: "KI-Analyse abgeschlossen.", i: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800" };
+            if (vibe > 80) choice = { t: "Action-Highlight: Queenstown", d: "Ultimatives Adrenalin für euch.", i: "https://images.unsplash.com/photo-1589802829985-817e51181b92?w=800" };
+            document.getElementById('res-title').innerText = choice.t;
+            document.getElementById('res-text').innerText = choice.d;
+            const img = document.getElementById('main-img'); img.src = choice.i; img.onload = () => img.classList.add('visible');
+        }, 1600);
+    </script>
+</body>
+</html>
