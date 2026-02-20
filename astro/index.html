@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KI-Ferien.de | Dein Astro-Planer</title>
+    <style>
+        :root {
+            --glow-color: rgba(0, 150, 255, 0.6);
+            --text-gold: #ffcc00;
+            --bg-dark: #050a15;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-dark);
+            background-image: radial-gradient(circle at center, #1a1a2e 0%, #050a15 100%);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Hintergrund-Sterne-Effekt */
+        .stars {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: transparent url('https://www.transparenttextures.com/patterns/stardust.png') repeat;
+        }
+
+        .main-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+        }
+
+        .zodiac-column {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 180px;
+        }
+
+        .zodiac-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            text-align: center;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .zodiac-card:hover {
+            transform: scale(1.05);
+            border-color: var(--glow-color);
+            box-shadow: 0 0 15px var(--glow-color);
+        }
+
+        .zodiac-symbol {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-gold);
+        }
+
+        .zodiac-name {
+            font-weight: bold;
+            display: block;
+            font-size: 0.9rem;
+        }
+
+        .zodiac-date {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        /* Die zentrale Glaskugel */
+        .crystal-ball-container {
+            position: relative;
+            width: 350px;
+            height: 350px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .crystal-ball {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, rgba(0,120,255,0.1) 50%, rgba(0,0,0,0.4) 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 50px var(--glow-color), inset 0 0 30px rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 30px;
+            position: relative;
+            animation: pulse 4s infinite ease-in-out;
+        }
+
+        .ball-content h1 {
+            font-size: 1.5rem;
+            margin: 0;
+            color: #fff;
+            text-shadow: 0 0 10px var(--glow-color);
+        }
+
+        .ball-content p {
+            font-size: 0.85rem;
+            margin: 10px 0;
+            opacity: 0.9;
+        }
+
+        .btn-astro {
+            background: linear-gradient(45deg, #0078ff, #00d4ff);
+            border: none;
+            padding: 10px 20px;
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: transform 0.2s;
+        }
+
+        .btn-astro:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 120, 255, 0.4);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 40px var(--glow-color); }
+            50% { box-shadow: 0 0 65px var(--glow-color); }
+            100% { box-shadow: 0 0 40px var(--glow-color); }
+        }
+
+        /* Mobile Anpassung */
+        @media (max-width: 850px) {
+            .main-container { flex-direction: column; }
+            .zodiac-column { flex-direction: row; flex-wrap: wrap; justify-content: center; width: 100%; }
+            .crystal-ball-container { margin: 30px 0; width: 280px; height: 280px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="stars"></div>
+
+    <main class="main-container">
+        <section class="zodiac-column" id="left-column">
+            <div class="zodiac-card" data-sign="widder">
+                <span class="zodiac-symbol">♈</span>
+                <span class="zodiac-name">Widder</span>
+                <span class="zodiac-date">21.03. - 20.04.</span>
+            </div>
+            <div class="zodiac-card" data-sign="stier">
+                <span class="zodiac-symbol">♉</span>
+                <span class="zodiac-name">Stier</span>
+                <span class="zodiac-date">21.04. - 20.05.</span>
+            </div>
+            <div class="zodiac-card" data-sign="zwillinge">
+                <span class="zodiac-symbol">♊</span>
+                <span class="zodiac-name">Zwillinge</span>
+                <span class="zodiac-date">21.05. - 21.06.</span>
+            </div>
+            <div class="zodiac-card" data-sign="krebs">
+                <span class="zodiac-symbol">♋</span>
+                <span class="zodiac-name">Krebs</span>
+                <span class="zodiac-date">22.06. - 22.07.</span>
+            </div>
+            <div class="zodiac-card" data-sign="loewe">
+                <span class="zodiac-symbol">♌</span>
+                <span class="zodiac-name">Löwe</span>
+                <span class="zodiac-date">23.07. - 23.08.</span>
+            </div>
+            <div class="zodiac-card" data-sign="jungfrau">
+                <span class="zodiac-symbol">♍</span>
+                <span class="zodiac-name">Jungfrau</span>
+                <span class="zodiac-date">24.08. - 23.09.</span>
+            </div>
+        </section>
+
+        <section class="crystal-ball-container">
+            <div class="crystal-ball">
+                <div class="ball-content">
+                    <h1>KI-FERIEN</h1>
+                    <p>Dein kosmischer Reiseplaner für unvergessliche Ferien.</p>
+                    <button class="btn-astro" onclick="initAstroSearch()">Universum fragen</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="zodiac-column" id="right-column">
+            <div class="zodiac-card" data-sign="waage">
+                <span class="zodiac-symbol">♎</span>
+                <span class="zodiac-name">Waage</span>
+                <span class="zodiac-date">24.09. - 23.10.</span>
+            </div>
+            <div class="zodiac-card" data-sign="skorpion">
+                <span class="zodiac-symbol">♏</span>
+                <span class="zodiac-name">Skorpion</span>
+                <span class="zodiac-date">24.10. - 22.11.</span>
+            </div>
+            <div class="zodiac-card" data-sign="schuetze">
+                <span class="zodiac-symbol">♐</span>
+                <span class="zodiac-name">Schütze</span>
+                <span class="zodiac-date">23.11. - 21.12.</span>
+            </div>
+            <div class="zodiac-card" data-sign="steinbock">
+                <span class="zodiac-symbol">♑</span>
+                <span class="zodiac-name">Steinbock</span>
+                <span class="zodiac-date">22.12. - 20.01.</span>
+            </div>
+            <div class="zodiac-card" data-sign="wassermann">
+                <span class="zodiac-symbol">♒</span>
+                <span class="zodiac-name">Wassermann</span>
+                <span class="zodiac-date">21.01. - 19.02.</span>
+            </div>
+            <div class="zodiac-card" data-sign="fische">
+                <span class="zodiac-symbol">♓</span>
+                <span class="zodiac-name">Fische</span>
+                <span class="zodiac-date">20.02. - 20.03.</span>
+            </div>
+        </section>
+    </main>
+
+    <script src="match.js"></script>
+    <script>
+        function initAstroSearch() {
+            console.log("Starte /astro Suche...");
+            // Logik wird in match.js definiert
+        }
+    </script>
+</body>
+</html>
