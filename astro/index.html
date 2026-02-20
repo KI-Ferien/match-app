@@ -3,172 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KI-Ferien.de | Dein Astro-Planer</title>
+    <title>KI-Ferien.de | Astro-Planer</title>
     <style>
         :root {
-            --glow-color: rgba(0, 150, 255, 0.6);
+            --glow-color: rgba(0, 150, 255, 0.7);
             --text-gold: #ffcc00;
             --bg-dark: #050a15;
-            --ball-size: 380px;
         }
 
         body {
             margin: 0;
             padding: 0;
             background: var(--bg-dark);
-            background-image: radial-gradient(circle at center, #1a1a2e 0%, #050a15 100%);
+            /* Ein kräftigerer Gradient, damit man sieht, dass die Seite lebt */
+            background-image: radial-gradient(circle at center, #0a1931 0%, #050a15 100%);
             color: white;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
             overflow-x: hidden;
-        }
-
-        .stars {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            background: transparent url('https://www.transparenttextures.com/patterns/stardust.png') repeat;
-            opacity: 0.5;
         }
 
         .main-container {
             display: flex;
+            flex-direction: row;
             align-items: center;
             justify-content: center;
-            gap: 40px;
-            width: 100%;
-            max-width: 1300px;
-            padding: 20px;
+            gap: 30px;
+            width: 95%;
+            max-width: 1200px;
+            z-index: 10;
+            flex-wrap: nowrap; /* Verhindert das Umbrechen am Desktop */
         }
 
         .zodiac-column {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            width: 200px;
+            gap: 15px;
+            min-width: 160px;
         }
 
         .zodiac-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 12px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px;
             text-align: center;
-            border-radius: 15px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
         }
 
         .zodiac-card:hover {
-            transform: scale(1.1);
-            background: rgba(255, 255, 255, 0.08);
             border-color: var(--glow-color);
-            box-shadow: 0 0 20px var(--glow-color);
-        }
-
-        .zodiac-card.active {
-            border-color: var(--text-gold);
-            box-shadow: 0 0 25px rgba(255, 204, 0, 0.4);
-            background: rgba(255, 204, 0, 0.05);
+            box-shadow: 0 0 15px var(--glow-color);
+            background: rgba(255, 255, 255, 0.12);
         }
 
         .zodiac-symbol {
-            font-size: 2.2rem;
-            display: block;
-            margin-bottom: 4px;
+            font-size: 1.8rem;
             color: var(--text-gold);
-            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+            display: block;
         }
 
         .zodiac-name {
             font-weight: bold;
             display: block;
-            font-size: 1rem;
-            letter-spacing: 1px;
+            margin-top: 5px;
         }
 
         .zodiac-date {
-            font-size: 0.75rem;
-            opacity: 0.7;
-            display: block;
-            margin-top: 2px;
+            font-size: 0.7rem;
+            opacity: 0.8;
         }
 
-        /* Die zentrale Glaskugel - Garantiert Rund */
+        /* Glaskugel Sektion */
         .crystal-ball-container {
             position: relative;
-            width: var(--ball-size);
-            height: var(--ball-size);
+            width: 350px;
+            height: 350px;
             flex-shrink: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
 
         .crystal-ball {
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, 
-                        rgba(255, 255, 255, 0.25) 0%, 
-                        rgba(0, 120, 255, 0.1) 45%, 
-                        rgba(0, 5, 20, 0.7) 85%);
-            box-shadow: 0 0 60px var(--glow-color), 
-                        inset 0 0 50px rgba(255, 255, 255, 0.1),
-                        inset -20px -20px 60px rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, rgba(0,120,255,0.1) 50%, rgba(0,0,0,0.6) 100%);
+            box-shadow: 0 0 60px var(--glow-color), inset 0 0 40px rgba(255,255,255,0.1);
+            border: 2px solid rgba(255, 255, 255, 0.1);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 40px;
+            padding: 20px;
             box-sizing: border-box;
-            position: relative;
-            animation: pulse 6s infinite ease-in-out;
-            overflow: hidden;
         }
 
-        /* Glanzpunkt auf der Kugel */
-        .crystal-ball::after {
-            content: '';
-            position: absolute;
-            top: 15%; left: 15%;
-            width: 20%; height: 10%;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            filter: blur(8px);
-            transform: rotate(-45deg);
-        }
-
-        .ball-content h1 {
-            font-size: 1.8rem;
-            margin: 0;
-            color: #fff;
-            text-transform: uppercase;
-            text-shadow: 0 0 15px var(--glow-color);
-        }
-
-        .ball-content p {
-            font-size: 0.95rem;
-            margin: 15px 0;
-            line-height: 1.4;
-            min-height: 3em;
-        }
+        .ball-content h1 { font-size: 1.5rem; margin: 0; text-shadow: 0 0 10px var(--glow-color); }
+        .ball-content p { font-size: 0.9rem; margin: 15px 0; }
 
         .btn-astro {
-            background: linear-gradient(45deg, #0078ff, #00d4ff);
+            background: #0078ff;
             border: none;
-            padding: 12px 25px;
+            padding: 10px 20px;
             color: white;
-            border-radius: 30px;
+            border-radius: 20px;
             cursor: pointer;
             font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0, 120, 255, 0.3);
         }
+
+        /* Mobile Anpassung */
+        @media (max-width: 800px) {
+            .main-container { flex-direction: column; padding-top: 20px; }
+            .zodiac-column { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+            .crystal-ball-container { width: 280px; height: 280px; }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="main-container">
+        <div class="zodiac-column">
+            <div class="zodiac-card" onclick="selectSign('widder')">
+                <span class="zodiac-symbol">♈</span>
+                <span class="zodiac-name">Widder</span>
+                <span class="zodiac-date">21.03. - 20.04.</span>
+            </div>
+            <div class="zodiac-card" onclick="selectSign('stier')">
+                <span class="zodiac-symbol">♉</span>
+                <span class="zodiac-name">Stier</span>
+                <span class="zodiac-date">21.04. - 20.05.</span>
+            </div>
+            <div class="zodiac-card" onclick="selectSign('zwillinge')">
+                <span class="zodiac-symbol">♊</span>
+                <span class="zodiac-name">Zwillinge</span>
+                <span class="zodiac-date">21.05. - 21.06.</span>
+            </div>
+            <div class="zodiac-card" onclick="selectSign('krebs')">
+                <span class="zodiac-symbol">♋</span>
+                <span class="zodiac-name">Krebs</span>
+                <span class="zodiac-date">22.06. - 22.07.</span>
+            </div>
+            <div class="zodiac-card" onclick="selectSign('loewe')">
+                <span class="zodiac-symbol">♌</span>
+                <span class="zodiac-name">Löwe</span>
+                <span class="zodiac-date">23.07. - 23.08.</span>
+            </div>
+            <div class="zodiac-card" onclick="selectSign('jungfrau')">
+                <span class="zodiac-symbol">♍</span>
+                <span class="zodiac-name">Jungfrau</span>
+                <span class="zodiac-date">24.08. - 23.09.</span>
+            </div>
+        </div>
+
+        <div class="crystal-ball-container">
+            <div class="crystal-ball">
+                <div class="ball-content">
+                    <h1 id="ball-title">KI-FERIEN</h1>
+                    <p id="ball-text">Wähle ein Sternzeichen für deine nächste Ferien-Reise.</p>
+                    <button class="btn-astro" id="main-btn" onclick="redirectAstro()">Ferien finden</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="zodiac-column">
+            <div class="zodiac-card" onclick="selectSign('waage')">
+                <span class="zodiac-symbol">♎</span>
+                <span class="zodiac-name">Waage</span>
+                <span class="zodiac-date">24.09. - 23.10.</span>
+            </div>
+            <div class="zodiac-card" onclick="selectSign('skorpion')">
+                <span class="zodiac-symbol">♏</span>
+                <span class="zodiac-name">Skorpion</span>
+                <span class="zodiac-date">24.10. - 22.11.</span>
+            </div>
+            <div class="zodiac-card" onclick="selectSign('schuetze')">
+                <span class="zodiac-symbol">♐</span>
+                <span class="zodiac-name">Schütze</span>
+                <span class="zodiac-date">23.11. - 21.12.</span>
+            </div>
+            <div class="zodiac-card" onclick="selectSign('steinbock')">
+                <span class="zodiac-symbol">♑</span>
+                <span class="zodiac-name">Steinbock</span>
+                <span class="zodiac-date">22.12. - 20.01.</span>
+            </div>
+            <div class="zodiac-card" onclick="selectSign('wassermann')">
+                <span class="zodiac-symbol">♒</span>
+                <span class="zodiac-name">Wassermann</span>
+                <span class="zodiac-date">21.01. - 19.02.</span>
+            </div>
+            <div class="zodiac-card" onclick="selectSign('fische')">
+                <span class="zodiac-symbol">♓</span>
+                <span class="zodiac-name">Fische</span>
+                <span class="zodiac-date">20.02. - 20.03.</span>
+            </div>
+        </div>
+    </main>
+
+    <script src="match.js"></script>
+</body>
+</html>
