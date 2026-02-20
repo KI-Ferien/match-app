@@ -24,7 +24,6 @@
             overflow-x: hidden; position: relative;
         }
 
-        /* Hintergrund-Effekte */
         .nebula {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle at 20% 30%, var(--mystic-purple), transparent 50%),
@@ -32,7 +31,6 @@
             filter: blur(60px); z-index: -2;
             animation: nebulaPulse 15s infinite alternate ease-in-out;
         }
-        @keyframes nebulaPulse { from { opacity: 0.5; } to { opacity: 0.8; } }
 
         .stars-container {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -43,9 +41,7 @@
                 radial-gradient(2px 2px at 70% 80%, #fff, transparent),
                 radial-gradient(1px 1px at 90% 30%, #fff, transparent);
             background-size: 350px 350px;
-            animation: twinkle 8s infinite alternate;
         }
-        @keyframes twinkle { from { opacity: 0.2; } to { opacity: 0.5; } }
 
         .main-container {
             position: relative; z-index: 10;
@@ -69,7 +65,7 @@
 
         .zodiac-symbol { font-size: 2.2rem; color: var(--text-gold); display: block; }
         .zodiac-name { font-weight: bold; display: block; margin-top: 5px; font-size: 0.95rem; }
-        .zodiac-date { font-size: 0.75rem; opacity: 0.7; }
+        .zodiac-date { font-size: 0.75rem; opacity: 0.7; pointer-events: none; }
 
         .crystal-ball-container {
             width: 400px; height: 400px; flex-shrink: 0;
@@ -111,22 +107,22 @@
 
     <main class="main-container">
         <div class="zodiac-column">
-            <div class="zodiac-card" onclick="updateBall('widder')">
+            <div class="zodiac-card" onclick="updateBall('widder', this)">
                 <span class="zodiac-symbol">♈</span><span class="zodiac-name">Widder</span><span class="zodiac-date">21.03.-20.04.</span>
             </div>
-            <div class="zodiac-card" onclick="updateBall('stier')">
+            <div class="zodiac-card" onclick="updateBall('stier', this)">
                 <span class="zodiac-symbol">♉</span><span class="zodiac-name">Stier</span><span class="zodiac-date">21.04.-20.05.</span>
             </div>
-            <div class="zodiac-card" onclick="updateBall('zwillinge')">
+            <div class="zodiac-card" onclick="updateBall('zwillinge', this)">
                 <span class="zodiac-symbol">♊</span><span class="zodiac-name">Zwillinge</span><span class="zodiac-date">21.05.-21.06.</span>
             </div>
-            <div class="zodiac-card" onclick="updateBall('krebs')">
+            <div class="zodiac-card" onclick="updateBall('krebs', this)">
                 <span class="zodiac-symbol">♋</span><span class="zodiac-name">Krebs</span><span class="zodiac-date">22.06.-22.07.</span>
             </div>
-            <div class="zodiac-card" onclick="updateBall('loewe')">
+            <div class="zodiac-card" onclick="updateBall('loewe', this)">
                 <span class="zodiac-symbol">♌</span><span class="zodiac-name">Löwe</span><span class="zodiac-date">23.07.-23.08.</span>
             </div>
-            <div class="zodiac-card" onclick="updateBall('jungfrau')">
+            <div class="zodiac-card" onclick="updateBall('jungfrau', this)">
                 <span class="zodiac-symbol">♍</span><span class="zodiac-name">Jungfrau</span><span class="zodiac-date">24.08.-23.09.</span>
             </div>
         </div>
@@ -135,36 +131,17 @@
             <div class="crystal-ball">
                 <div class="ball-content">
                     <h1 id="ball-title">KI-FERIEN</h1>
-                    <p id="ball-text">Entdecke magische Ferienorte, die zu deinen Sternen passen.</p>
+                    <p id="ball-text">Wähle dein Sternzeichen für deine kosmischen Ferien.</p>
                     <button class="btn-astro" id="astro-btn" onclick="startTravel()">Sternenreise planen</button>
                 </div>
             </div>
         </div>
 
         <div class="zodiac-column">
-            <div class="zodiac-card" onclick="updateBall('waage')">
+            <div class="zodiac-card" onclick="updateBall('waage', this)">
                 <span class="zodiac-symbol">♎</span><span class="zodiac-name">Waage</span><span class="zodiac-date">24.09.-23.10.</span>
             </div>
-            <div class="zodiac-card" onclick="updateBall('skorpion')">
+            <div class="zodiac-card" onclick="updateBall('skorpion', this)">
                 <span class="zodiac-symbol">♏</span><span class="zodiac-name">Skorpion</span><span class="zodiac-date">24.10.-22.11.</span>
             </div>
-            <div class="zodiac-card" onclick="updateBall('schuetze')">
-                <span class="zodiac-symbol">♐</span><span class="zodiac-name">Schütze</span><span class="zodiac-date">23.11.-21.12.</span>
-            </div>
-            <div class="zodiac-card" onclick="updateBall('steinbock')">
-                <span class="zodiac-symbol">♑</span><span class="zodiac-name">Steinbock</span><span class="zodiac-date">22.12.-20.01.</span>
-            </div>
-            <div class="zodiac-card" onclick="updateBall('wassermann')">
-                <span class="zodiac-symbol">♒</span><span class="zodiac-name">Wassermann</span><span class="zodiac-date">21.01.-19.02.</span>
-            </div>
-            <div class="zodiac-card" onclick="updateBall('fische')">
-                <span class="zodiac-symbol">♓</span><span class="zodiac-name">Fische</span><span class="zodiac-date">20.02.-20.03.</span>
-            </div>
-        </div>
-    </main>
-
-    <script>
-        const config = {
-            widder: { t: "Widder Energie", p: "Action, Abenteuer und feurige Horizonte erwarten dich." },
-            stier: { t: "Stier Genuss", p: "Sinnliche Naturerlebnisse und Wellness unter Sternen." },
-            zw
+            <div class="zodiac-card" onclick="updateBall('schuet
