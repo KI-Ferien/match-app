@@ -3,47 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KI-Analyse | KI-Ferien.de</title>
+    <title>Deine Analyse | KI-Ferien.de</title>
     <style>
         :root { --glow: #0096ff; --gold: #ffcc00; --bg: #02050a; }
-        body { background: #02050a; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; background: radial-gradient(circle at center, #0a1e3b 0%, #02040a 100%); }
-        .result-card { max-width: 800px; width: 100%; background: rgba(255,255,255,0.05); padding: 40px; border-radius: 25px; border: 1px solid var(--glow); text-align: center; }
-        .ai-status { color: var(--gold); font-weight: bold; margin-bottom: 20px; font-size: 1.2rem; }
-        .dynamic-content { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 15px; margin: 20px 0; border-left: 4px solid var(--glow); text-align: left; }
-        .group-zodiacs { margin-top: 10px; font-style: italic; color: #aaa; }
+        body { 
+            background: #02050a; color: white; font-family: 'Helvetica Neue', Arial, sans-serif; 
+            display: flex; flex-direction: column; align-items: center; padding: 40px 20px; 
+            background: radial-gradient(circle at center, #0a1e3b 0%, #02040a 100%); 
+        }
+        .container { 
+            max-width: 850px; width: 100%; background: rgba(255,255,255,0.05); 
+            padding: 40px; border-radius: 25px; border: 1px solid var(--glow); 
+            text-align: center; backdrop-filter: blur(15px); 
+        }
+        .ai-badge { 
+            display: inline-block; padding: 5px 15px; background: var(--glow); 
+            border-radius: 20px; font-size: 0.7rem; font-weight: bold; margin-bottom: 20px; 
+        }
+        .result-box { 
+            background: rgba(255,255,255,0.03); padding: 30px; border-radius: 15px; 
+            border-left: 4px solid var(--gold); text-align: left; margin: 20px 0; 
+        }
+        h1 { color: var(--gold); font-size: 1.8rem; }
+        .zodiac-tags { margin: 10px 0; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .tag { background: rgba(0, 150, 255, 0.2); padding: 4px 12px; border-radius: 15px; font-size: 0.8rem; border: 1px solid var(--glow); }
+        
+        /* Widget Placeholder für Travelpayouts */
+        .travel-widget { 
+            background: white; color: #333; padding: 20px; border-radius: 12px; 
+            margin-top: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+        }
     </style>
 </head>
 <body>
-    <div class="result-card">
-        <h1>Deine KI-Ferien Analyse</h1>
-        <p class="ai-status">Die KI (Mistral) hat eure Konstellation berechnet!</p>
+
+    <div class="container">
+        <div class="ai-badge">KI-ENGINE AKTIV (MISTRAL)</div>
+        <h1 id="main-title">Deine Kosmische Ferien-Analyse</h1>
         
-        <div class="dynamic-content">
-            <h2 id="res-title" style="color:var(--glow);">Lade Ziel für eure Gruppe...</h2>
-            <p id="res-desc" style="margin-top:10px; line-height: 1.5;">Analysiere die gemeinsame Energie der Sternzeichen...</p>
-            <p class="group-zodiacs" id="group-info"></p>
+        <div class="zodiac-tags" id="tag-container">
+            </div>
+
+        <div class="result-box">
+            <h2 id="dest-title" style="color:var(--glow);">Berechne Harmonien...</h2>
+            <p id="dest-text" style="line-height: 1.6; margin-top: 10px; opacity: 0.9;">
+                Die Konstellation eurer Gruppe wird analysiert. Wir suchen nach dem Ort, der Vibe, Budget und eure Sternzeichen vereint...
+            </p>
         </div>
 
-        <a href="index.html" style="color:var(--glow); text-decoration: none; margin-top: 20px; font-weight: bold; display: block;">← Neue Analyse starten</a>
+        <div class="travel-widget">
+            <h3 style="margin-bottom:15px; font-size: 1rem;">Exklusive Angebote für eure Konstellation</h3>
+            <div id="tp-widget">
+                <p style="font-size: 0.8rem; color: #666;">Suche nach passenden Flügen und Unterkünften...</p>
+            </div>
+        </div>
+
+        <p style="font-size: 0.8rem; margin-top: 30px; opacity: 0.5;">
+            Eine detaillierte PDF-Analyse wurde soeben an deine Email-Adresse versandt.
+        </p>
+        <a href="index.html" style="color:var(--glow); text-decoration:none; display:block; margin-top:20px; font-weight:bold;">← Neue Suche</a>
     </div>
 
     <script>
-        const params = new URLSearchParams(window.location.search);
-        const signs = (params.get('signs') || "").split(',');
-        const p = params.get('p');
+        // Daten aus der URL extrahieren
+        const urlParams = new URLSearchParams(window.location.search);
+        const signs = (urlParams.get('signs') || "").split(',');
+        const vibe = parseInt(urlParams.get('v') || 50);
+        const budget = parseInt(urlParams.get('b') || 50);
 
-        setTimeout(() => {
-            document.getElementById('group-info').innerText = `Gruppe: ${signs.map(s => s.toUpperCase()).join(' + ')}`;
-            
-            // Logik für Krebs (Cornwall Beispiel)
-            if(signs.includes('krebs')) {
-                document.getElementById('res-title').innerText = "Harmonie am Wasser: Cornwall";
-                document.getElementById('res-desc').innerText = "Für eure Gruppe von " + p + " Personen ist die romantische Steilküste ideal. Die Gezeiten spiegeln eure Seelen – perfekt für Geborgenheit.";
-            } else {
-                document.getElementById('res-title').innerText = "Kosmische Gruppenreise gefunden!";
-                document.getElementById('res-desc').innerText = "Die KI hat ein Ziel generiert, das die Energien eurer " + p + " Sternzeichen perfekt bündelt. Details wurden an eure Email gesendet.";
+        // UI-Update
+        const tagContainer = document.getElementById('tag-container');
+        signs.forEach(s => {
+            if(s) {
+                const span = document.createElement('span');
+                span.className = 'tag';
+                span.innerText = s.toUpperCase();
+                tagContainer.appendChild(span);
             }
-        }, 1500);
+        });
+
+        // Simulation der dynamischen KI-Antwort
+        setTimeout(() => {
+            const destTitle = document.getElementById('dest-title');
+            const destText = document.getElementById('dest-text');
+
+            // Beispielhafte Logik für die dynamische Anzeige
+            if (signs.includes('krebs') && signs.includes('skorpion')) {
+                destTitle.innerText = "Mystisches Wasser-Abenteuer: Schottische Highlands";
+                destText.innerText = "Eure Kombination aus zwei Wasserzeichen verlangt nach Tiefe und Mystik. Basierend auf eurem Budget-Index von " + budget + " empfehlen wir ein historisches Schloss am See. Perfekt für den gewählten Vibe.";
+            } else if (vibe > 70) {
+                destTitle.innerText = "Action-Highlight: Queenstown, Neuseeland";
+                destText.innerText = "Euer Vibe-Level steht auf Maximum! Für eure Gruppe ist dies der ultimative Ort für Adrenalin und unvergessliche Ferien.";
+            } else {
+                destTitle.innerText = "Eure individuelle KI-Empfehlung";
+                destText.innerText = "Die KI hat die Energien eurer " + signs.length + " Teilnehmer gebündelt. Ein Ziel wurde gefunden, das euren Wunsch nach " + (vibe < 50 ? 'Entspannung' : 'Erlebnissen') + " perfekt erfüllt.";
+            }
+
+            // Travelpayouts Widget Laden (Simulation)
+            const tpWidget = document.getElementById('tp-widget');
+            tpWidget.innerHTML = `<p style="color:#0056b3; font-weight:bold;">Top-Deals für ${signs[0].toUpperCase()}-Reisende verfügbar! (ID: 698672)</p>`;
+        }, 2000);
     </script>
 </body>
 </html>
