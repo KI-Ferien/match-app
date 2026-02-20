@@ -2,154 +2,89 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta property="og:type" content="article">
-<meta property="og:url" content="https://ki-ferien.de/">
-<meta property="og:title" content="KI-Ferien.de | Deine perfekten Ferien in Sekunden geplant">
-<meta property="og:description" content="Nutze Künstliche Intelligenz für deine Ferienplanung. Finde Traumziele passend zu deinem Budget – stressfrei und schnell.">
-<meta property="og:image" content="https://ki-ferien.de/social-share-bild.jpg">
-
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="KI-Ferien.de | Smarte Reiseplanung">
-<meta name="twitter:description" content="Finde deine nächsten Ferien mit KI.">
-<meta name="twitter:image" content="https://ki-ferien.de/social-share-bild.jpg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KI-Ferien.de | Kosmische Ferien</title>
+    <title>KI-Ferien.de | Kosmische Ferien-Analyse</title>
     <style>
-        body {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
-            background-size: cover;
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-        }
-
-        .main-container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 30px;
-            border-radius: 20px;
-            width: 100%;
-            max-width: 700px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            text-align: center;
-            margin-top: 20px;
-            color: #333;
-        }
-
-        h1 { color: #2c3e50; margin-bottom: 5px; font-size: 2.2rem; }
-        p.subtitle { color: #7f8c8d; font-size: 1.2rem; margin-top: 0; }
-
-        label {
-            display: block;
-            font-weight: bold;
-            margin-top: 15px;
-            margin-bottom: 5px;
-            text-align: left;
-            font-size: 1rem;
-            color: #2c3e50;
-        }
-
-        select, input, textarea {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            background: #fff;
-            box-sizing: border-box;
-            color: #333;
-        }
-        
-        select:focus, input:focus, textarea:focus { border-color: #ff6b6b; outline: none; }
-
-        .participants-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin: 25px 0;
-        }
-
-        .card { background: #f8f9fa; border: 1px solid #ddd; padding: 15px; border-radius: 12px; text-align: left; }
-        .card h3 { margin-top: 0; color: #ff6b6b; }
-
-        .extra-box {
-            background: #fff3e0;
-            border: 2px solid #ffe0b2;
-            padding: 20px;
-            border-radius: 15px;
-            margin: 30px 0;
-            text-align: left;
-        }
-        
-        /* Hilfsklasse für größere Emojis */
-        .big-icon { font-size: 1.5em; vertical-align: middle; }
-
-        button.cta-btn {
-            background: #ff6b6b;
-            color: white;
-            font-size: 1.3rem;
-            font-weight: bold;
-            padding: 18px 40px;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            width: 100%;
-            transition: background 0.2s;
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
-        }
-        button.cta-btn:hover { background: #ee5253; }
-        button.cta-btn:disabled { background: #ccc; box-shadow: none; }
+        :root { --glow: #0096ff; --gold: #ffcc00; --bg: #02050a; --cta: #ff6b6b; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: var(--bg); color: white; font-family: 'Helvetica Neue', Arial, sans-serif; min-height: 100vh; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle at center, #0a1e3b 0%, #02040a 100%); padding: 20px; overflow-x: hidden; }
+        .main-grid { position: relative; z-index: 100; display: grid; grid-template-columns: 180px 1fr 180px; align-items: center; gap: 30px; width: 100%; max-width: 1400px; }
+        .zodiac-column { display: flex; flex-direction: column; gap: 10px; }
+        .zodiac-card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 10px; text-align: center; border-radius: 12px; cursor: pointer; transition: 0.3s; backdrop-filter: blur(5px); }
+        .zodiac-card:hover, .zodiac-card.active { border-color: var(--glow); background: rgba(0, 150, 255, 0.2); box-shadow: 0 0 15px var(--glow); transform: scale(1.05); }
+        .zodiac-symbol { font-size: 1.8rem; color: var(--gold); display: block; }
+        .zodiac-name { font-weight: bold; display: block; font-size: 0.8rem; margin-top: 4px; }
+        .crystal-ball { width: 580px; min-height: 580px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0.95) 90%); box-shadow: 0 0 60px var(--glow), inset 0 0 40px rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.15); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 50px; text-align: center; }
+        .input-wrap { width: 90%; margin-bottom: 10px; text-align: left; }
+        label { font-size: 0.6rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 3px; }
+        select, input, textarea { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white; font-size: 0.8rem; outline: none; }
+        input[type="range"] { accent-color: var(--cta); margin-top: 5px; }
+        .participants-scroll { width: 95%; max-height: 120px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .participant-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; background: rgba(255,255,255,0.05); padding: 5px; border-radius: 5px; }
+        .cta-btn { background: var(--cta); color: white; font-size: 1rem; font-weight: bold; padding: 12px 30px; border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4); width: 90%; transition: 0.3s; margin-top: 10px; }
+        @media (max-width: 1000px) { .main-grid { grid-template-columns: 1fr; } .zodiac-column { flex-direction: row; flex-wrap: wrap; justify-content: center; } .crystal-ball { width: 400px; min-height: 400px; padding: 30px; } }
     </style>
 </head>
 <body>
-
-<div class="main-container">
-    <h1>KI-Ferien.de</h1>
-    <p class="subtitle">Finde das perfekte Ziel für dich.</p>
-
-    <label>Wie viele Personen reisen?</label>
-    <select id="personCount" onchange="renderCards()">
-        <option value="1">1 Person</option>
-        <option value="2">2 Personen</option>
-        <option value="3">3 Personen</option>
-        <option value="4">4 Personen</option>
-        <option value="5">5 Personen</option>
-    </select>
-
-    <div id="participants-grid" class="participants-grid"></div>
-
-    <div class="extra-box">
-        <h3 style="margin-top:0; color:#e67e22;">Eure Wünsche</h3>
-        
-        <label>Ferien-Vibe:</label>
-        <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.9rem; align-items: center;">
-            <span>Entspannt <span class="big-icon">🏖️</span></span>
-            <span>Action <span class="big-icon">🧗</span></span>
-        </div>
-        <input type="range" id="vibeRange" min="0" max="100" value="50">
-
-        <label>Budget:</label>
-        <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.9rem; align-items: center;">
-            <span>Sparsam <span class="big-icon">💶</span></span>
-            <span>Luxus <span class="big-icon">💎</span></span>
-        </div>
-        <input type="range" id="budgetRange" min="0" max="100" value="50">
-
-        <label>Besondere Hobbies / Wünsche:</label>
-        <textarea id="hobbiesInput" rows="3" placeholder="z.B. Vegan, Surfen, Nachtleben..."></textarea>
-
-        <label style="color:#d35400;">Wohin soll die Empfehlung geschickt werden?</label>
-        <input type="email" id="userEmail" placeholder="deine@email.de" style="border: 2px solid #e67e22;">
+<div class="main-grid">
+    <div class="zodiac-column">
+        <div class="zodiac-card" onclick="setMainZodiac('widder', this)"><span class="zodiac-symbol">♈</span><span class="zodiac-name">Widder</span></div>
+        <div class="zodiac-card" onclick="setMainZodiac('stier', this)"><span class="zodiac-symbol">♉</span><span class="zodiac-name">Stier</span></div>
+        <div class="zodiac-card" onclick="setMainZodiac('zwillinge', this)"><span class="zodiac-symbol">♊</span><span class="zodiac-name">Zwillinge</span></div>
+        <div class="zodiac-card" onclick="setMainZodiac('krebs', this)"><span class="zodiac-symbol">♋</span><span class="zodiac-name">Krebs</span></div>
+        <div class="zodiac-card" onclick="setMainZodiac('loewe', this)"><span class="zodiac-symbol">♌</span><span class="zodiac-name">Löwe</span></div>
+        <div class="zodiac-card" onclick="setMainZodiac('jungfrau', this)"><span class="zodiac-symbol">♍</span><span class="zodiac-name">Jungfrau</span></div>
     </div>
-
-    <button onclick="startMatching()" class="cta-btn">Kostenlose Analyse starten</button>
-    <div id="result" style="margin-top:20px;"></div>
+    <div style="display:flex; justify-content:center;">
+        <div class="crystal-ball">
+            <h2 id="ball-title" style="color:var(--gold); margin-bottom:10px; font-size: 1.1rem; letter-spacing: 2px;">KI-FERIEN.DE</h2>
+            <div class="input-wrap">
+                <label>Email & Teilnehmer:</label>
+                <div style="display:flex; gap:5px;">
+                    <input type="email" id="userEmail" placeholder="deine@email.de">
+                    <select id="personCount" style="width:30%;" onchange="renderParticipantFields()">
+                        <option value="1">1 Pers.</option><option value="2">2 Pers.</option><option value="3">3 Pers.</option><option value="4">4 Pers.</option><option value="5">5 Pers.</option>
+                    </select>
+                </div>
+            </div>
+            <div id="participants-list" class="participants-scroll"></div>
+            <div class="input-wrap">
+                <div style="display:flex; justify-content:space-between;"><label>Entspannt 🏖️</label><label>Action 🧗</label></div>
+                <input type="range" id="vibeRange" min="0" max="100" value="50">
+            </div>
+            <div class="input-wrap">
+                <div style="display:flex; justify-content:space-between;"><label>Sparsam 💶</label><label>Luxus 💎</label></div>
+                <input type="range" id="budgetRange" min="0" max="100" value="50">
+            </div>
+            <div class="input-wrap"><label>Besondere Hobbies / Wünsche:</label><textarea id="hobbiesInput" rows="1" placeholder="z.B. Vegan, Surfen..."></textarea></div>
+            <button class="cta-btn" id="matchBtn" onclick="submitCosmicMatch()">Kostenlose Analyse starten</button>
+        </div>
+    </div>
+    <div class="zodiac-column">
+        <div class="zodiac-card" onclick="setMainZodiac('waage', this)"><span class="zodiac-symbol">♎</span><span class="zodiac-name">Waage</span></div>
+        <div class="zodiac-card" onclick="setMainZodiac('skorpion', this)"><span class="zodiac-symbol">♏</span><span class="zodiac-name">Skorpion</span></div>
+        <div class="zodiac-card" onclick="setMainZodiac('schuetze', this)"><span class="zodiac-symbol">♐</span><span class="zodiac-name">Schütze</span></div>
+        <div class="zodiac-card" onclick="setMainZodiac('steinbock', this)"><span class="zodiac-symbol">♑</span><span class="zodiac-name">Steinbock</span></div>
+        <div class="zodiac-card" onclick="setMainZodiac('wassermann', this)"><span class="zodiac-symbol">♒</span><span class="zodiac-name">Wassermann</span></div>
+        <div class="zodiac-card" onclick="setMainZodiac('fische', this)"><span class="zodiac-symbol">♓</span><span class="zodiac-name">Fische</span></div>
+    </div>
 </div>
-
-<script src="match.js"></script>
-
+<script>
+    let mainTravelerSign = "";
+    const zodiacs = ["widder", "stier", "zwillinge", "krebs", "loewe", "jungfrau", "waage", "skorpion", "schuetze", "steinbock", "wassermann", "fische"];
+    function setMainZodiac(name, el) { mainTravelerSign = name; document.getElementById('ball-title').innerText = name.toUpperCase(); document.querySelectorAll('.zodiac-card').forEach(c => c.classList.remove('active')); el.classList.add('active'); }
+    function renderParticipantFields() { const count = parseInt(document.getElementById('personCount').value); const list = document.getElementById('participants-list'); list.innerHTML = ""; for(let i = 2; i <= count; i++) { const row = document.createElement('div'); row.className = "participant-row"; row.innerHTML = `<label>Pers. ${i}:</label><select class="extra-zodiac">${zodiacs.map(z => `<option value="${z}">${z.charAt(0).toUpperCase() + z.slice(1)}</option>`).join('')}</select>`; list.appendChild(row); } }
+    async function submitCosmicMatch() {
+        const email = document.getElementById('userEmail').value;
+        const btn = document.getElementById('matchBtn');
+        if (!mainTravelerSign || !email) { alert("Bitte Sternzeichen wählen und Email eingeben."); return; }
+        btn.disabled = true; btn.innerText = "KI analysiert...";
+        const extras = document.querySelectorAll('.extra-zodiac');
+        const groupZodiacs = [mainTravelerSign, ...Array.from(extras).map(s => s.value)];
+        const analysisData = { email, zodiacs: groupZodiacs, vibe: document.getElementById('vibeRange').value, budget: document.getElementById('budgetRange').value, hobbies: document.getElementById('hobbiesInput').value, persons: document.getElementById('personCount').value, marker: "698672", project: "492044" };
+        try { await fetch('/.netlify/functions/match', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(analysisData) }); } catch (e) { console.error(e); }
+        window.location.href = `reise.html?signs=${groupZodiacs.join(',')}&v=${analysisData.vibe}`;
+    }
+</script>
 </body>
 </html>
