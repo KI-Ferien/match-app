@@ -3,216 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KI-Ferien.de | Kosmische Ferienplanung</title>
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://ki-ferien.de/">
+    <meta property="og:title" content="KI-Ferien.de | Deine perfekten Ferien in Sekunden geplant">
+    <meta property="og:description" content="Nutze Künstliche Intelligenz für deine Ferienplanung. Finde Traumziele passend zu deinem Budget – stressfrei und schnell.">
+    <title>KI-Ferien.de | Kosmische Ferien-Planung</title>
     <style>
         :root {
-            --glow-color: #0096ff;
-            --text-gold: #ffcc00;
-            --bg-deep: #02050a;
+            --glow: #0096ff;
+            --gold: #ffcc00;
+            --bg: #02050a;
+            --cta-color: #ff6b6b; /* Original CTA-Farbe von KI-Ferien.de */
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-deep);
+            background-color: var(--bg);
             color: white;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             overflow-x: hidden;
-            position: relative;
             background: radial-gradient(circle at center, #0a1e3b 0%, #02040a 100%);
         }
 
         /* Hintergrund-Sterne */
-        .stars-container {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            background-image: 
-                radial-gradient(1px 1px at 10% 20%, #fff, transparent),
-                radial-gradient(1.5px 1.5px at 30% 40%, #fff, transparent),
-                radial-gradient(2px 2px at 70% 80%, #fff, transparent),
-                radial-gradient(1.5px 1.5px at 15% 75%, #fff, transparent);
-            background-size: 350px 350px;
-            opacity: 0.4;
+        .stars {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            background-image: radial-gradient(1px 1px at 20px 30px, #fff, transparent), radial-gradient(1.5px 1.5px at 100px 150px, #fff, transparent);
+            background-size: 300px 300px;
+            opacity: 0.3;
         }
 
         .main-container {
             position: relative;
-            z-index: 10;
-            display: flex;
-            flex-direction: row;
+            z-index: 9999; /* Stellt sicher, dass Klicks durchgehen */
+            display: grid;
+            grid-template-columns: 200px 1fr 200px;
             align-items: center;
-            justify-content: center;
-            gap: 40px;
+            gap: 30px;
             width: 100%;
-            max-width: 1300px;
+            max-width: 1200px;
             padding: 20px;
         }
 
-        .zodiac-column {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            width: 190px;
-        }
+        .zodiac-column { display: flex; flex-direction: column; gap: 12px; }
 
         .zodiac-card {
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 12px;
             text-align: center;
             border-radius: 12px;
             cursor: pointer;
             transition: 0.3s;
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(10px);
         }
 
         .zodiac-card:hover, .zodiac-card.active {
-            border-color: var(--glow-color);
-            background: rgba(0, 150, 255, 0.15);
-            box-shadow: 0 0 25px var(--glow-color);
-            transform: scale(1.08);
+            border-color: var(--glow);
+            background: rgba(0, 150, 255, 0.2);
+            box-shadow: 0 0 15px var(--glow);
+            transform: scale(1.05);
         }
 
-        .zodiac-symbol { font-size: 2.2rem; color: var(--text-gold); display: block; }
-        .zodiac-name { font-weight: bold; display: block; margin-top: 5px; font-size: 0.95rem; }
+        .zodiac-symbol { font-size: 2rem; color: var(--gold); display: block; pointer-events: none; }
+        .zodiac-name { font-weight: bold; display: block; margin-top: 5px; font-size: 0.9rem; pointer-events: none; }
 
-        .crystal-ball-container {
-            width: 400px;
-            height: 400px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+        /* Glaskugel */
+        .crystal-ball-area { display: flex; flex-direction: column; align-items: center; text-align: center; }
 
         .crystal-ball {
-            width: 100%;
-            height: 100%;
+            width: 380px; height: 380px;
             border-radius: 50%;
-            background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.3) 0%, rgba(0,150,255,0.1) 40%, rgba(0,5,20,0.85) 90%);
-            box-shadow: 0 0 70px var(--glow-color), inset 0 0 50px rgba(255,255,255,0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 45px;
-            animation: sphereFloat 6s infinite ease-in-out;
+            background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.8) 90%);
+            box-shadow: 0 0 60px var(--glow), inset 0 0 40px rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 40px; margin-bottom: 20px;
         }
 
-        @keyframes sphereFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .ball-content h1 { font-size: 1.8rem; margin: 0; text-shadow: 0 0 15px var(--glow-color); letter-spacing: 2px; }
-        .ball-content p { font-size: 1rem; margin: 20px 0; line-height: 1.4; }
-
-        .btn-astro {
-            background: linear-gradient(45deg, #ff6b6b, #ee5253);
-            border: none;
-            padding: 14px 28px;
+        .cta-btn {
+            background: var(--cta-color);
             color: white;
-            border-radius: 35px;
-            cursor: pointer;
+            font-size: 1.2rem;
             font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
+            padding: 15px 35px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
             transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
         }
 
-        .btn-astro:hover { transform: translateY(-3px) scale(1.05); filter: brightness(1.1); }
+        .cta-btn:hover { background: #ee5253; transform: scale(1.05); }
 
-        @media (max-width: 950px) {
-            .main-container { flex-direction: column; padding: 60px 10px; }
-            .zodiac-column { flex-direction: row; flex-wrap: wrap; justify-content: center; width: 100%; }
-            .crystal-ball-container { width: 320px; height: 320px; order: -1; }
+        @media (max-width: 900px) {
+            .main-container { grid-template-columns: 1fr; }
+            .zodiac-column { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+            .crystal-ball { width: 300px; height: 300px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="stars-container"></div>
+<div class="stars"></div>
 
-    <main class="main-container">
-        <div class="zodiac-column">
-            <div class="zodiac-card" onclick="selectSign('widder', this)"><span class="zodiac-symbol">♈</span><span class="zodiac-name">Widder</span></div>
-            <div class="zodiac-card" onclick="selectSign('stier', this)"><span class="zodiac-symbol">♉</span><span class="zodiac-name">Stier</span></div>
-            <div class="zodiac-card" onclick="selectSign('zwillinge', this)"><span class="zodiac-symbol">♊</span><span class="zodiac-name">Zwillinge</span></div>
-            <div class="zodiac-card" onclick="selectSign('krebs', this)"><span class="zodiac-symbol">♋</span><span class="zodiac-name">Krebs</span></div>
-            <div class="zodiac-card" onclick="selectSign('loewe', this)"><span class="zodiac-symbol">♌</span><span class="zodiac-name">Löwe</span></div>
-            <div class="zodiac-card" onclick="selectSign('jungfrau', this)"><span class="zodiac-symbol">♍</span><span class="zodiac-name">Jungfrau</span></div>
+<main class="main-container">
+    <div class="zodiac-column">
+        <div class="zodiac-card" onclick="selectSign('widder', this)"><span class="zodiac-symbol">♈</span><span class="zodiac-name">Widder</span></div>
+        <div class="zodiac-card" onclick="selectSign('stier', this)"><span class="zodiac-symbol">♉</span><span class="zodiac-name">Stier</span></div>
+        <div class="zodiac-card" onclick="selectSign('zwillinge', this)"><span class="zodiac-symbol">♊</span><span class="zodiac-name">Zwillinge</span></div>
+        <div class="zodiac-card" onclick="selectSign('krebs', this)"><span class="zodiac-symbol">♋</span><span class="zodiac-name">Krebs</span></div>
+        <div class="zodiac-card" onclick="selectSign('loewe', this)"><span class="zodiac-symbol">♌</span><span class="zodiac-name">Löwe</span></div>
+        <div class="zodiac-card" onclick="selectSign('jungfrau', this)"><span class="zodiac-symbol">♍</span><span class="zodiac-name">Jungfrau</span></div>
+    </div>
+
+    <div class="crystal-ball-area">
+        <div class="crystal-ball">
+            <h1 id="ball-title" style="margin:0;">KI-FERIEN</h1>
+            <p id="ball-text" style="margin:15px 0; font-size: 0.9rem;">Wähle dein Sternzeichen für deine individuelle Analyse.</p>
         </div>
+        <button class="cta-btn" onclick="executeAstroPlan()">Sternenreise planen</button>
+    </div>
 
-        <div class="crystal-ball-container">
-            <div class="crystal-ball">
-                <div class="ball-content">
-                    <h1 id="ball-title">KI-FERIEN</h1>
-                    <p id="ball-text">Wähle dein Sternzeichen für eine kostenlose KI-Ferien-Analyse.</p>
-                    <button class="btn-astro" onclick="generateRequest()">Sternenreise planen</button>
-                </div>
-            </div>
-        </div>
+    <div class="zodiac-column">
+        <div class="zodiac-card" onclick="selectSign('waage', this)"><span class="zodiac-symbol">♎</span><span class="zodiac-name">Waage</span></div>
+        <div class="zodiac-card" onclick="selectSign('skorpion', this)"><span class="zodiac-symbol">♏</span><span class="zodiac-name">Skorpion</span></div>
+        <div class="zodiac-card" onclick="selectSign('schuetze', this)"><span class="zodiac-symbol">♐</span><span class="zodiac-name">Schütze</span></div>
+        <div class="zodiac-card" onclick="selectSign('steinbock', this)"><span class="zodiac-symbol">♑</span><span class="zodiac-name">Steinbock</span></div>
+        <div class="zodiac-card" onclick="selectSign('wassermann', this)"><span class="zodiac-symbol">♒</span><span class="zodiac-name">Wassermann</span></div>
+        <div class="zodiac-card" onclick="selectSign('fische', this)"><span class="zodiac-symbol">♓</span><span class="zodiac-name">Fische</span></div>
+    </div>
+</main>
 
-        <div class="zodiac-column">
-            <div class="zodiac-card" onclick="selectSign('waage', this)"><span class="zodiac-symbol">♎</span><span class="zodiac-name">Waage</span></div>
-            <div class="zodiac-card" onclick="selectSign('skorpion', this)"><span class="zodiac-symbol">♏</span><span class="zodiac-name">Skorpion</span></div>
-            <div class="zodiac-card" onclick="selectSign('schuetze', this)"><span class="zodiac-symbol">♐</span><span class="zodiac-name">Schütze</span></div>
-            <div class="zodiac-card" onclick="selectSign('steinbock', this)"><span class="zodiac-symbol">♑</span><span class="zodiac-name">Steinbock</span></div>
-            <div class="zodiac-card" onclick="selectSign('wassermann', this)"><span class="zodiac-symbol">♒</span><span class="zodiac-name">Wassermann</span></div>
-            <div class="zodiac-card" onclick="selectSign('fische', this)"><span class="zodiac-symbol">♓</span><span class="zodiac-name">Fische</span></div>
-        </div>
-    </main>
+<script>
+    let currentSign = "";
 
-    <script>
-        let selectedSign = "";
+    function selectSign(name, el) {
+        currentSign = name;
+        document.getElementById('ball-title').innerText = name.toUpperCase();
+        document.getElementById('ball-text').innerText = "Bereit für deine kosmische Ferien-Analyse?";
+        document.querySelectorAll('.zodiac-card').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+    }
 
-        function selectSign(name, el) {
-            selectedSign = name;
-            document.getElementById('ball-title').innerText = name.toUpperCase();
-            document.getElementById('ball-text').innerText = "Bereit für deine kosmische Ferien-Analyse?";
-            document.querySelectorAll('.zodiac-card').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
+    function executeAstroPlan() {
+        if (!currentSign) {
+            alert("Bitte wähle zuerst ein Sternzeichen!");
+            return;
         }
 
-        function generateRequest() {
-            if (!selectedSign) {
-                alert("Bitte wähle zuerst dein Sternzeichen aus!");
-                return;
-            }
+        // Email-Generierung mit KI-Ferien Parametern
+        const recipient = "info@ki-ferien.de";
+        const subject = encodeURIComponent(`KI-Ferien Analyse: Sternzeichen ${currentSign}`);
+        const body = encodeURIComponent(
+            `Hallo KI-Ferien Team,\n\n` +
+            `Ich bitte um eine kostenlose KI-Analyse für meine nächsten Ferien.\n\n` +
+            `DATEN:\n` +
+            `- Sternzeichen: ${currentSign.toUpperCase()}\n` +
+            `- Projekt-ID: 492044\n` +
+            `- Partner-ID: 698672\n` +
+            `- Quelle: KI-Ferien.de/astro\n\n` +
+            `Beste Grüße`
+        );
 
-            // Parameter für die Email (inspiriert von deiner Original-Struktur)
-            const emailReceiver = "info@ki-ferien.de";
-            const subject = encodeURIComponent(`KI-Ferien Analyse: Sternzeichen ${selectedSign}`);
-            
-            // Der Email-Text ersetzt das alte Formular und sammelt die "KI-Parameter"
-            const body = encodeURIComponent(
-                `Hallo KI-Ferien Team,\n\n` +
-                `Ich habe über den Astro-Planer meine Ferien-Analyse gestartet.\n\n` +
-                `PARAMETER:\n` +
-                `- Sternzeichen: ${selectedSign.toUpperCase()}\n` +
-                `- Webseite: KI-Ferien.de\n` +
-                `- Travelpayouts-ID: 698672\n\n` +
-                `Bitte erstellt mir basierend auf diesen kosmischen Daten eine passende Ferien-Empfehlung.\n\n` +
-                `Beste Grüße`
-            );
+        // Öffnet das Email-Programm
+        window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
 
-            // 1. Email-Programm öffnen
-            window.location.href = `mailto:${emailReceiver}?subject=${subject}&body=${body}`;
+        // Weiterleitung zu den passenden Beiträgen (reise.html)
+        setTimeout(() => {
+            window.location.href = `reise.html?sign=${currentSign}`;
+        }, 1500);
+    }
+</script>
 
-            // 2. Zeitverzögerte Weiterleitung zur Beitragsseite (reise.html)
-            setTimeout(() => {
-                window.location.href = `reise.html?sign=${selectedSign}`;
-            }, 2000);
-        }
-    </script>
 </body>
 </html>
