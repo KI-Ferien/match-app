@@ -1,91 +1,81 @@
 const { Resend } = require('resend');
 
 exports.handler = async (event) => {
-    if (event.httpMethod !== "POST") return { statusCode: 405, body: "Method Not Allowed" };
+    // CORS & Method Check
+    if (event.httpMethod !== "POST") {
+        return { statusCode: 405, body: "Nur POST erlaubt" };
+    }
 
     try {
         const { email, zodiacs, vibe, budget, hobbies, persons, marker, project } = JSON.parse(event.body);
+        
+        // Initialisiere Resend mit deinem Key aus Netlify
         const resend = new Resend(process.env.RESEND_API_KEY);
 
-        // 1. DYNAMISCHE KI-LOGIK (MISTRAL-SIMULATION)
-        // Hier wird die Destination basierend auf echten Daten gewählt
-        const primarySign = zodiacs[0].charAt(0).toUpperCase() + zodiacs[0].slice(1);
-        
-        // Logik für die Zielwahl (wird in der Email dynamisch eingesetzt)
-        let destination = "Bali";
-        let vibeText = "spirituelle Erneuerung und tropische Gelassenheit";
-        
-        if (vibe > 70) {
-            destination = "Queenstown";
-            vibeText = "Adrenalin, Weite und ultimative Freiheit";
+        // 1. DYNAMISCHE KI-LOGIK (MISTRAL-STIL)
+        const primarySign = zodiacs[0].toUpperCase();
+        let dest = "Bali";
+        let vibeMsg = "spirituelle Tiefe und tropische Erneuerung";
+        let heroImg = "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800";
+
+        if (vibe > 75) {
+            dest = "Queenstown";
+            vibeMsg = "pures Adrenalin und grenzenlose Freiheit";
+            heroImg = "https://images.unsplash.com/photo-1589802829985-817e51181b92?w=800";
         } else if (zodiacs.includes('krebs') || zodiacs.includes('fische')) {
-            destination = "Cornwall";
-            vibeText = "tiefe emotionale Geborgenheit und mystische Küstenmagie";
+            dest = "Cornwall";
+            vibeMsg = "emotionale Geborgenheit an mystischen Küsten";
+            heroImg = "https://images.unsplash.com/photo-1510253451774-67f781f8f782?w=800";
         }
 
-        // 2. PSYCHOLOGISCH OPTIMIERTES HTML-TEMPLATE
-        const htmlContent = `
+        // 2. HIGH-CONVERSION EMAIL TEMPLATE
+        const emailHtml = `
         <!DOCTYPE html>
-        <html>
+        <html lang="de">
         <head>
             <style>
-                body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #02050a; color: #ffffff; margin: 0; padding: 0; }
-                .container { width: 100%; max-width: 600px; margin: 0 auto; background-color: #0a1e3b; border-radius: 24px; overflow: hidden; border: 1px solid rgba(0, 150, 255, 0.3); }
-                .hero { background: linear-gradient(135deg, #0096ff 0%, #0a1e3b 100%); padding: 50px 30px; text-align: center; }
-                .hero h1 { margin: 0; font-size: 28px; letter-spacing: 3px; color: #ffcc00; text-transform: uppercase; }
-                .badge { display: inline-block; padding: 6px 18px; background: rgba(255, 204, 0, 0.15); border: 1px solid #ffcc00; color: #ffcc00; border-radius: 20px; font-weight: bold; font-size: 14px; margin-top: 15px; }
-                
-                .content { padding: 40px 30px; line-height: 1.8; color: #e0e0e0; }
-                .analysis-card { background: rgba(255, 255, 255, 0.03); border-radius: 16px; padding: 25px; border-left: 5px solid #0096ff; margin: 30px 0; }
-                .highlight { color: #0096ff; font-weight: bold; }
-                
-                .cta-section { text-align: center; padding: 20px 0 40px; }
-                .btn { display: inline-block; width: 85%; padding: 18px; margin: 10px 0; border-radius: 50px; font-weight: bold; text-decoration: none; font-size: 16px; transition: 0.3s; text-align: center; }
-                .btn-primary { background: #ff6b6b; color: white; box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3); }
-                .btn-secondary { background: transparent; border: 2px solid #0096ff; color: #0096ff; }
-                
-                .footer { background: rgba(0,0,0,0.3); padding: 30px; text-align: center; font-size: 12px; color: #666; }
-                .footer a { color: #888; text-decoration: underline; }
+                body { font-family: 'Arial', sans-serif; background-color: #02050a; color: #ffffff; margin: 0; padding: 0; }
+                .card { max-width: 600px; margin: 20px auto; background: #0a1e3b; border-radius: 20px; overflow: hidden; border: 1px solid #0096ff; }
+                .banner { background: linear-gradient(135deg, #0096ff, #0a1e3b); padding: 40px; text-align: center; }
+                .content { padding: 30px; line-height: 1.7; }
+                .analysis { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; border-left: 4px solid #ffcc00; margin: 20px 0; }
+                .cta-btn { display: block; padding: 18px; margin: 15px 0; text-align: center; background: #ff6b6b; color: white; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 18px; box-shadow: 0 5px 15px rgba(255,107,107,0.4); }
+                .secondary-btn { background: #0096ff; }
+                .footer { padding: 20px; text-align: center; font-size: 11px; color: #666; }
             </style>
         </head>
         <body>
-            <div class="container">
-                <div class="hero">
-                    <h1>KI-FERIEN.DE</h1>
-                    <div class="badge">KONSTELLATION: ${primarySign} + ${persons-1}</div>
+            <div class="card">
+                <div class="banner">
+                    <h1 style="color:#ffcc00; margin:0; letter-spacing:3px;">KI-FERIEN.DE</h1>
+                    <p style="margin-top:10px; opacity:0.8;">Deine Kosmische Prophezeiung</p>
                 </div>
-                
                 <div class="content">
+                    <div style="text-align:center; margin-bottom:20px;">
+                        <span style="border:1px solid #ffcc00; color:#ffcc00; padding:5px 15px; border-radius:15px; font-size:12px; font-weight:bold;">KONSTELLATION: ${primarySign}</span>
+                    </div>
                     <p>Hallo,</p>
-                    <p>unsere KI-Engine <strong>Mistral</strong> hat die energetischen Signaturen eurer Gruppe entschlüsselt. Die Sterne stehen aktuell in einer seltenen Harmonie für eure geplanten <strong>Ferien</strong>.</p>
+                    <p>die Sterne haben sich neu ausgerichtet. Unsere KI Mistral hat <strong>${dest}</strong> als deinen ultimativen Kraftort für die nächsten Ferien identifiziert.</p>
                     
-                    <div class="analysis-card">
-                        <h3 style="color: #ffcc00; margin-top: 0;">📍 Euer kosmisches Ziel: ${destination}</h3>
-                        <p>Basierend auf eurem Vibe-Profil (${vibe}%) und den Hobbies (${hobbies || 'Entdeckung'}) ist <span class="highlight">${destination}</span> der Ort, an dem eure kollektive Energie am stärksten schwingt.</p>
-                        <p>Hier findet ihr <strong>${vibeText}</strong>. Es ist kein Zufall, dass genau diese Destination jetzt in eurer Analyse erscheint.</p>
+                    <div class="analysis">
+                        <h3 style="color:#0096ff; margin-top:0;">✨ Warum ${dest}?</h3>
+                        <p>Eure Gruppen-Energie verlangt nach <strong>${vibeMsg}</strong>. Die gewählten Parameter (Vibe: ${vibe}%) harmonieren perfekt mit der energetischen Signatur dieses Ortes.</p>
+                        <p>Hobbies wie <em>"${hobbies || 'Entdeckung'}"</em> lassen sich dort ideal in den kosmischen Rhythmus integrieren.</p>
                     </div>
 
-                    <p style="text-align: center; font-weight: bold; color: #ffffff;">Handelt jetzt, solange die Konstellation stabil ist:</p>
+                    <p style="text-align:center; font-weight:bold; margin-top:30px;">Nutze das aktuelle Zeitfenster für die beste Buchung:</p>
+                    
+                    <a href="https://tp.media/r?marker=${marker}&p=4113&u=https%3A%2F%2Fwww.aviasales.com%2Fsearch%3Fdestination%3D${dest}" class="cta-btn">✈️ Passende Flüge nach ${dest}</a>
+                    
+                    <a href="https://tp.media/r?marker=${marker}&p=4113&u=https%3A%2F%2Fsearch.hotellook.com%2Fhotels%3Flocation%3D${dest}" class="cta-btn secondary-btn">🏨 Kraftorte & Hotels in ${dest}</a>
 
-                    <div class="cta-section">
-                        <a href="https://tp.media/r?marker=${marker}&p=4113&u=https%3A%2F%2Fwww.aviasales.com%2Fsearch%3Fdestination%3D${destination}" class="btn btn-primary">
-                            ✈️ Harmonische Flüge nach ${destination} prüfen
-                        </a>
-                        
-                        <a href="https://tp.media/r?marker=${marker}&p=4113&u=https%3A%2F%2Fsearch.hotellook.com%2Fhotels%3Flocation%3D${destination}" class="btn btn-secondary">
-                            🏨 Kraftorte & Unterkünfte in ${destination}
-                        </a>
-                    </div>
-
-                    <p style="font-size: 13px; opacity: 0.7; text-align: center; font-style: italic;">
-                        Die berechneten Angebote basieren auf eurem Budget-Index von ${budget}/100 und sind für begrenzte Zeit energetisch reserviert.
+                    <p style="font-size:12px; text-align:center; opacity:0.6; margin-top:30px;">
+                        Diese Analyse basiert auf deinem Budget-Profil von ${budget}/100 und ist energetisch auf deine Anfrage optimiert.
                     </p>
                 </div>
-                
                 <div class="footer">
-                    &copy; 2026 KI-Ferien.de | Projekt-ID: ${project}<br>
-                    Du erhältst diese Analyse basierend auf deiner Anfrage bei unserer Astro-KI.<br>
-                    <a href="https://ki-ferien.de">Neue Analyse starten</a>
+                    &copy; 2026 KI-Ferien.de | Projekt: ${project}<br>
+                    Dein kosmischer Partner für intelligente Ferien-Planung.
                 </div>
             </div>
         </body>
@@ -93,15 +83,31 @@ exports.handler = async (event) => {
         `;
 
         // 3. VERSAND ÜBER RESEND
-        await resend.emails.send({
+        const sendResult = await resend.emails.send({
             from: 'KI-Ferien Analyse <info@ki-ferien.de>',
             to: email,
-            subject: `✨ Prophezeiung bereit: Warum ${destination} perfekt für euch ist`,
-            html: htmlContent
+            subject: `✨ Prophezeiung: Warum ${dest} euer Schicksal ist`,
+            html: emailHtml
         });
 
-        return { statusCode: 200, body: JSON.stringify({ message: "Analyse erfolgreich versandt" }) };
+        // 4. RESPONSE FÜR DIE WEBSEITE
+        return {
+            statusCode: 200,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                success: true, 
+                dest: dest,
+                title: vibe > 75 ? "Action-Highlight" : "Kosmische Harmonie",
+                text: vibeMsg,
+                image: heroImg
+            })
+        };
+
     } catch (error) {
-        return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+        console.error("Resend Error:", error);
+        return { 
+            statusCode: 500, 
+            body: JSON.stringify({ error: "Versand fehlgeschlagen: " + error.message }) 
+        };
     }
 };
