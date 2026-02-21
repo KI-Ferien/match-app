@@ -22,6 +22,7 @@
         .participants-scroll { width: 95%; max-height: 120px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .participant-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; background: rgba(255,255,255,0.05); padding: 5px; border-radius: 5px; }
         .cta-btn { background: var(--cta); color: white; font-size: 1rem; font-weight: bold; padding: 12px 30px; border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4); width: 90%; transition: 0.3s; margin-top: 10px; }
+        .cta-btn:disabled { background: #555; cursor: not-allowed; }
         @media (max-width: 1000px) { .main-grid { grid-template-columns: 1fr; } .zodiac-column { flex-direction: row; flex-wrap: wrap; justify-content: center; } .crystal-ball { width: 400px; min-height: 400px; padding: 30px; } }
     </style>
 </head>
@@ -35,6 +36,7 @@
         <div class="zodiac-card" onclick="setMainZodiac('loewe', this)"><span class="zodiac-symbol">♌</span><span class="zodiac-name">Löwe</span></div>
         <div class="zodiac-card" onclick="setMainZodiac('jungfrau', this)"><span class="zodiac-symbol">♍</span><span class="zodiac-name">Jungfrau</span></div>
     </div>
+
     <div style="display:flex; justify-content:center;">
         <div class="crystal-ball">
             <h2 id="ball-title" style="color:var(--gold); margin-bottom:10px; font-size: 1.1rem; letter-spacing: 2px;">KI-FERIEN.DE</h2>
@@ -48,18 +50,22 @@
                 </div>
             </div>
             <div id="participants-list" class="participants-scroll"></div>
+            
             <div class="input-wrap">
                 <div style="display:flex; justify-content:space-between;"><label>Entspannt 🏖️</label><label>Action 🧗</label></div>
                 <input type="range" id="vibeRange" min="0" max="100" value="50">
             </div>
+            
             <div class="input-wrap">
                 <div style="display:flex; justify-content:space-between;"><label>Sparsam 💶</label><label>Luxus 💎</label></div>
                 <input type="range" id="budgetRange" min="0" max="100" value="50">
             </div>
+            
             <div class="input-wrap"><label>Besondere Hobbies / Wünsche:</label><textarea id="hobbiesInput" rows="1" placeholder="z.B. Vegan, Surfen..."></textarea></div>
             <button class="cta-btn" id="matchBtn" onclick="submitCosmicMatch()">Kostenlose Analyse starten</button>
         </div>
     </div>
+
     <div class="zodiac-column">
         <div class="zodiac-card" onclick="setMainZodiac('waage', this)"><span class="zodiac-symbol">♎</span><span class="zodiac-name">Waage</span></div>
         <div class="zodiac-card" onclick="setMainZodiac('skorpion', this)"><span class="zodiac-symbol">♏</span><span class="zodiac-name">Skorpion</span></div>
@@ -69,21 +75,82 @@
         <div class="zodiac-card" onclick="setMainZodiac('fische', this)"><span class="zodiac-symbol">♓</span><span class="zodiac-name">Fische</span></div>
     </div>
 </div>
+
 <script>
     let mainTravelerSign = "";
     const zodiacs = ["widder", "stier", "zwillinge", "krebs", "loewe", "jungfrau", "waage", "skorpion", "schuetze", "steinbock", "wassermann", "fische"];
-    function setMainZodiac(name, el) { mainTravelerSign = name; document.getElementById('ball-title').innerText = name.toUpperCase(); document.querySelectorAll('.zodiac-card').forEach(c => c.classList.remove('active')); el.classList.add('active'); }
-    function renderParticipantFields() { const count = parseInt(document.getElementById('personCount').value); const list = document.getElementById('participants-list'); list.innerHTML = ""; for(let i = 2; i <= count; i++) { const row = document.createElement('div'); row.className = "participant-row"; row.innerHTML = `<label>Pers. ${i}:</label><select class="extra-zodiac">${zodiacs.map(z => `<option value="${z}">${z.charAt(0).toUpperCase() + z.slice(1)}</option>`).join('')}</select>`; list.appendChild(row); } }
+
+    function setMainZodiac(name, el) { 
+        mainTravelerSign = name; 
+        document.getElementById('ball-title').innerText = name.toUpperCase(); 
+        document.querySelectorAll('.zodiac-card').forEach(c => c.classList.remove('active')); 
+        el.classList.add('active'); 
+    }
+
+    function renderParticipantFields() { 
+        const count = parseInt(document.getElementById('personCount').value); 
+        const list = document.getElementById('participants-list'); 
+        list.innerHTML = ""; 
+        for(let i = 2; i <= count; i++) { 
+            const row = document.createElement('div'); 
+            row.className = "participant-row"; 
+            row.innerHTML = `<label>Pers. ${i}:</label><select class="extra-zodiac">${zodiacs.map(z => `<option value="${z}">${z.charAt(0).toUpperCase() + z.slice(1)}</option>`).join('')}</select>`; 
+            list.appendChild(row); 
+        } 
+    }
+
     async function submitCosmicMatch() {
         const email = document.getElementById('userEmail').value;
         const btn = document.getElementById('matchBtn');
-        if (!mainTravelerSign || !email) { alert("Bitte Sternzeichen wählen und Email eingeben."); return; }
-        btn.disabled = true; btn.innerText = "KI analysiert...";
+        const vibeValue = document.getElementById('vibeRange').value;
+        const budgetValue = document.getElementById('budgetRange').value;
+        const hobbies = document.getElementById('hobbiesInput').value;
+
+        if (!mainTravelerSign || !email) { 
+            alert("Bitte Sternzeichen wählen und Email eingeben."); 
+            return; 
+        }
+
+        btn.disabled = true; 
+        btn.innerText = "KI analysiert...";
+
         const extras = document.querySelectorAll('.extra-zodiac');
         const groupZodiacs = [mainTravelerSign, ...Array.from(extras).map(s => s.value)];
-        const analysisData = { email, zodiacs: groupZodiacs, vibe: document.getElementById('vibeRange').value, budget: document.getElementById('budgetRange').value, hobbies: document.getElementById('hobbiesInput').value, persons: document.getElementById('personCount').value, marker: "698672", project: "492044" };
-        try { await fetch('/.netlify/functions/match', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(analysisData) }); } catch (e) { console.error(e); }
-        window.location.href = `reise.html?signs=${groupZodiacs.join(',')}&v=${analysisData.vibe}`;
+
+        // Wir übersetzen die Range-Werte (0-100) in Begriffe für Mistral
+        const style = vibeValue > 70 ? 'action' : (vibeValue < 30 ? 'relax' : 'mixed');
+        const budget = budgetValue < 40 ? 'low' : (budgetValue > 80 ? 'high' : 'medium');
+
+        const analysisData = { 
+            email, 
+            zodiacs: groupZodiacs, 
+            vibe: vibeValue, 
+            budget: budget, 
+            style: style, 
+            hobbies: hobbies,
+            marker: "698672" 
+        };
+
+        try { 
+            const response = await fetch('/.netlify/functions/match', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(analysisData) 
+            }); 
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Weiterleitung zur reise.html mit dem exakten Ziel von Mistral
+                window.location.href = `reise.html?destination=${encodeURIComponent(result.destination)}&signs=${groupZodiacs.join(',')}&v=${vibeValue}`;
+            } else {
+                alert("Fehler bei der Analyse. Bitte erneut versuchen.");
+                btn.disabled = false; btn.innerText = "Analyse starten";
+            }
+        } catch (e) { 
+            console.error(e); 
+            btn.disabled = false; btn.innerText = "Analyse starten";
+        }
     }
 </script>
 </body>
