@@ -1,0 +1,128 @@
+<!DOCTYPE html> <html lang="de"> <head>
+    <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, 
+    initial-scale=1.0"> <title>Deine Ferien-Prophezeiung | KI-Ferien.de</title> <style>
+        :root { --glow: #0096ff; --gold: #ffcc00; --bg: #02050a; --cta: #ff6b6b; }
+        body { 
+            background-color: var(--bg); 
+            color: white; 
+            font-family: 'Helvetica Neue', Arial, sans-serif; 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+            background: radial-gradient(circle at center, #0a1e3b 0%, #02040a 100%);
+        }
+        .result-container { 
+            max-width: 800px; 
+            width: 90%; 
+            background: rgba(255, 255, 255, 0.03); 
+            border: 1px solid rgba(0, 150, 255, 0.3); 
+            border-radius: 24px; 
+            padding: 40px; 
+            text-align: center; 
+            backdrop-filter: blur(15px); 
+            box-shadow: 0 0 50px rgba(0,0,0,0.8); 
+        }
+        .dest-image { 
+            width: 100%; 
+            height: 380px; 
+            object-fit: cover; 
+            border-radius: 16px; 
+            margin: 25px 0; 
+            border: 1px solid var(--glow); 
+            box-shadow: 0 0 25px rgba(0, 150, 255, 0.4); 
+        }
+        h1 { color: var(--gold); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 5px; font-size: 1.2rem; }
+        .dest-name { font-size: 2.8rem; color: #fff; margin-bottom: 10px; text-shadow: 0 0 15px var(--glow); font-weight: bold; }
+        .info-text { color: #aaa; line-height: 1.6; margin-bottom: 30px; font-size: 1rem; }
+        
+        .btn-group { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; align-items: center; }
+        .booking-btn { 
+            width: 85%;
+            padding: 18px; 
+            border-radius: 50px; 
+            text-decoration: none; 
+            font-weight: bold; 
+            font-size: 1.1rem; 
+            transition: 0.3s transform ease; 
+            display: inline-block;
+        }
+        .btn-flight { background: var(--cta); color: white; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4); }
+        .btn-hotel { background: var(--glow); color: white; box-shadow: 0 4px 15px rgba(0, 150, 255, 0.4); }
+        .btn-transfer { background: transparent; border: 1px solid #444; color: #888; font-size: 0.9rem; padding: 12px; }
+        
+        .booking-btn:hover { transform: scale(1.03); filter: brightness(1.1); }
+        .btn-back { margin-top: 30px; color: #555; text-decoration: none; font-size: 0.8rem; display: block; text-transform: uppercase; letter-spacing: 1px; }
+        
+        #loading { font-style: italic; color: var(--glow); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+    </style>
+</head>
+<body>
+
+<div class="result-container">
+    <h1>Die kosmische Bestimmung</h1>
+    <div id="loading">Koordinaten werden empfangen...</div>
+    
+    <div id="content" style="display:none;">
+        <div class="dest-name" id="display-destination">Suche...</div>
+        <img id="display-image" class="dest-image" src="" alt="Dein Reiseziel">
+        
+        <p class="info-text">
+            Die Analyse für <span id="display-signs" style="color:var(--gold); font-weight: bold;"></span> 
+            ergab eine Übereinstimmung von <span id="display-vibe" style="color:var(--gold);"></span>% 
+            mit diesem Kraftort. Deine detaillierten <strong>Ferien</strong>-Unterlagen wurden per E-Mail versandt.
+        </p>
+
+        <div class="btn-group">
+            <a id="link-flight" href="#" class="booking-btn btn-flight">✈️ Flüge nach <span class="dest-placeholder"></span></a>
+            <a id="link-hotel" href="#" class="booking-btn btn-hotel">🏨 Unterkünfte in <span class="dest-placeholder"></span></a>
+            <a id="link-transfer" href="#" class="booking-btn btn-transfer">🚗 Privat-Transfer am Ziel buchen</a>
+            <a href="index.html" class="btn-back">← Neue Analyse starten</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.onload = function() {
+        // 1. Parameter aus der URL extrahieren
+        const urlParams = new URLSearchParams(window.location.search);
+        const destination = urlParams.get('destination') || "Deine Bestimmung";
+        const signs = urlParams.get('signs') || "Deine Zeichen";
+        const vibe = urlParams.get('v') || "50";
+
+        // 2. Texte im UI setzen
+        document.getElementById('display-destination').innerText = destination;
+        document.getElementById('display-signs').innerText = signs.replace(/,/g, " & ").toUpperCase();
+        document.getElementById('display-vibe').innerText = vibe;
+        
+        // Buttons personalisieren
+        document.querySelectorAll('.dest-placeholder').forEach(el => el.innerText = destination);
+
+        // 3. Bild dynamisch laden (Robust via LoremFlickr für Reise-Kontext)
+        const imgEl = document.getElementById('display-image');
+        const cleanDest = encodeURIComponent(destination);
+        imgEl.src = `https://loremflickr.com/800/600/${cleanDest},landscape/all`;
+        
+        // Fallback falls Bild nicht lädt
+        imgEl.onerror = function() {
+            this.src = "https://images.unsplash.com/photo-1488085061387-422e29b40080?auto=format&fit=crop&w=800&q=80";
+        };
+
+        // 4. Affiliate-Links für die Weiche (buchen.html)
+        const base = "https://ki-ferien.de/buchen";
+        
+        document.getElementById('link-flight').href = `${base}?typ=flug&ziel=${cleanDest}`;
+        document.getElementById('link-hotel').href = `${base}?typ=erlebnis&ziel=${cleanDest}`;
+        document.getElementById('link-transfer').href = `${base}?typ=transfer&ziel=${cleanDest}`;
+
+        // 5. UI umschalten
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+    };
+</script>
+
+</body>
+</html>
