@@ -32,14 +32,9 @@
         input[type="range"] { accent-color: var(--cta); margin-top: 5px; }
         .participants-scroll { width: 95%; max-height: 120px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .participant-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; background: rgba(255,255,255,0.05); padding: 5px; border-radius: 5px; }
-        .cta-btn { background: var(--cta); color: white; font-size: 1rem; font-weight: bold; padding: 12px 30px; border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4); width: 90%; transition: 0.3s; margin-top: 10px; z-index: 10; }
-        .cta-btn:disabled { background: #444; cursor: not-allowed; box-shadow: none; }
-        
-        @media (max-width: 1000px) { 
-            .main-grid { grid-template-columns: 1fr; } 
-            .zodiac-column { flex-direction: row; flex-wrap: wrap; justify-content: center; } 
-            .crystal-ball { width: 400px; min-height: 400px; padding: 30px; } 
-        }
+        .cta-btn { background: var(--cta); color: white; font-size: 1rem; font-weight: bold; padding: 12px 30px; border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4); width: 90%; transition: 0.3s; margin-top: 10px; }
+        .cta-btn:disabled { background: #444; cursor: not-allowed; }
+        @media (max-width: 1000px) { .main-grid { grid-template-columns: 1fr; } .zodiac-column { flex-direction: row; flex-wrap: wrap; justify-content: center; } .crystal-ball { width: 400px; min-height: 400px; padding: 30px; } }
     </style>
 </head>
 <body>
@@ -57,7 +52,6 @@
     <div style="display:flex; justify-content:center;">
         <div class="crystal-ball">
             <h2 id="ball-title" style="color:var(--gold); margin-bottom:10px; font-size: 1.1rem; letter-spacing: 2px;">KI-FERIEN.DE</h2>
-            
             <div class="input-wrap">
                 <label>Email & Teilnehmer:</label>
                 <div style="display:flex; gap:5px;">
@@ -71,15 +65,106 @@
                     </select>
                 </div>
             </div>
-
             <div id="participants-list" class="participants-scroll"></div>
-
             <div class="input-wrap">
                 <div style="display:flex; justify-content:space-between;"><label>Entspannt 🏖️</label><label>Action 🧗</label></div>
                 <input type="range" id="vibeRange" min="0" max="100" value="50">
             </div>
-
             <div class="input-wrap">
                 <div style="display:flex; justify-content:space-between;"><label>Sparsam 💶</label><label>Luxus 💎</label></div>
                 <input type="range" id="budgetRange" min="0" max="100" value="50">
             </div>
+            <div class="input-wrap">
+                <label>Besondere Hobbies / Wünsche:</label>
+                <textarea id="hobbiesInput" rows="1" placeholder="z.B. Vegan, Surfen..."></textarea>
+            </div>
+            <button class="cta-btn" id="matchBtn" onclick="submitCosmicMatch()">Kostenlose Analyse starten</button>
+        </div>
+    </div>
+
+    <div class="zodiac-column">
+        <div class="zodiac-card" onclick="setMainZodiac('waage', this)"><span class="zodiac-symbol">♎</span><span class="zodiac-name">Waage</span></div>
+        <div class="zodiac-card" onclick="setMainZodiac('skorpion', this)"><span class="zodiac-symbol">♏</span><span class="zodiac-name">Skorpion</span></div>
+        <div class="zodiac-card" onclick="setMainZodiac('schuetze', this)"><span class="zodiac-symbol">♐</span><span class="zodiac-name">Schütze</span></div>
+        <div class="zodiac-card" onclick="setMainZodiac('steinbock', this)"><span class="zodiac-symbol">♑</span><span class="zodiac-name">Steinbock</span></div>
+        <div class="zodiac-card" onclick="setMainZodiac('wassermann', this)"><span class="zodiac-symbol">♒</span><span class="zodiac-name">Wassermann</span></div>
+        <div class="zodiac-card" onclick="setMainZodiac('fische', this)"><span class="zodiac-symbol">♓</span><span class="zodiac-name">Fische</span></div>
+    </div>
+</div>
+
+<script>
+    let mainTravelerSign = "";
+    const zodiacsList = ["widder", "stier", "zwillinge", "krebs", "loewe", "jungfrau", "waage", "skorpion", "schuetze", "steinbock", "wassermann", "fische"];
+
+    function setMainZodiac(name, el) { 
+        mainTravelerSign = name; 
+        document.getElementById('ball-title').innerText = name.toUpperCase(); 
+        document.querySelectorAll('.zodiac-card').forEach(c => c.classList.remove('active')); 
+        el.classList.add('active'); 
+    }
+
+    function renderParticipantFields() { 
+        const count = parseInt(document.getElementById('personCount').value); 
+        const list = document.getElementById('participants-list'); 
+        list.innerHTML = ""; 
+        for(let i = 2; i <= count; i++) { 
+            const row = document.createElement('div'); 
+            row.className = "participant-row"; 
+            row.innerHTML = `<label>Pers. ${i}:</label><select class="extra-zodiac">${zodiacsList.map(z => `<option value="${z}">${z.charAt(0).toUpperCase() + z.slice(1)}</option>`).join('')}</select>`; 
+            list.appendChild(row); 
+        } 
+    }
+
+    async function submitCosmicMatch() {
+        const email = document.getElementById('userEmail').value;
+        const btn = document.getElementById('matchBtn');
+        const vibeVal = document.getElementById('vibeRange').value;
+        const budgetVal = document.getElementById('budgetRange').value;
+
+        if (!mainTravelerSign || !email) { 
+            alert("Bitte Sternzeichen wählen und Email eingeben."); 
+            return; 
+        }
+
+        btn.disabled = true; 
+        btn.innerText = "KI analysiert...";
+
+        const extras = document.querySelectorAll('.extra-zodiac');
+        const groupZodiacs = [mainTravelerSign, ...Array.from(extras).map(s => s.value)];
+
+        const style = vibeVal > 60 ? 'action' : (vibeVal < 40 ? 'relax' : 'mixed');
+        const budget = budgetVal < 40 ? 'low' : (budgetVal > 80 ? 'high' : 'medium');
+
+        const payload = { 
+            email, 
+            zodiacs: groupZodiacs, 
+            vibe: vibeVal, 
+            budget, 
+            style, 
+            hobbies: document.getElementById('hobbiesInput').value,
+            marker: "698672" 
+        };
+
+        try { 
+            const response = await fetch('/.netlify/functions/match', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(payload) 
+            }); 
+            
+            const result = await response.json();
+            
+            if (result.success && result.destination) {
+                window.location.href = `reise.html?destination=${encodeURIComponent(result.destination)}&signs=${groupZodiacs.join(',')}&v=${vibeVal}`;
+            } else {
+                window.location.href = `reise.html?destination=Toskana&signs=${groupZodiacs.join(',')}&v=${vibeVal}`;
+            }
+        } catch (e) { 
+            console.error(e); 
+            btn.disabled = false; btn.innerText = "Analyse starten";
+            alert("Fehler bei der Übertragung.");
+        }
+    }
+</script>
+</body>
+</html>
