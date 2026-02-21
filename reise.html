@@ -3,53 +3,286 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ergebnis | KI-Ferien.de</title>
+    <title>KI-Ferien.de | Dein Orakel</title>
     <style>
-        :root { --glow: #0096ff; --gold: #ffcc00; --bg: #02050a; }
+        :root { 
+            --oracle-light: #ffffff; 
+            --oracle-cyan: #a8e6cf; 
+            --oracle-deep: #1b2e4a;
+            --gold: #ffcc00; 
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
-            background: radial-gradient(circle at center, #0a1e3b 0%, #02040a 100%);
-            color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;
+            background: radial-gradient(ellipse at center, #152238 0%, #050a14 50%, #000000 100%);
+            color: white; font-family: 'Helvetica Neue', Arial, sans-serif;
+            min-height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden;
         }
-        .box { max-width: 600px; width: 100%; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glow); border-radius: 24px; padding: 40px; text-align: center; backdrop-filter: blur(15px); }
-        .dest-title { font-size: 2.5rem; color: #fff; text-shadow: 0 0 15px var(--glow); margin: 15px 0; }
-        .dest-image { width: 100%; height: 300px; object-fit: cover; border-radius: 16px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1); }
-        .btn-group { display: flex; flex-direction: column; gap: 12px; }
-        .btn { display: block; padding: 18px; border-radius: 50px; text-decoration: none; font-weight: bold; transition: 0.3s; text-align: center; color: white; }
-        .btn-welcome { background: #002f54; }
-        .btn-klook { background: #ff5b00; }
-        .btn-gettransfer { background: #f3ce56; color: #222; }
-        .btn:hover { transform: translateY(-3px); filter: brightness(1.2); }
+
+        /* --- Sternenhimmel (wie auf der Startseite) --- */
+        .stars { position: fixed; top: -60%; left: -60%; width: 220%; height: 220%; z-index: 1; pointer-events: none; animation: rotateSky 240s linear infinite; }
+        .stars::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, transparent 35%, rgba(30, 60, 100, 0.1) 40%, rgba(255, 220, 180, 0.1) 45%, rgba(255, 255, 255, 0.15) 50%, rgba(100, 180, 255, 0.1) 55%, transparent 65%);
+            filter: blur(30px); opacity: 0.5; z-index: -1;
+        }
+        .star { position: absolute; border-radius: 50%; background-color: var(--c, white); box-shadow: 0 0 var(--g, 0px) var(--c, white); animation: twinkle var(--t) infinite alternate; }
+        @keyframes rotateSky { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes twinkle { 0% { opacity: 0.2; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* Das Layout */
+        .universe { position: relative; width: 900px; height: 900px; z-index: 10; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+        
+        .center-display {
+            position: relative; z-index: 50;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        /* --- DAS KI-ORAKEL (Ersatz für die Glaskugel) --- */
+        .oracle-portal {
+            position: relative;
+            width: 400px; height: 400px;
+            display: flex; justify-content: center; align-items: center;
+            /* Sanftes Schweben des gesamten Orakels */
+            animation: levitate 6s ease-in-out infinite alternate;
+            margin-bottom: 20px;
+        }
+
+        @keyframes levitate {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-15px); }
+        }
+
+        /* Der pulsierende, strahlende Kern (Die KI-Präsenz) */
+        .oracle-core {
+            position: absolute;
+            width: 320px; height: 320px;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.9) 0%, rgba(168, 230, 207, 0.2) 40%, transparent 70%);
+            box-shadow: 0 0 80px rgba(168, 230, 207, 0.3), 0 0 30px rgba(255,255,255,0.5);
+            animation: breathe 4s ease-in-out infinite alternate;
+            z-index: 2;
+        }
+
+        @keyframes breathe {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            100% { transform: scale(1.05); opacity: 1; box-shadow: 0 0 100px rgba(168, 230, 207, 0.5), 0 0 50px rgba(255,255,255,0.8); }
+        }
+
+        /* Holografische Projektion des Reiseziels */
+        .hologram-image {
+            position: absolute;
+            width: 260px; height: 260px;
+            border-radius: 50%;
+            background-size: cover; 
+            background-position: center;
+            z-index: 3;
+            /* Der Trick für die ätherische Illusion: Es mischt sich mit dem Licht dahinter */
+            mix-blend-mode: luminosity; 
+            opacity: 0.7;
+            /* Eine feine Maske, damit es zu den Rändern hin sanft verblasst */
+            mask-image: radial-gradient(circle, black 40%, transparent 70%);
+            -webkit-mask-image: radial-gradient(circle, black 40%, transparent 70%);
+        }
+
+        /* 3D Daten-Ringe um das Orakel */
+        .oracle-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-left: 1px solid rgba(168, 230, 207, 0.8); /* Ein leuchtender Abschnitt */
+            z-index: 1;
+        }
+
+        .ring-1 {
+            width: 360px; height: 360px;
+            animation: spinRing1 25s linear infinite;
+        }
+        .ring-2 {
+            width: 390px; height: 390px;
+            border-right: 1px solid rgba(255, 204, 0, 0.6); /* Zarter Goldhauch */
+            animation: spinRing2 35s linear infinite reverse;
+        }
+
+        @keyframes spinRing1 { 0% { transform: rotateX(60deg) rotateY(20deg) rotateZ(0deg); } 100% { transform: rotateX(60deg) rotateY(20deg) rotateZ(360deg); } }
+        @keyframes spinRing2 { 0% { transform: rotateX(70deg) rotateY(-20deg) rotateZ(0deg); } 100% { transform: rotateX(70deg) rotateY(-20deg) rotateZ(360deg); } }
+
+        /* Typografie im Orakel */
+        .oracle-text-container {
+            position: relative; z-index: 10;
+            text-align: center;
+            pointer-events: none; /* Damit man durch den Text auf nichts klickt */
+        }
+
+        .destination-subtitle { 
+            font-size: 0.7rem; color: var(--oracle-cyan); 
+            text-transform: uppercase; letter-spacing: 4px; 
+            margin-bottom: 8px; font-weight: 300;
+        }
+        
+        .destination-title { 
+            font-size: 2.8rem; color: white; 
+            /* Sehr feiner, eleganter Schatten für maximale Lesbarkeit im Licht */
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8), 0 0 20px rgba(255,255,255,0.4); 
+            font-weight: 200; /* Sehr dünne, edle Schrift */
+            letter-spacing: 2px;
+        }
+
+        /* --- DAS MODERNE SCHRÄNKCHEN (unverändert elegant) --- */
+        .cabinet {
+            position: relative; z-index: 15;
+            width: 320px; 
+            background: linear-gradient(to bottom, #1c2838, #0b111a);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.9), inset 0 2px 5px rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .cabinet::before, .cabinet::after {
+            content: ''; position: absolute; bottom: -15px; width: 15px; height: 15px;
+            background: #111a26; border-radius: 0 0 5px 5px; box-shadow: 5px 0 10px rgba(0,0,0,0.5);
+        }
+        .cabinet::before { left: 30px; }
+        .cabinet::after { right: 30px; }
+
+        .drawers-container { display: flex; flex-direction: column; gap: 12px; }
+
+        .drawer {
+            position: relative; height: 48px;
+            background: #0f1722; border-radius: 6px; overflow: hidden; cursor: pointer;
+            box-shadow: inset 0 -2px 5px rgba(0,0,0,0.5), 0 4px 6px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .drawer-front {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            background: linear-gradient(to bottom, #2a3b52, #1a2535);
+            color: #d0d0d0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2;
+        }
+        .drawer-front::after {
+            content: ''; position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+            width: 40px; height: 4px; background: rgba(0,0,0,0.3); border-radius: 2px;
+            box-shadow: 0 1px 1px rgba(255,255,255,0.1);
+        }
+
+        .drawer-link {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+            background: var(--glow); color: white; font-weight: bold; text-decoration: none; font-size: 1rem;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1; transform: translateY(100%);
+        }
+        
+        .link-klook { background: #ff5a00; } 
+        .link-gettransfer { background: #ffcc00; color: #000; } 
+        .link-welcome { background: #0096ff; } 
+
+        .drawer:hover .drawer-front { transform: translateY(-100%); }
+        .drawer:hover .drawer-link { transform: translateY(0); }
+        .drawer:hover { box-shadow: 0 0 15px rgba(255,255,255,0.1); }
+
+        @media (max-width: 850px) {
+            .universe { width: 100vw; height: auto; min-height: 100vh; padding: 40px 20px; }
+            .oracle-portal { width: 300px; height: 300px; }
+            .destination-title { font-size: 2rem; }
+            .cabinet { width: 280px; }
+        }
     </style>
 </head>
 <body>
-<div class="box">
-    <div class="dest-title" id="display-ziel">Wird geladen...</div>
-    <img id="display-bild" class="dest-image" src="" alt="Ferienziel">
-    <div class="btn-group">
-        <a id="link-welcome" href="#" class="btn btn-welcome">🚕 Premium Abholung in <span class="stadt">...</span></a>
-        <a id="link-klook" href="#" class="btn btn-klook">🏨 Unterkünfte in <span class="stadt">...</span></a>
-        <a id="link-get" href="#" class="btn btn-gettransfer">🚗 Privat-Fahrt in <span class="stadt">...</span></a>
+
+<div class="stars" id="stars"></div>
+
+<div class="universe">
+    <div class="center-display">
+        
+        <div class="oracle-portal">
+            <div class="oracle-ring ring-1"></div>
+            <div class="oracle-ring ring-2"></div>
+            
+            <div class="oracle-core"></div>
+            
+            <div class="hologram-image" id="dest-image"></div>
+            
+            <div class="oracle-text-container">
+                <div class="destination-subtitle">Das Orakel sieht</div>
+                <h1 class="destination-title" id="dest-title">Lade...</h1>
+            </div>
+        </div>
+
+        <div class="cabinet">
+            <div class="drawers-container">
+                <div class="drawer">
+                    <div class="drawer-front">Flughafentransfer</div>
+                    <a href="https://www.welcomepickups.com/" target="_blank" class="drawer-link link-welcome">
+                        Welcome Pickups
+                    </a>
+                </div>
+                
+                <div class="drawer">
+                    <div class="drawer-front">Aktivitäten & Touren</div>
+                    <a href="https://www.klook.com/?aff_adid=492044" target="_blank" class="drawer-link link-klook">
+                        Klook Erlebnisse
+                    </a>
+                </div>
+
+                <div class="drawer">
+                    <div class="drawer-front">Fahrten buchen</div>
+                    <a href="https://gettransfer.com/?txid=698672" target="_blank" class="drawer-link link-gettransfer">
+                        GetTransfer
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-    <a href="index.html" style="display:block; margin-top:30px; color:#444; text-decoration:none; font-size:0.7rem;">NEUE ANALYSE</a>
 </div>
+
 <script>
-    (function() {
+    // 1. Sternenhimmel (nahtloser Übergang von der Startseite)
+    const field = document.getElementById('stars');
+    const starCount = 400; 
+    const starColors = ['#ffffff', '#d0efff', '#fffdd0', '#ffebd0'];
+
+    for(let i=0; i<starCount; i++) {
+        const s = document.createElement('div'); s.className='star';
+        const randomType = Math.random();
+        let size, color, glow;
+        color = starColors[Math.floor(Math.random() * starColors.length)];
+
+        if(randomType < 0.6) { 
+            size = Math.random() * 1 + 0.5 + 'px'; glow = '0px';
+        } else if(randomType < 0.9) {
+            size = Math.random() * 1.5 + 1 + 'px'; glow = '2px';
+        } else {
+            size = Math.random() * 2 + 2 + 'px'; color = Math.random() > 0.5 ? '#ffffff' : '#d0efff'; glow = '4px';
+        }
+        s.style.width = s.style.height = size;
+        s.style.left = Math.random() * 100 + '%'; s.style.top = Math.random() * 100 + '%';
+        s.style.setProperty('--t', Math.random() * 5 + 3 + 's'); 
+        s.style.setProperty('--c', color); s.style.setProperty('--g', glow);
+        field.appendChild(s);
+    }
+
+    // 2. Ziel aus der URL auslesen
+    function getDestinationFromUrl() {
         const params = new URLSearchParams(window.location.search);
-        let ziel = params.get('destination') || "Santorini";
-        const sauberZiel = decodeURIComponent(ziel);
-        const encZiel = encodeURIComponent(sauberZiel);
-        const stadt = sauberZiel.split(',')[0].trim();
+        return params.get('destination') || 'Santorini';
+    }
 
-        document.getElementById('display-ziel').innerText = sauberZiel;
-        document.querySelectorAll('.stadt').forEach(el => el.innerText = stadt);
-        document.getElementById('display-bild').src = `https://loremflickr.com/800/600/${encodeURIComponent(stadt)},travel/all`;
+    // 3. Orakel-Daten befüllen
+    window.onload = () => {
+        const destination = getDestinationFromUrl();
+        
+        // Titel setzen
+        document.getElementById('dest-title').innerText = destination;
 
-        // Weiterleitung zur buchen.html mit dem korrekten Typ
-        document.getElementById('link-welcome').href = `buchen.html?typ=welcome&ziel=${encZiel}`;
-        document.getElementById('link-klook').href = `buchen.html?typ=hotel&ziel=${encZiel}`;
-        document.getElementById('link-get').href = `buchen.html?typ=transfer&ziel=${encZiel}`;
-    })();
+        // Bild dynamisch laden (Platzhalter für die Illusion)
+        const imageUrl = `https://loremflickr.com/800/800/${encodeURIComponent(destination)},landscape/all`;
+        document.getElementById('dest-image').style.backgroundImage = `url('${imageUrl}')`;
+    };
 </script>
 </body>
 </html>

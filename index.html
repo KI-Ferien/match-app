@@ -3,167 +3,348 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KI-Ferien.de | Kosmische Analyse</title>
+    <title>KI-Ferien.de | /astro</title>
     <style>
-        :root { --glow: #0096ff; --gold: #ffcc00; --bg: #02050a; --cta: #ff6b6b; }
+        :root { 
+            --oracle-cyan: #a8e6cf; 
+            --glow: #0096ff; 
+            --gold: #ffcc00; 
+            --bg: #02050a; 
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
-            background-color: var(--bg); color: white; font-family: 'Helvetica Neue', Arial, sans-serif;
-            min-height: 100vh; overflow-x: hidden;
+            background: radial-gradient(ellipse at center, #152238 0%, #050a14 50%, #000000 100%);
+            color: white; font-family: 'Helvetica Neue', Arial, sans-serif;
+            min-height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden;
+        }
+
+        /* --- Der rotierende Sternenhimmel mit Milchstraße --- */
+        .stars { position: fixed; top: -60%; left: -60%; width: 220%; height: 220%; z-index: 1; pointer-events: none; animation: rotateSky 240s linear infinite; }
+        .stars::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, transparent 35%, rgba(30, 60, 100, 0.1) 40%, rgba(255, 220, 180, 0.1) 45%, rgba(255, 255, 255, 0.15) 50%, rgba(100, 180, 255, 0.1) 55%, transparent 65%);
+            filter: blur(30px); opacity: 0.5; z-index: -1;
+        }
+        .star { position: absolute; border-radius: 50%; background-color: var(--c, white); box-shadow: 0 0 var(--g, 0px) var(--c, white); animation: twinkle var(--t) infinite alternate; }
+        @keyframes rotateSky { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes twinkle { 0% { opacity: 0.2; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* 3D Orbit Layout */
+        .universe { position: relative; width: 900px; height: 900px; z-index: 10; display: flex; justify-content: center; align-items: center; }
+        
+        /* --- DAS KI-ORAKEL (Zentrum) --- */
+        .oracle-portal {
+            position: relative; z-index: 20;
+            width: 380px; height: 380px;
             display: flex; justify-content: center; align-items: center;
-            background: radial-gradient(circle at center, #0a1e3b 0%, #02040a 100%);
+            animation: levitate 6s ease-in-out infinite alternate;
         }
 
-        /* Sternenschleier-Effekt */
-        .stars-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
-        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.5; animation: twinkle var(--t) infinite ease-in-out; }
-        @keyframes twinkle { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.3); } }
-
-        .container { 
-            position: relative; z-index: 10; width: 95%; max-width: 1200px; 
-            display: grid; grid-template-columns: 1fr 450px 1fr; gap: 30px; align-items: center; 
+        @keyframes levitate {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-15px); }
         }
 
-        .zodiac-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .oracle-core {
+            position: absolute; width: 360px; height: 360px; border-radius: 50%;
+            background: radial-gradient(circle at center, rgba(5, 10, 20, 0.8) 0%, rgba(168, 230, 207, 0.15) 70%, transparent 90%);
+            box-shadow: inset 0 0 50px rgba(168, 230, 207, 0.2), 0 0 40px rgba(168, 230, 207, 0.3);
+            animation: breathe 4s ease-in-out infinite alternate; z-index: 2;
+            backdrop-filter: blur(5px); border: 1px solid rgba(168, 230, 207, 0.2);
+        }
+
+        @keyframes breathe {
+            0% { transform: scale(0.98); opacity: 0.9; box-shadow: inset 0 0 40px rgba(168, 230, 207, 0.1), 0 0 30px rgba(168, 230, 207, 0.2); }
+            100% { transform: scale(1.02); opacity: 1; box-shadow: inset 0 0 60px rgba(168, 230, 207, 0.3), 0 0 60px rgba(168, 230, 207, 0.4); border-color: rgba(168, 230, 207, 0.4); }
+        }
+
+        .oracle-ring { position: absolute; border-radius: 50%; border: 1px dashed rgba(255, 255, 255, 0.15); z-index: 1; pointer-events: none; }
+        .ring-1 { width: 420px; height: 420px; border-left: 2px solid rgba(168, 230, 207, 0.6); animation: spinRing1 25s linear infinite; }
+        .ring-2 { width: 450px; height: 450px; border-right: 2px solid rgba(255, 204, 0, 0.5); animation: spinRing2 35s linear infinite reverse; }
+
+        @keyframes spinRing1 { 0% { transform: rotateX(60deg) rotateY(20deg) rotateZ(0deg); } 100% { transform: rotateX(60deg) rotateY(20deg) rotateZ(360deg); } }
+        @keyframes spinRing2 { 0% { transform: rotateX(70deg) rotateY(-20deg) rotateZ(0deg); } 100% { transform: rotateX(70deg) rotateY(-20deg) rotateZ(360deg); } }
+
+        /* --- FORMULAR STYLES --- */
+        .oracle-form { position: relative; z-index: 10; width: 80%; display: flex; flex-direction: column; align-items: center; }
+        h1 { font-size: 0.85rem; color: var(--gold); letter-spacing: 3px; margin-bottom: 20px; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
         
-        .zodiac-btn { 
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); 
-            padding: 18px; border-radius: 15px; cursor: pointer; text-align: center; 
-            transition: 0.3s; font-weight: bold; letter-spacing: 1px;
+        .input-row { display: flex; gap: 10px; width: 100%; margin-bottom: 15px; }
+        .input-group { width: 100%; display: flex; flex-direction: column; margin-bottom: 5px; }
+        
+        label { font-size: 0.65rem; color: var(--oracle-cyan); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+        
+        input[type="number"] {
+            width: 100%; background: rgba(0,0,0,0.6); border: 1px solid rgba(168, 230, 207, 0.3);
+            color: white; padding: 10px; border-radius: 8px; outline: none; text-align: center;
+            font-size: 0.9rem; transition: 0.3s;
         }
-        .zodiac-btn:hover { background: rgba(0, 150, 255, 0.15); border-color: var(--glow); }
-        .zodiac-btn.active { border-color: var(--glow); box-shadow: 0 0 20px var(--glow); background: rgba(0, 150, 255, 0.2); color: white; }
+        input[type="number"]:focus { border-color: var(--gold); box-shadow: 0 0 10px rgba(255,204,0,0.3); }
 
-        .crystal-ball { 
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(0, 150, 255, 0.4); 
-            border-radius: 50%; width: 450px; height: 450px; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            padding: 50px; box-shadow: inset 0 0 60px rgba(0,150,255,0.2), 0 0 40px rgba(0,0,0,0.5); 
-            backdrop-filter: blur(15px); text-align: center;
+        /* Slider */
+        input[type="range"] { -webkit-appearance: none; width: 100%; background: transparent; margin: 8px 0; }
+        input[type="range"]:focus { outline: none; }
+        input[type="range"]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: rgba(255,255,255,0.2); border-radius: 2px; }
+        input[type="range"]::-webkit-slider-thumb {
+            height: 16px; width: 16px; border-radius: 50%; background: var(--gold); cursor: pointer;
+            -webkit-appearance: none; margin-top: -6px; box-shadow: 0 0 10px var(--gold), 0 0 5px rgba(0,0,0,0.8); transition: transform 0.1s;
         }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.3); }
+        
+        .slider-labels { display: flex; justify-content: space-between; font-size: 0.55rem; color: #aaa; text-transform: uppercase; }
+        .slider-labels span { text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
 
-        h2 { color: var(--gold); font-size: 0.8rem; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 25px; }
-        
-        input, select, textarea { 
-            width: 100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.2); 
-            color: white; padding: 12px; border-radius: 10px; margin-bottom: 12px; font-size: 0.9rem;
+        /* NEU: Multi-Select Slots */
+        .selection-display {
+            display: flex; gap: 8px; justify-content: center; margin: 15px 0 5px 0; flex-wrap: wrap; width: 100%;
         }
-        textarea { resize: none; }
-        
-        .cta-btn { 
-            background: var(--cta); color: white; padding: 18px; border-radius: 50px; 
-            border: none; font-weight: bold; cursor: pointer; width: 100%; 
-            margin-top: 10px; font-size: 1rem; letter-spacing: 1px;
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4); transition: 0.3s;
+        .selection-slot {
+            width: 32px; height: 32px; border-radius: 50%; border: 1px dashed rgba(168, 230, 207, 0.4);
+            display: flex; justify-content: center; align-items: center; font-size: 1.2rem; color: var(--gold);
+            background: rgba(0,0,0,0.5); box-shadow: inset 0 0 5px rgba(0,0,0,0.8); transition: 0.3s;
         }
-        .cta-btn:hover { transform: scale(1.03); filter: brightness(1.1); }
-        .cta-btn:disabled { background: #444; cursor: not-allowed; box-shadow: none; }
+        .selection-slot.filled { border: 1px solid var(--gold); background: rgba(255,204,0,0.15); box-shadow: 0 0 10px rgba(255,204,0,0.3); }
+
+        .btn {
+            background: linear-gradient(45deg, #1b2e4a, #0a1525); color: var(--oracle-cyan); border: 1px solid var(--oracle-cyan); 
+            padding: 12px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; 
+            margin-top: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); transition: 0.3s; width: 100%;
+            text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem;
+        }
+        .btn:hover { background: var(--oracle-cyan); color: #000; box-shadow: 0 0 20px rgba(168,230,207,0.5); }
+        .btn:disabled { background: #333; color: #666; border-color: #444; cursor: not-allowed; box-shadow: none; }
+
+        /* --- STERNZEICHEN ORBIT --- */
+        .zodiac-wrapper { position: absolute; display: flex; flex-direction: column; align-items: center; z-index: 30; transition: transform 0.3s; width: 100px; text-align: center; cursor: pointer; }
+        .zodiac-wrapper:hover { z-index: 40; transform: scale(1.15); }
+        .planet {
+            width: 85px; height: 85px; border-radius: 50%; margin-bottom: 10px; position: relative; border: 1px solid rgba(255,255,255,0.2); overflow: hidden; 
+            background-image: radial-gradient(circle at center, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.8) 100%), url('earth-map.jpg');
+            background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .planet::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 50%;
+            box-shadow: inset -8px -8px 12px rgba(0,0,0,0.9), inset 2px 2px 5px rgba(255,255,255,0.5); pointer-events: none; z-index: 1; transition: box-shadow 0.3s; 
+        }
+        .inner-name { position: relative; z-index: 2; font-size: 0.55rem; font-weight: 600; text-transform: uppercase; color: white; text-shadow: 0 1px 2px black, 0 0 1px black; margin-bottom: 1px; transition: color 0.3s; width: 90%; text-align: center; }
+        .inner-symbol { position: relative; z-index: 2; font-size: 1.6rem; color: #e0e0e0; font-family: 'Segoe UI Symbol', 'Apple Symbols', sans-serif; line-height: 1; text-shadow: 0 2px 3px black; transition: color 0.3s, text-shadow 0.3s; }
+        .planet.active { border-color: var(--gold); }
+        .planet.active::after { box-shadow: 0 0 25px var(--gold), inset -8px -8px 12px rgba(0,0,0,0.9), inset 2px 2px 5px rgba(255,255,255,0.5); }
         
-        @media (max-width: 1000px) { 
-            .container { grid-template-columns: 1fr; } 
-            .crystal-ball { width: 100%; height: auto; border-radius: 30px; aspect-ratio: 1/1; }
-            .zodiac-grid { grid-template-columns: 1fr 1fr; }
+        .zodiac-caption { font-size: 0.6rem; color: #bbb; line-height: 1.2; text-shadow: 0 1px 2px black; }
+        .dates { display: block; color: var(--gold); font-weight: bold; margin-bottom: 3px; font-size: 0.65rem; }
+
+        @media (max-width: 850px) {
+            .universe { width: 100vw; height: auto; min-height: 100vh; overflow-y: auto; display: flex; flex-direction: column; padding: 40px 20px; }
+            .oracle-portal { margin-bottom: 50px; order: 1; }
+            .orbit-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px 10px; width: 100%; order: 2; }
+            .zodiac-wrapper { position: relative; left: auto!important; top: auto!important; width: auto; }
+            .oracle-ring { display: none; }
         }
     </style>
 </head>
 <body>
 
-<div class="stars-container" id="starfield"></div>
+<div class="stars" id="stars"></div>
 
-<div class="container">
-    <div class="zodiac-grid" id="grid-left"></div>
-    
-    <div class="crystal-ball">
-        <h2>KI-FERIEN /ASTRO</h2>
-        <input type="email" id="email" placeholder="Deine Email-Adresse">
+<div class="universe">
+    <div class="oracle-portal">
+        <div class="oracle-ring ring-1"></div>
+        <div class="oracle-ring ring-2"></div>
+        <div class="oracle-core"></div>
         
-        <select id="count" onchange="updateExtras()">
-            <option value="1">1 Person (Solo-Reise)</option>
-            <option value="2">2 Personen (Partner-Check)</option>
-        </select>
-        
-        <div id="extras" style="width: 100%;"></div>
-        
-        <textarea id="hobbies" placeholder="Welche Schwingungen suchst du? (z.B. Natur, Party, Ruhe...)" rows="2"></textarea>
-        
-        <button class="cta-btn" id="goBtn" onclick="startAnalysis()">KOSMOS BEFRAGEN</button>
+        <div class="oracle-form">
+            <h1>Dein Astro-Profil</h1>
+            
+            <div class="input-row">
+                <div class="input-group">
+                    <label>Gefühltes Alter (Ø)</label>
+                    <input type="number" id="age" placeholder="z.B. 35" min="16" max="99">
+                </div>
+                <div class="input-group">
+                    <label>Reisende</label>
+                    <input type="number" id="participants" value="2" min="1" max="20">
+                </div>
+            </div>
+
+            <div class="input-group" style="margin-bottom: 12px;">
+                <label>Vibe der Ferien</label>
+                <input type="range" id="vibe" min="1" max="3" step="1" value="2">
+                <div class="slider-labels">
+                    <span>Ausgleich</span>
+                    <span>Action</span>
+                    <span>Relaxen</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Reisekasse</label>
+                <input type="range" id="budget" min="1" max="3" step="1" value="2">
+                <div class="slider-labels">
+                    <span>Sparsam</span>
+                    <span>Mittel</span>
+                    <span>Luxus</span>
+                </div>
+            </div>
+
+            <div class="selection-display" id="selection-display"></div>
+
+            <button class="btn" onclick="befrageKosmos()" id="go-btn">Orakel befragen</button>
+        </div>
     </div>
-    
-    <div class="zodiac-grid" id="grid-right"></div>
+
+    <div id="orbit-container" class="orbit-grid"></div>
 </div>
 
 <script>
-    const signs = ["Widder", "Stier", "Zwillinge", "Krebs", "Löwe", "Jungfrau", "Waage", "Skorpion", "Schütze", "Steinbock", "Wassermann", "Fische"];
-    let selectedSign = "";
-
-    // 1. Sternen-Hintergrund initialisieren
-    const field = document.getElementById('starfield');
-    for(let i=0; i<120; i++) {
+    const field = document.getElementById('stars');
+    const starCount = 400; 
+    const starColors = ['#ffffff', '#d0efff', '#fffdd0', '#ffebd0'];
+    for(let i=0; i<starCount; i++) {
         const s = document.createElement('div'); s.className='star';
-        s.style.left = Math.random()*100+'%'; s.style.top = Math.random()*100+'%';
-        const size = Math.random()*2.5+'px';
-        s.style.width = s.style.height = size;
-        s.style.setProperty('--t', Math.random()*3+2+'s');
+        const randomType = Math.random();
+        let size, color, glow;
+        color = starColors[Math.floor(Math.random() * starColors.length)];
+        if(randomType < 0.6) { size = Math.random() * 1 + 0.5 + 'px'; glow = '0px'; } 
+        else if(randomType < 0.9) { size = Math.random() * 1.5 + 1 + 'px'; glow = '2px'; } 
+        else { size = Math.random() * 2 + 2 + 'px'; color = Math.random() > 0.5 ? '#ffffff' : '#d0efff'; glow = '4px'; }
+        s.style.width = s.style.height = size; s.style.left = Math.random() * 100 + '%'; s.style.top = Math.random() * 100 + '%';
+        s.style.setProperty('--t', Math.random() * 5 + 3 + 's'); s.style.setProperty('--c', color); s.style.setProperty('--g', glow);
         field.appendChild(s);
     }
 
-    // 2. Sternzeichen-Buttons bauen
-    signs.forEach((s, i) => {
-        const b = document.createElement('div'); 
-        b.className='zodiac-btn'; 
-        b.innerText = s;
-        b.onclick = () => { 
-            document.querySelectorAll('.zodiac-btn').forEach(x=>x.classList.remove('active')); 
-            b.classList.add('active'); 
-            selectedSign = s; 
-        };
-        document.getElementById(i < 6 ? 'grid-left' : 'grid-right').appendChild(b);
-    });
+    const zodiacs = [
+        { name: "Widder", dates: "21.03 - 19.04", traits: "Mutig, energisch", symbol: "♈" },
+        { name: "Stier", dates: "20.04 - 20.05", traits: "Genießer, treu", symbol: "♉" },
+        { name: "Zwillinge", dates: "21.05 - 20.06", traits: "Neugierig, kommunikativ", symbol: "♊" },
+        { name: "Krebs", dates: "21.06 - 22.07", traits: "Emotional, fürsorglich", symbol: "♋" },
+        { name: "Löwe", dates: "23.07 - 22.08", traits: "Stolz, großzügig", symbol: "♌" },
+        { name: "Jungfrau", dates: "23.08 - 22.09", traits: "Analytisch, ordentlich", symbol: "♍" },
+        { name: "Waage", dates: "23.09 - 22.10", traits: "Harmonisch, ästhetisch", symbol: "♎" },
+        { name: "Skorpion", dates: "23.10 - 21.11", traits: "Intensiv, tiefgründig", symbol: "♏" },
+        { name: "Schütze", dates: "22.11 - 21.12", traits: "Optimistisch, frei", symbol: "♐" },
+        { name: "Steinbock", dates: "22.12 - 19.01", traits: "Ehrgeizig, diszipliniert", symbol: "♑" },
+        { name: "Wassermann", dates: "20.01 - 18.02", traits: "Originell, unabhängig", symbol: "♒" },
+        { name: "Fische", dates: "19.02 - 20.03", traits: "Sensibel, verträumt", symbol: "♓" }
+    ];
 
-    // 3. Zweites Sternzeichen einblenden bei 2 Personen
-    function updateExtras() {
-        const div = document.getElementById('extras'); 
-        div.innerHTML = "";
-        if(document.getElementById('count').value === "2") {
-            div.innerHTML = '<select id="extra-sign" class="extra-sign">' + 
-                signs.map(s => `<option value="${s}">Partner: ${s}</option>`).join('') + 
-                '</select>';
+    const container = document.getElementById('orbit-container');
+    const radius = 350; 
+    
+    // --- NEU: Multi-Select Logik ---
+    let maxParticipants = parseInt(document.getElementById('participants').value) || 2;
+    let selectedZodiacs = []; // Array für die Auswahl
+
+    function renderSlots() {
+        const display = document.getElementById('selection-display');
+        display.innerHTML = '';
+        for(let i=0; i<maxParticipants; i++) {
+            const slot = document.createElement('div');
+            slot.className = 'selection-slot' + (selectedZodiacs[i] ? ' filled' : '');
+            slot.innerHTML = selectedZodiacs[i] ? selectedZodiacs[i].symbol : '';
+            display.appendChild(slot);
         }
     }
 
-    // 4. Analyse-Logik
-    async function startAnalysis() {
-        const email = document.getElementById('email').value;
-        const hobbies = document.getElementById('hobbies').value;
-        
-        if(!selectedSign || !email) {
-            return alert("Bitte wähle dein Sternzeichen und gib deine Email ein.");
-        }
-        
-        const btn = document.getElementById('goBtn');
-        btn.disabled = true; 
-        btn.innerText = "Sterne werden synchronisiert...";
+    // Hört auf Änderungen im Feld "Reisende"
+    document.getElementById('participants').addEventListener('input', (e) => {
+        let val = parseInt(e.target.value);
+        if(isNaN(val) || val < 1) val = 1;
+        if(val > 20) val = 20;
+        maxParticipants = val;
+        selectedZodiacs = []; // Auswahl zurücksetzen
+        renderSlots();
+    });
 
-        const zodiacs = [selectedSign];
-        const extra = document.getElementById('extra-sign');
-        if(extra) zodiacs.push(extra.value);
+    // Initiale Slots rendern
+    renderSlots();
+
+    zodiacs.forEach((z, index) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'zodiac-wrapper';
+
+        if (window.innerWidth > 850) {
+            const angle = (index / 12) * Math.PI * 2 - (Math.PI / 2);
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+            wrapper.style.left = `calc(50% + ${x}px - 50px)`;
+            wrapper.style.top = `calc(50% + ${y}px - 50px)`;
+        }
+
+        const planet = document.createElement('div');
+        planet.className = 'planet';
+        planet.innerHTML = `<span class="inner-name">${z.name}</span><span class="inner-symbol">${z.symbol}</span>`;
+
+        const caption = document.createElement('div');
+        caption.className = 'zodiac-caption';
+        caption.innerHTML = `<span class="dates">${z.dates}</span>${z.traits}`;
+
+        wrapper.onclick = () => {
+            // Wenn alle Plätze voll sind, fangen wir von vorne an
+            if(selectedZodiacs.length >= maxParticipants) {
+                selectedZodiacs = []; 
+            }
+            selectedZodiacs.push(z);
+            renderSlots();
+
+            // Kurzes Aufleuchten der Kugel
+            document.querySelectorAll('.planet').forEach(p => p.classList.remove('active'));
+            planet.classList.add('active');
+            setTimeout(() => planet.classList.remove('active'), 400);
+        };
+
+        wrapper.appendChild(planet);
+        wrapper.appendChild(caption);
+        container.appendChild(wrapper);
+    });
+
+    const vibeMap = { "1": "Ausgeglichen", "2": "Action", "3": "Entspannung" };
+    const budgetMap = { "1": "Sparsam", "2": "Mittel", "3": "Luxus" };
+
+    async function befrageKosmos() {
+        const age = document.getElementById('age').value;
+        const vibeVal = document.getElementById('vibe').value;
+        const budgetVal = document.getElementById('budget').value;
+        const btn = document.getElementById('go-btn');
+
+        if(selectedZodiacs.length < maxParticipants || !age) {
+            return alert(`Bitte wähle ${maxParticipants} Sternzeichen aus dem Orbit und gib das gefühlte Alter ein.`);
+        }
+
+        btn.disabled = true;
+        btn.innerText = "Das Orakel sucht...";
+
+        const finalVibe = vibeMap[vibeVal];
+        const finalBudget = budgetMap[budgetVal];
+        
+        // Liste der ausgewählten Namen extrahieren
+        const signsList = selectedZodiacs.map(s => s.name);
 
         try {
             const res = await fetch('/.netlify/functions/match', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, zodiacs, hobbies })
+                body: JSON.stringify({ 
+                    signs: signsList, // Jetzt schicken wir ein Array!
+                    age: age, 
+                    participants: maxParticipants,
+                    vibe: finalVibe, 
+                    budget: finalBudget 
+                })
             });
-            
             const data = await res.json();
             
-            // Weiterleitung zur Ergebnisseite mit Ziel-Übergabe
-            const target = data.destination || "Santorini";
-            window.location.href = `reise.html?destination=${encodeURIComponent(target)}&signs=${zodiacs.join(',')}&v=92`;
-            
+            // NEU: Wir speichern die komplette KI-Antwort lokal im Browser
+            sessionStorage.setItem('astroResult', JSON.stringify(data));
+            window.location.href = `reise.html`;
         } catch(e) {
-            // Fallback falls der Server hakt
-            window.location.href = `reise.html?destination=Porto&signs=${zodiacs.join(',')}&v=85`;
+            // Fallback für lokale Tests
+            sessionStorage.setItem('astroResult', JSON.stringify({
+                destination: "Kyoto, Japan",
+                explanation: "Die Sterne zeigen, dass diese Kombination an Charakteren einen Ort braucht, der sowohl tiefe spirituelle Ruhe (für die entspannten Seelen) als auch faszinierende Entdeckungen bietet. Kyoto balanciert das perfekt aus.",
+                bestTime: "April oder Oktober"
+            }));
+            window.location.href = `reise.html`;
         }
     }
 </script>
