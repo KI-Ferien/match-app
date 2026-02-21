@@ -7,26 +7,43 @@
     <style>
         :root { --glow: #0096ff; --gold: #ffcc00; --bg: #02050a; --cta: #ff6b6b; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background-color: var(--bg); color: white; font-family: 'Helvetica Neue', Arial, sans-serif; min-height: 100vh; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle at center, #0a1e3b 0%, #02040a 100%); padding: 20px; overflow-x: hidden; }
+        body { 
+            background-color: var(--bg); 
+            color: white; 
+            font-family: 'Helvetica Neue', Arial, sans-serif; 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            background: radial-gradient(circle at center, #0a1e3b 0%, #02040a 100%); 
+            padding: 20px; 
+            overflow-x: hidden; 
+        }
         .main-grid { position: relative; z-index: 100; display: grid; grid-template-columns: 180px 1fr 180px; align-items: center; gap: 30px; width: 100%; max-width: 1400px; }
         .zodiac-column { display: flex; flex-direction: column; gap: 10px; }
         .zodiac-card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 10px; text-align: center; border-radius: 12px; cursor: pointer; transition: 0.3s; backdrop-filter: blur(5px); }
         .zodiac-card:hover, .zodiac-card.active { border-color: var(--glow); background: rgba(0, 150, 255, 0.2); box-shadow: 0 0 15px var(--glow); transform: scale(1.05); }
         .zodiac-symbol { font-size: 1.8rem; color: var(--gold); display: block; }
         .zodiac-name { font-weight: bold; display: block; font-size: 0.8rem; margin-top: 4px; }
-        .crystal-ball { width: 580px; min-height: 580px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0.95) 90%); box-shadow: 0 0 60px var(--glow), inset 0 0 40px rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.15); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 50px; text-align: center; }
+        .crystal-ball { width: 580px; min-height: 580px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0.95) 90%); box-shadow: 0 0 60px var(--glow), inset 0 0 40px rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.15); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 50px; text-align: center; position: relative; }
         .input-wrap { width: 90%; margin-bottom: 10px; text-align: left; }
         label { font-size: 0.6rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 3px; }
         select, input, textarea { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white; font-size: 0.8rem; outline: none; }
         input[type="range"] { accent-color: var(--cta); margin-top: 5px; }
         .participants-scroll { width: 95%; max-height: 120px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .participant-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; background: rgba(255,255,255,0.05); padding: 5px; border-radius: 5px; }
-        .cta-btn { background: var(--cta); color: white; font-size: 1rem; font-weight: bold; padding: 12px 30px; border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4); width: 90%; transition: 0.3s; margin-top: 10px; }
-        .cta-btn:disabled { background: #555; cursor: not-allowed; }
-        @media (max-width: 1000px) { .main-grid { grid-template-columns: 1fr; } .zodiac-column { flex-direction: row; flex-wrap: wrap; justify-content: center; } .crystal-ball { width: 400px; min-height: 400px; padding: 30px; } }
+        .cta-btn { background: var(--cta); color: white; font-size: 1rem; font-weight: bold; padding: 12px 30px; border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4); width: 90%; transition: 0.3s; margin-top: 10px; z-index: 10; }
+        .cta-btn:disabled { background: #444; cursor: not-allowed; box-shadow: none; }
+        
+        @media (max-width: 1000px) { 
+            .main-grid { grid-template-columns: 1fr; } 
+            .zodiac-column { flex-direction: row; flex-wrap: wrap; justify-content: center; } 
+            .crystal-ball { width: 400px; min-height: 400px; padding: 30px; } 
+        }
     </style>
 </head>
 <body>
+
 <div class="main-grid">
     <div class="zodiac-column">
         <div class="zodiac-card" onclick="setMainZodiac('widder', this)"><span class="zodiac-symbol">♈</span><span class="zodiac-name">Widder</span></div>
@@ -40,118 +57,29 @@
     <div style="display:flex; justify-content:center;">
         <div class="crystal-ball">
             <h2 id="ball-title" style="color:var(--gold); margin-bottom:10px; font-size: 1.1rem; letter-spacing: 2px;">KI-FERIEN.DE</h2>
+            
             <div class="input-wrap">
                 <label>Email & Teilnehmer:</label>
                 <div style="display:flex; gap:5px;">
                     <input type="email" id="userEmail" placeholder="deine@email.de">
-                    <select id="personCount" style="width:30%;" onchange="renderParticipantFields()">
-                        <option value="1">1 Pers.</option><option value="2">2 Pers.</option><option value="3">3 Pers.</option><option value="4">4 Pers.</option><option value="5">5 Pers.</option>
+                    <select id="personCount" style="width:35%;" onchange="renderParticipantFields()">
+                        <option value="1">1 Pers.</option>
+                        <option value="2">2 Pers.</option>
+                        <option value="3">3 Pers.</option>
+                        <option value="4">4 Pers.</option>
+                        <option value="5">5 Pers.</option>
                     </select>
                 </div>
             </div>
+
             <div id="participants-list" class="participants-scroll"></div>
-            
+
             <div class="input-wrap">
                 <div style="display:flex; justify-content:space-between;"><label>Entspannt 🏖️</label><label>Action 🧗</label></div>
                 <input type="range" id="vibeRange" min="0" max="100" value="50">
             </div>
-            
+
             <div class="input-wrap">
                 <div style="display:flex; justify-content:space-between;"><label>Sparsam 💶</label><label>Luxus 💎</label></div>
                 <input type="range" id="budgetRange" min="0" max="100" value="50">
             </div>
-            
-            <div class="input-wrap"><label>Besondere Hobbies / Wünsche:</label><textarea id="hobbiesInput" rows="1" placeholder="z.B. Vegan, Surfen..."></textarea></div>
-            <button class="cta-btn" id="matchBtn" onclick="submitCosmicMatch()">Kostenlose Analyse starten</button>
-        </div>
-    </div>
-
-    <div class="zodiac-column">
-        <div class="zodiac-card" onclick="setMainZodiac('waage', this)"><span class="zodiac-symbol">♎</span><span class="zodiac-name">Waage</span></div>
-        <div class="zodiac-card" onclick="setMainZodiac('skorpion', this)"><span class="zodiac-symbol">♏</span><span class="zodiac-name">Skorpion</span></div>
-        <div class="zodiac-card" onclick="setMainZodiac('schuetze', this)"><span class="zodiac-symbol">♐</span><span class="zodiac-name">Schütze</span></div>
-        <div class="zodiac-card" onclick="setMainZodiac('steinbock', this)"><span class="zodiac-symbol">♑</span><span class="zodiac-name">Steinbock</span></div>
-        <div class="zodiac-card" onclick="setMainZodiac('wassermann', this)"><span class="zodiac-symbol">♒</span><span class="zodiac-name">Wassermann</span></div>
-        <div class="zodiac-card" onclick="setMainZodiac('fische', this)"><span class="zodiac-symbol">♓</span><span class="zodiac-name">Fische</span></div>
-    </div>
-</div>
-
-<script>
-    let mainTravelerSign = "";
-    const zodiacs = ["widder", "stier", "zwillinge", "krebs", "loewe", "jungfrau", "waage", "skorpion", "schuetze", "steinbock", "wassermann", "fische"];
-
-    function setMainZodiac(name, el) { 
-        mainTravelerSign = name; 
-        document.getElementById('ball-title').innerText = name.toUpperCase(); 
-        document.querySelectorAll('.zodiac-card').forEach(c => c.classList.remove('active')); 
-        el.classList.add('active'); 
-    }
-
-    function renderParticipantFields() { 
-        const count = parseInt(document.getElementById('personCount').value); 
-        const list = document.getElementById('participants-list'); 
-        list.innerHTML = ""; 
-        for(let i = 2; i <= count; i++) { 
-            const row = document.createElement('div'); 
-            row.className = "participant-row"; 
-            row.innerHTML = `<label>Pers. ${i}:</label><select class="extra-zodiac">${zodiacs.map(z => `<option value="${z}">${z.charAt(0).toUpperCase() + z.slice(1)}</option>`).join('')}</select>`; 
-            list.appendChild(row); 
-        } 
-    }
-
-    async function submitCosmicMatch() {
-        const email = document.getElementById('userEmail').value;
-        const btn = document.getElementById('matchBtn');
-        const vibeValue = document.getElementById('vibeRange').value;
-        const budgetValue = document.getElementById('budgetRange').value;
-        const hobbies = document.getElementById('hobbiesInput').value;
-
-        if (!mainTravelerSign || !email) { 
-            alert("Bitte Sternzeichen wählen und Email eingeben."); 
-            return; 
-        }
-
-        btn.disabled = true; 
-        btn.innerText = "KI analysiert...";
-
-        const extras = document.querySelectorAll('.extra-zodiac');
-        const groupZodiacs = [mainTravelerSign, ...Array.from(extras).map(s => s.value)];
-
-        // Wir übersetzen die Range-Werte (0-100) in Begriffe für Mistral
-        const style = vibeValue > 70 ? 'action' : (vibeValue < 30 ? 'relax' : 'mixed');
-        const budget = budgetValue < 40 ? 'low' : (budgetValue > 80 ? 'high' : 'medium');
-
-        const analysisData = { 
-            email, 
-            zodiacs: groupZodiacs, 
-            vibe: vibeValue, 
-            budget: budget, 
-            style: style, 
-            hobbies: hobbies,
-            marker: "698672" 
-        };
-
-        try { 
-            const response = await fetch('/.netlify/functions/match', { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify(analysisData) 
-            }); 
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                // Weiterleitung zur reise.html mit dem exakten Ziel von Mistral
-                window.location.href = `reise.html?destination=${encodeURIComponent(result.destination)}&signs=${groupZodiacs.join(',')}&v=${vibeValue}`;
-            } else {
-                alert("Fehler bei der Analyse. Bitte erneut versuchen.");
-                btn.disabled = false; btn.innerText = "Analyse starten";
-            }
-        } catch (e) { 
-            console.error(e); 
-            btn.disabled = false; btn.innerText = "Analyse starten";
-        }
-    }
-</script>
-</body>
-</html>
