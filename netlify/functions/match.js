@@ -26,6 +26,10 @@ exports.handler = async (event) => {
     1. "Heimatliche Gefilde" & "Nachbarreiche": Das Ziel soll in Deutschland, Österreich, Frankreich, Italien, Belgien,Niederlande oder der Schweiz liegen. (Beispiele: Rügen, Tirol, Zermatt, Spreewald). 
     2. "Kontinentale Weite": Das Ziel DARF NUR in ganz Europa liegen. Keine Fernreisen!
     3. NUR bei "Über die Meere" oder "Ans Ende der Welt" darfst du Japan, USA oder Bali wählen.
+    UNUMSTÖSSLICHE LOGIK- & GEOGRAFIE-REGELN:
+    PHYSISCHE ERREICHBARKEIT: Wenn Transport "Gefährten der Straße" (Bus/Auto) oder "Eiserne Pfade" (Zug) gewählt wurde, darf das Ziel NIEMALS auf einem anderen Kontinent oder einer Fernreise-Insel (wie Bali, Thailand, USA) liegen.
+    Es muss auf dem Landweg von Mitteleuropa erreichbar sein.
+    - NUR bei "Über die Meere" / "Ans Ende der Welt" + Transport "Flug der Falken" sind Fernziele wie Bali erlaubt.
     
     INHALTLICHE VORGABEN:
     - Nutze das Wort "Ferien".
