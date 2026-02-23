@@ -5,127 +5,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KI-Ferien.de - Dein Astrologisches Orakel</title>
     <style>
-        :root {
-            --gold: #d4af37;
-            --ocean: #005c97;
-            --sunrise: #ff7e5f;
-        }
-
+        :root { --gold: #d4af37; --ocean: #005c97; --glass: rgba(255, 255, 255, 0.05); }
+        
         body {
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(180deg, #0a0b1e 0%, #16213e 100%);
-            color: white;
-            font-family: 'Segoe UI', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            margin: 0; padding: 0; background: linear-gradient(180deg, #0a0b1e 0%, #16213e 100%);
+            color: white; font-family: 'Segoe UI', sans-serif; min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center; overflow-x: hidden;
         }
 
-        .hero {
-            text-align: center;
-            padding: 40px 20px;
-            max-width: 800px;
-        }
+        .hero { text-align: center; padding: 40px 20px; max-width: 800px; }
+        h1 { font-size: clamp(2rem, 8vw, 3.5rem); color: var(--gold); margin-bottom: 10px; }
 
-        h1 {
-            font-size: clamp(2rem, 8vw, 3.5rem);
-            color: var(--gold);
-            margin-bottom: 10px;
-        }
-
+        /* Responsive Zodiac Grid */
         .zodiac-grid {
-            display: grid;
-            /* Automatische Anpassung der Spalten je nach Breite */
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            gap: 15px;
-            width: 100%;
-            max-width: 600px;
-            margin: 30px auto;
-            padding: 10px;
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+            gap: 15px; width: 95%; max-width: 600px; margin: 20px auto;
         }
 
         .zodiac-ball {
-            width: clamp(60px, 15vw, 90px);
-            height: clamp(60px, 15vw, 90px);
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--gold);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.8rem;
-            text-align: center;
-            margin: auto; /* Zentrierung im Grid-Fach */
+            width: 80px; height: 80px; background: var(--glass);
+            border: 1px solid var(--gold); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.3s ease; font-size: 0.8rem; text-align: center;
+            margin: auto; box-sizing: border-box;
         }
 
-        .zodiac-ball.selected {
-            background: var(--gold);
-            color: black;
-            box-shadow: 0 0 20px var(--gold);
-            transform: scale(1.1);
+        .zodiac-ball.selected { 
+            background: var(--gold); color: black; 
+            box-shadow: 0 0 20px var(--gold); transform: scale(1.1); 
         }
 
         .config-section {
-            width: 90%;
-            max-width: 500px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 25px;
-            border-radius: 20px;
-            margin-top: 20px;
+            width: 90%; max-width: 500px; background: var(--glass);
+            padding: 25px; border-radius: 25px; margin-top: 20px;
+            backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);
+            box-sizing: border-box;
         }
 
-        select, input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 10px;
-            border: 1px solid #444;
-            background: #1a1a1a;
-            color: white;
-            box-sizing: border-box; /* Wichtig für Mobile-Padding */
+        label { display: block; margin-top: 15px; color: var(--gold); font-size: 0.9rem; font-weight: bold; }
+        
+        select {
+            width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px;
+            border: 1px solid #444; background: #1a1a1a; color: white;
+            font-size: 1rem; appearance: none; cursor: pointer;
         }
 
         .oracle-btn {
-            width: 100%;
-            max-width: 400px;
-            padding: 20px;
-            background: var(--gold);
-            border: none;
-            border-radius: 50px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin: 30px 0;
-            transition: transform 0.2s;
+            width: 90%; max-width: 400px; padding: 20px; background: var(--gold);
+            border: none; border-radius: 50px; font-size: 1.2rem; font-weight: bold;
+            cursor: pointer; margin: 30px 0; transition: transform 0.2s, background 0.3s;
         }
 
         .oracle-btn:active { transform: scale(0.95); }
+        .oracle-btn:disabled { background: #555; cursor: not-allowed; }
 
-        footer { margin-top: auto; padding: 20px; opacity: 0.6; font-size: 0.8rem; }
-
-        /* Mobile Optimierung */
-        @media (max-width: 480px) {
-            .hero { padding: 20px 10px; }
-            .config-section { padding: 15px; }
-            .zodiac-grid { gap: 10px; }
-        }
+        footer { padding: 30px; opacity: 0.6; font-size: 0.8rem; text-align: center; margin-top: auto; }
+        footer a { color: white; margin: 0 10px; text-decoration: none; }
     </style>
 </head>
 <body>
 
 <div class="hero">
     <h1>Ferien-Orakel</h1>
-    <p>Wähle Deine Zeichen und befrage die Sterne.</p>
+    <p>Wähle Deine Zeichen und bestimme die Größe Deiner Reisegruppe.</p>
 </div>
 
-<div class="zodiac-grid" id="zodiac-container">
-    </div>
+<div class="zodiac-grid" id="zodiac-container"></div>
 
 <div class="config-section">
+    <label>Anzahl der Reisenden:</label>
+    <select id="participants">
+        <option value="1">Einsame Seele (1)</option>
+        <option value="2" selected>Zwei Seelenverwandte (2)</option>
+        <option value="3">Drei Weggefährten (3)</option>
+        <option value="4">Vier Wanderer (4)</option>
+        <option value="5">Kleine Karawane (5+)</option>
+    </select>
+
     <label>Reise-Vibe:</label>
     <select id="vibe">
         <option>Fließende Balance</option>
@@ -133,23 +90,16 @@
         <option>Stille Einkehr</option>
     </select>
 
-    <label>Budget-Pfad:</label>
-    <select id="budget">
-        <option>Goldene Mitte</option>
-        <option>Königlicher Luxus</option>
-        <option>Bescheidene Genügsamkeit</option>
-    </select>
-
     <label>Entfernung:</label>
     <select id="distance">
-        <option>Nachbarreiche</option>
-        <option>Kontinentale Weite</option>
-        <option>Ans Ende der Welt</option>
+        <option value="Heimatliche Gefilde">Heimatliche Gefilde</option>
+        <option value="Nachbarreiche">Nachbarreiche</option>
+        <option value="Kontinentale Weite">Kontinentale Weite</option>
+        <option value="Ans Ende der Welt">Ans Ende der Welt</option>
     </select>
 </div>
 
 <button class="oracle-btn" id="ask-oracle">Das Orakel befragen</button>
-
 <footer id="status">Bereit für Deine Bestimmung.</footer>
 
 <script src="app.js"></script>
