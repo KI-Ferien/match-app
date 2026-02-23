@@ -17,6 +17,7 @@
             min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden;
         }
 
+        /* WELLEN ANIMATION */
         .waves-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 160px; z-index: -1; }
         .wave {
             position: absolute; bottom: 0; width: 200%; height: 100%;
@@ -44,48 +45,81 @@
         .packlist-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 20px 0; }
         .pack-item { background: white; padding: 12px; border-radius: 12px; text-align: center; box-shadow: 0 3px 6px rgba(0,0,0,0.05); }
 
+        /* TEILEN SEKTION */
+        .share-section {
+            margin: 30px 0; padding: 20px; background: rgba(0, 92, 151, 0.05);
+            border-radius: 25px; text-align: center;
+        }
+        .share-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
+        
+        .share-btn {
+            padding: 10px 20px; border-radius: 20px; border: none; font-weight: bold;
+            cursor: pointer; transition: 0.3s; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;
+            text-decoration: none;
+        }
+        .btn-copy { background: var(--gold); color: black; }
+        .btn-whatsapp { background: #25D366; color: white; }
+
         .affiliate-section { display: flex; flex-direction: column; gap: 12px; margin-top: 30px; }
         .affiliate-btn {
             background: var(--ocean); color: white; padding: 18px; text-decoration: none;
             border-radius: 50px; text-align: center; font-weight: bold; transition: 0.3s;
         }
-        .affiliate-btn:hover { background: #004471; transform: translateY(-3px); }
 
         footer { padding: 40px; text-align: center; font-size: 0.85rem; color: white; background: rgba(0,0,0,0.1); }
         footer a { color: white; margin: 0 10px; text-decoration: none; }
     </style>
 </head>
 <body>
-    <div class="waves-container"><div class="wave"></div><div class="wave"></div></div>
+    <div class="waves-container"><div class="wave"></div></div>
     <div class="container">
         <div class="result-card">
             <h1 id="destName">Lädt...</h1>
             <p id="destExp"></p>
+            
             <div id="bestTimeTip"></div>
+
+            <h3 style="text-align:center; color: var(--ocean);">Kosmisches Reisegepäck</h3>
             <div class="packlist-grid" id="packlist"></div>
+
+            <div class="share-section">
+                <span style="font-weight: bold; color: var(--ocean);">Schicksal teilen</span>
+                <div class="share-buttons">
+                    <button class="share-btn btn-copy" onclick="copyResult()">📋 Kopieren</button>
+                    <a id="whatsapp-link" href="#" class="share-btn btn-whatsapp" target="_blank">🟢 WhatsApp</a>
+                </div>
+            </div>
+
             <div id="affiliate-links" class="affiliate-section"></div>
+            
             <div style="text-align: center; margin-top: 40px;">
-                <a href="index.html" style="color: var(--ocean); font-weight: bold; text-decoration: none;">← Neue Reise orakeln</a>
+                <a href="index.html" style="color: var(--ocean); font-weight: bold; text-decoration: none;">← Neue Ferien orakeln</a>
             </div>
         </div>
     </div>
     <footer>
         <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
     </footer>
+
     <script>
+        let shareText = "";
+
         document.addEventListener('DOMContentLoaded', () => {
             const data = JSON.parse(sessionStorage.getItem('orakelResult'));
             if (!data) return;
             const res = data.result;
+            
             document.getElementById('destName').textContent = res.destination;
             document.getElementById('destExp').textContent = res.explanation;
             document.getElementById('bestTimeTip').textContent = "Die ideale Zeit:\n" + res.bestTimeTip;
+            
             const pack = document.getElementById('packlist');
             res.packliste.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'pack-item'; div.textContent = '🏖️ ' + item;
                 pack.appendChild(div);
             });
+
             const aff = document.getElementById('affiliate-links');
             res.affiliate_suggestions.forEach(link => {
                 const a = document.createElement('a');
@@ -93,7 +127,22 @@
                 a.target = '_blank'; a.textContent = link.label;
                 aff.appendChild(a);
             });
+
+            // Share Text vorbereiten
+            shareText = `Das Orakel hat gesprochen! Meine Bestimmung sind Ferien in ${res.destination}. 🌌✨\n\nBefrage auch du die Sterne auf: https://ki-ferien.de`;
+            
+            // WhatsApp Link aktualisieren
+            document.getElementById('whatsapp-link').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
         });
+
+        function copyResult() {
+            navigator.clipboard.writeText(shareText).then(() => {
+                const btn = document.querySelector('.btn-copy');
+                const original = btn.innerText;
+                btn.innerText = "✅ Kopiert!";
+                setTimeout(() => btn.innerText = original, 2000);
+            });
+        }
     </script>
 </body>
 </html>
