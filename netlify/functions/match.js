@@ -24,21 +24,21 @@ exports.handler = async (event) => {
     
     STRENGE GEOGRAFISCHE BEFEHLE:
     1. "Heimatliche Gefilde" & "Nachbarreiche": Ziel MUSS in Deutschland, Österreich, Frankreich, Italien, Belgien, Niederlande oder Schweiz liegen.
-    2. "Kontinentale Weite": Ziel DARF NUR in ganz Europa liegen. Keine Fernreisen!
-    3. NUR bei "Über die Meere" oder "Ans Ende der Welt" + Transport "Flug der Falken" sind Fernziele wie Japan, USA oder Bali erlaubt.
+    2. "Kontinentale Weite": Ziel DARF NUR in ganz Europa liegen.
+    3. NUR bei "Über die Meere" + Transport "Flug der Falken" sind Fernziele erlaubt.
     
-    UNUMSTÖSSLICHE LOGIK-REGELN:
-    - Wenn Transport "Gefährten der Straße" (Bus/Auto) oder "Eiserne Pfade" (Zug) gewählt wurde, darf das Ziel NIEMALS auf einem anderen Kontinent liegen.
-    - WICHTIG: Nenne als "destination" bevorzugt eine bekannte Stadt oder eine bekannte Insel (z.B. "Bozen" statt "Dolomiten"), damit Transfer-Dienste das Ziel finden.
+    WICHTIGE TRANSFER-LOGIK:
+    - Damit Transfer-Dienste funktionieren, darf die "destination" KEINE Region sein. 
+    - Nenne IMMER eine konkrete, bekannte Stadt oder einen Flughafen-Hub (z.B. "Innsbruck" statt "Tirol", "Salzburg" statt "Salzkammergut", "Bozen" statt "Südtirol").
     
     INHALTLICHE VORGABEN:
     - Nutze das Wort "Ferien".
     - Binde Buddha (Yamamoto 1973) und Atman (Webster 2003) tiefgründig ein, ohne sie namentlich zu nennen.
-    - Die Packliste soll 3-4 nützliche reale Profi-Items oder Tipps enthalten.
+    - Die Packliste soll 3-4 nützliche reale Profi-Items enthalten.
     
     Antworte NUR mit validem JSON:
     {
-      "destination": "Name des Ziels (Bevorzugt Stadt oder Insel)",
+      "destination": "Name der Stadt (z.B. Wien, Berlin, Paris, Innsbruck)",
       "explanation": "Begründung...",
       "bestTimeTip": "Reisezeit-Tipp",
       "packliste": ["Item 1", "Item 2", "Item 3"],
@@ -63,10 +63,9 @@ exports.handler = async (event) => {
     const dRaw = result.destination;
     const dEnc = encodeURIComponent(dRaw);
     
-    // VERBESSERTE SLUG-LOGIK für Welcome Pickups:
-    // Nimmt nur den Teil vor Kommas oder Klammern und wandelt Umlaute um
-    let cleanBase = dRaw.split(',')[0].split('(')[0].trim();
-    const dSlug = cleanBase.toLowerCase()
+    // Welcome Pickups braucht nur den Stadtnamen ohne Land
+    let cityOnly = dRaw.split(',')[0].split('(')[0].trim();
+    const dSlug = cityOnly.toLowerCase()
       .replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/ü/g, 'u').replace(/ß/g, 'ss')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
@@ -81,7 +80,7 @@ exports.handler = async (event) => {
         affiliate_url: `https://tp.media/r?campaign_id=147&marker=698672&p=4439&trs=492044&u=${encodeURIComponent('https://gettransfer.com/de')}` 
       },
       { 
-        label: "Persönlicher Empfang (Welcome)", 
+        label: "Persönlicher Empfang (Welcome Pickups)", 
         affiliate_url: `https://tp.media/r?campaign_id=627&marker=698672&p=8919&trs=492044&u=${encodeURIComponent('https://www.welcomepickups.com/' + dSlug + '/')}` 
       }
     ];
