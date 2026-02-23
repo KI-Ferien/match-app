@@ -14,11 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let selectedSigns = [];
 
-    // Sternzeichen-Kugeln erstellen
+    // Erstelle die Kugeln
     signs.forEach(sign => {
         const ball = document.createElement('div');
         ball.className = 'zodiac-ball';
-        ball.innerHTML = `<div>${sign.icon}<br><small>${sign.name}</small></div>`;
+        ball.innerHTML = `<div><span style="font-size: 1.5rem;">${sign.icon}</span><br><small>${sign.name}</small></div>`;
         
         ball.addEventListener('click', () => {
             if (ball.classList.contains('selected')) {
@@ -32,10 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
         zodiacContainer.appendChild(ball);
     });
 
-    // Orakel-Anfrage
     askButton.addEventListener('click', async () => {
         if (selectedSigns.length === 0) {
-            status.textContent = "Wähle Deine Sternzeichen, um das Schicksal zu rufen.";
+            status.textContent = "Wähle Deine Zeichen, bevor Du das Orakel weckst.";
             return;
         }
 
@@ -43,12 +42,12 @@ document.addEventListener('DOMContentLoaded', () => {
             signs: selectedSigns,
             participants: document.getElementById('participants').value,
             vibe: document.getElementById('vibe').value,
-            budget: document.getElementById('budget').value,
+            budget: "Goldene Mitte", // Standardwert
             distance: document.getElementById('distance').value,
-            transport: "Gefährten der Straße" // Kann bei Bedarf auch als Select ergänzt werden
+            transport: "Gefährten der Straße" 
         };
 
-        status.textContent = "Das Orakel liest in den Linien der Zeit...";
+        status.textContent = "Das Orakel befragt die Gezeiten...";
         askButton.disabled = true;
 
         try {
@@ -58,18 +57,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(payload)
             });
 
-            if (!response.ok) throw new Error('Kosmische Störung im Backend');
+            if (!response.ok) throw new Error('Kommunikationsfehler');
 
             const result = await response.json();
-            
-            // Speichern und Weiterleiten
             sessionStorage.setItem('orakelResult', JSON.stringify({ result }));
             window.location.href = 'reise.html';
 
         } catch (error) {
-            status.textContent = "Die Sterne sind getrübt. Versuche es erneut.";
+            status.textContent = "Eine dunkle Wolke zieht auf. Versuche es erneut.";
             console.error(error);
-        } finally {
             askButton.disabled = false;
         }
     });
