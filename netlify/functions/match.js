@@ -19,27 +19,23 @@ exports.handler = async (event) => {
 
     if (!apiKey) throw new Error("MISTRAL_API_KEY fehlt");
 
-    const prompt = `Du bist ein unfehlbares astrologisches Orakel und Reiseexperte für Ferien. /astro
-    Parameter: Personen: ${payload.participants}, Zeichen: ${payload.signs}, Vibe: ${payload.vibe}, Budget: ${payload.budget}, Distanz: ${payload.distance}.
+    const prompt = `Du bist ein unfehlbares astrologisches Orakel für Ferien. /astro
+    Parameter: Personen: ${payload.participants}, Zeichen: ${payload.signs}, Vibe: ${payload.vibe}, Budget: ${payload.budget}, Distanz: ${payload.distance}, Transport: ${payload.transport}.
     
-    STRENGE GEOGRAFISCHE BEFEHLE:
-    1. "Heimatliche Gefilde" & "Nachbarreiche": Ziel MUSS in Deutschland, Österreich, Frankreich, Italien, Belgien, Niederlande oder Schweiz liegen.
-    2. "Kontinentale Weite": Ziel DARF NUR in ganz Europa liegen.
-    3. NUR bei "Über die Meere" + Transport "Flug der Falken" sind Fernziele erlaubt.
+    GEOGRAFIE & LOGIK (PRIORITÄT 1):
+    - "Heimatliche Gefilde/Nachbarreiche" + Landtransport (Bus/Bahn/Auto) = NUR DACH-Region, BeNeLux, Frankreich, Italien.
+    - Fernziele (Bali/USA/Japan) sind NUR bei "Über die Meere" UND Transport "Flug" erlaubt.
+    - WICHTIG: Nenne als "destination" NUR eine bekannte Stadt (z.B. "Salzburg", "Venedig", "Palma"), keine Regionen, damit Transfer-Links funktionieren.
     
-    WICHTIGE TRANSFER-LOGIK:
-    - Damit Transfer-Dienste funktionieren, darf die "destination" KEINE Region sein. 
-    - Nenne IMMER eine konkrete, bekannte Stadt oder einen Flughafen-Hub (z.B. "Innsbruck" statt "Tirol", "Salzburg" statt "Salzkammergut", "Bozen" statt "Südtirol").
-    
-    INHALTLICHE VORGABEN:
+    STIL-VORGABEN (PRIORITÄT 2):
     - Nutze das Wort "Ferien".
-    - Binde Buddha (Yamamoto 1973) und Atman (Webster 2003) tiefgründig ein, ohne sie namentlich zu nennen.
-    - Die Packliste soll 3-4 nützliche reale Profi-Items enthalten.
+    - Binde die Konzepte von Buddha (Vergänglichkeit/Stille) und Atman (Einheit/Inneres Selbst) tiefgründig in die Begründung ein.
+    - VERBOT: Nenne NIEMALS die Namen "Buddha", "Yamamoto", "Atman" oder "Webster" und setze keine Quellen in Klammern. Beschreibe nur die philosophische Essenz im Textfluss.
     
     Antworte NUR mit validem JSON:
     {
-      "destination": "Name der Stadt (z.B. Wien, Berlin, Paris, Innsbruck)",
-      "explanation": "Begründung...",
+      "destination": "Name der Stadt",
+      "explanation": "Atmosphärische Begründung ohne namentliche Nennung der Quellen.",
       "bestTimeTip": "Reisezeit-Tipp",
       "packliste": ["Item 1", "Item 2", "Item 3"],
       "cta_text": "Ferien Erlebnisse buchen"
@@ -51,7 +47,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         model: "mistral-small-latest",
         messages: [{ role: "user", content: prompt }],
-        temperature: 0.1 
+        temperature: 0.2
       })
     });
 
@@ -63,9 +59,9 @@ exports.handler = async (event) => {
     const dRaw = result.destination;
     const dEnc = encodeURIComponent(dRaw);
     
-    // Welcome Pickups braucht nur den Stadtnamen ohne Land
-    let cityOnly = dRaw.split(',')[0].split('(')[0].trim();
-    const dSlug = cityOnly.toLowerCase()
+    // Welcome Pickups Link-Optimierung (nur Stadtname)
+    let cityClean = dRaw.split(',')[0].split('(')[0].trim();
+    const dSlug = cityClean.toLowerCase()
       .replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/ü/g, 'u').replace(/ß/g, 'ss')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
@@ -76,7 +72,7 @@ exports.handler = async (event) => {
         affiliate_url: `https://tp.media/r?campaign_id=137&marker=698672&p=4110&trs=492044&u=${encodeURIComponent('https://www.klook.com/de/search/result/?query=' + dEnc)}` 
       },
       { 
-        label: "Bequem ankommen (GetTransfer)", 
+        label: "Bequemer Transfer (GetTransfer)", 
         affiliate_url: `https://tp.media/r?campaign_id=147&marker=698672&p=4439&trs=492044&u=${encodeURIComponent('https://gettransfer.com/de')}` 
       },
       { 
