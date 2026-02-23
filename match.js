@@ -1,127 +1,101 @@
-// netlify/functions/match.js
-'use strict';
-
-// In Node.js 18+ (Standard bei Netlify) ist fetch global verfügbar.
-// Wir definieren fetchFn einfach als das native fetch.
-const fetchFn = globalThis.fetch;
+const https = require('https');
 
 exports.handler = async (event) => {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json'
-  };
-
-  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
-
-  try {
-    if (!event.body) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing body' }) };
-    
-    const payload = JSON.parse(event.body);
-    const signs = Array.isArray(payload.signs) ? payload.signs.join(', ') : 'Keine spezifischen';
-    const participants = Number(payload.participants) || 2;
-    const vibe = payload.vibe || 'Fließende Balance';
-    const budget = payload.budget || 'Goldene Mitte';
-    const distance = payload.distance || 'Kontinentale Weite';
-    const transport = payload.transport || 'Flug der Falken';
-
-    const apiKey = process.env.MISTRAL_API_KEY;
-    if (!apiKey) {
-      // Fallback für lokale Tests ohne API Key
-      return {
-        statusCode: 200, headers, body: JSON.stringify({
-          destination: "Mallorca", 
-          explanation: "Das Orakel ruht gerade. Dies ist eine Test-Empfehlung.", 
-          bestTimeTip: "Mai bis September",
-          packliste: ["Sonnencreme", "Gute Laune", "Reisepass"], 
-          cta_text: "Ferien planen",
-          affiliate_suggestions: []
-        })
-      };
-    }
-
-    const prompt = `Du bist ein hochentwickeltes astrologisches Orakel für Ferien. /astro
-    Analysiere folgende Parameter für ${participants} Personen der Sternzeichen ${signs}:
-    Erlebnis-Wunsch: ${vibe}
-    Budget-Pfad: ${budget}
-    Gewünschte Entfernung: ${distance}
-    Art der Fortbewegung: ${transport}
-    
-    WICHTIGE REGELN FÜR DEINE EMPFEHLUNG:
-    1. Geografische Bindung: "Heimatliche Gefilde" und "Nachbarreiche" bedeuten ZWINGEND DACH-Region. "Kontinentale Weite" bedeutet ZWINGEND Europa. Alles andere ist weltweit. 
-    2. Die Packliste MUSS 3 REALE, hochprofessionelle Ausrüstungsgegenstände enthalten. NENNE KEINE KAMERAS. Nenne stattdessen exklusives Premium-Gepäck, High-Tech Kleidung oder Gadgets. ERFINDE KEINE esoterischen Gegenstände.
-    3. Die Begründung ('explanation') MUSS ZWINGEND diese Quellen einbinden: 
-       - Wie Buddha es im Mahayana im Mahapäriniviranä Sutra erläutert (Übersetzer Kosho Yamamoto 1973).
-       - Das Konzept des Atman (Hinduismus, Merriam-Webster 2003).
-    4. Nutze immer das Wort "Ferien".
-    5. Beachte simulierte Reise- und Sicherheitswarnungen.
-    
-    Antworte AUSSCHLIESSLICH als JSON-Objekt ohne Markdown:
-    {
-      "destination": "Name des Ziels (NUR die Stadt oder Insel, z.B. 'Mallorca' oder 'Paris')",
-      "explanation": "Tiefgründige Begründung inkl. Sternzeichen, Buddha (Yamamoto 1973) und Atman (Webster 2003).",
-      "bestTimeTip": "Beste Reisezeit",
-      "packliste": ["Reales Profi-Item 1", "Reales Profi-Item 2", "Reales Profi-Item 3"],
-      "cta_text": "Ferien Erlebnisse buchen"
-    }`;
-
-    // Hier nutzen wir das native fetchFn
-    const mistralRes = await fetchFn('https://api.mistral.ai/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-      body: JSON.stringify({ model: "mistral-small-latest", messages: [{ role: "user", content: prompt }], temperature: 0.7 })
-    });
-
-    const mistralData = await mistralRes.json();
-    let rawText = mistralData.choices[0].message.content;
-    
-    let cleaned = rawText.trim();
-    // Falls Mistral Markdown-Boxen mitschickt, diese entfernen
-    const fenceMatch = cleaned.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
-    if (fenceMatch && fenceMatch[1]) cleaned = fenceMatch[1].trim();
-    if (!cleaned.startsWith('{')) {
-      const firstJson = cleaned.match(/\{[\s\S]*?\}/);
-      if (firstJson) cleaned = firstJson[0];
-    }
-
-    let parsed = JSON.parse(cleaned);
-
-    // Ziel formatieren für die verschiedenen Partner-Strukturen
-    const destRaw = parsed.destination || 'Mallorca';
-    const destEnc = encodeURIComponent(destRaw);
-    const destSlug = destRaw.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-
-    // Deep-Links für Travelpayouts mit deinen IDs
-    const klookTarget = encodeURIComponent(`https://www.klook.com/search/result/?query=${destEnc}`);
-    const getTransferTarget = encodeURIComponent(`https://gettransfer.com/`);
-    const wpTarget = encodeURIComponent(`https://www.welcomepickups.com/${destSlug}/`);
-
-    parsed.affiliate_suggestions = [
-      { 
-        type: 'activity', 
-        label: `Klook Erlebnisse in ${destRaw}`, 
-        affiliate_url: `https://tp.media/r?campaign_id=137&marker=698672&p=4110&trs=492044&u=${klookTarget}` 
-      },
-      { 
-        type: 'transfer', 
-        label: `GetTransfer Fahrt`, 
-        affiliate_url: `https://tp.media/r?campaign_id=147&marker=698672&p=4439&trs=492044&u=${getTransferTarget}` 
-      },
-      { 
-        type: 'pickup', 
-        label: `Welcome Pickups`, 
-        affiliate_url: `https://tp.media/r?campaign_id=627&marker=698672&p=8919&trs=492044&u=${wpTarget}` 
-      }
-    ];
-
-    return { statusCode: 200, headers, body: JSON.stringify(parsed) };
-    
-  } catch (error) {
-    return { 
-      statusCode: 500, 
-      headers, 
-      body: JSON.stringify({ error: error.message, stack: "Fehler im Orakel-Backend" }) 
+    const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Content-Type': 'application/json'
     };
-  }
+
+    if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
+
+    return new Promise((resolve) => {
+        const apiKey = process.env.MISTRAL_API_KEY;
+        if (!apiKey) {
+            return resolve({ 
+                statusCode: 500, 
+                headers, 
+                body: JSON.stringify({ error: "API-Key fehlt in Netlify Umgebungsvariablen" }) 
+            });
+        }
+
+        let payload;
+        try {
+            payload = JSON.parse(event.body || '{}');
+        } catch (e) {
+            return resolve({ statusCode: 400, headers, body: JSON.stringify({ error: "Ungültiger JSON-Body" }) });
+        }
+
+        const prompt = `Du bist ein astrologisches Reise-Orakel und erfahrener Reiseexperte. /astro
+Analysiere für ${payload.participants || 2} Personen (Sternzeichen: ${payload.signs || 'Unbekannt'}).
+Wunsch: ${payload.vibe}, Budget: ${payload.budget}, Entfernung: ${payload.distance}.
+WICHTIG: Nutze das Wort "Ferien". Binde Buddha (Yamamoto 1973) und das Atman-Konzept (Webster 2003) tiefgründig ein.
+Antworte NUR mit einem validen JSON-Objekt:
+{
+  "destination": "Stadt oder Insel",
+  "explanation": "Begründung...",
+  "bestTimeTip": "Reisezeit...",
+  "packliste": ["Item 1", "Item 2", "Item 3"],
+  "cta_text": "Ferien buchen"
+}`;
+
+        const postData = JSON.stringify({
+            model: "mistral-small-latest",
+            messages: [{ role: "user", content: prompt }],
+            temperature: 0.2
+        });
+
+        const options = {
+            hostname: 'api.mistral.ai',
+            path: '/v1/chat/completions',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Length': Buffer.byteLength(postData)
+            },
+            timeout: 15000 
+        };
+
+        const req = https.request(options, (res) => {
+            let responseBody = '';
+            res.on('data', (chunk) => responseBody += chunk);
+            res.on('end', () => {
+                try {
+                    const mistralData = JSON.parse(responseBody);
+                    if (!mistralData.choices) throw new Error("Keine Antwort von Mistral erhalten");
+                    
+                    let contentText = mistralData.choices[0].message.content.trim();
+                    
+                    // JSON-RETTUNG: Extrahiert alles zwischen den ersten und letzten geschweiften Klammern
+                    const start = contentText.indexOf('{');
+                    const end = contentText.lastIndexOf('}');
+                    if (start === -1 || end === -1) throw new Error("KI hat kein JSON geliefert");
+                    const cleanedJson = contentText.substring(start, end + 1);
+                    
+                    const finalResult = JSON.parse(cleanedJson);
+
+                    // Affiliate Links einfügen
+                    const dEnc = encodeURIComponent(finalResult.destination);
+                    finalResult.affiliate_suggestions = [
+                        { label: `Erlebnisse in ${finalResult.destination}`, affiliate_url: `https://tp.media/r?campaign_id=137&marker=698672&p=4110&trs=492044&u=${encodeURIComponent('https://www.klook.com/search/result/?query=' + dEnc)}` },
+                        { label: "Transfer buchen", affiliate_url: "https://tp.media/r?campaign_id=147&marker=698672&p=4439&trs=492044" }
+                    ];
+
+                    resolve({ statusCode: 200, headers, body: JSON.stringify(finalResult) });
+                } catch (err) {
+                    resolve({ 
+                        statusCode: 500, 
+                        headers, 
+                        body: JSON.stringify({ error: "JSON-Parsing Fehler", details: err.message, raw: responseBody }) 
+                    });
+                }
+            });
+        });
+
+        req.on('error', (e) => resolve({ statusCode: 500, headers, body: JSON.stringify({ error: e.message }) }));
+        req.write(postData);
+        req.end();
+    });
 };
