@@ -3,107 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KI-Ferien.de - Dein Orakel</title>
+    <title>KI-Ferien.de - Kosmisches Orakel</title>
     <style>
         :root {
             --gold: #d4af37;
-            --ocean-dark: #005c97;
-            --sunrise: #ff7e5f;
-            --glass: rgba(255, 255, 255, 0.12);
-            --circle-size: clamp(320px, 85vw, 550px);
-            --ball-size: clamp(58px, 13vw, 85px);
-            --rotation-speed: 140s;
+            --space-black: #05060f;
+            --cosmic-blue: #1a1c3a;
+            --glass: rgba(255, 255, 255, 0.05);
+            --circle-size: clamp(300px, 88vw, 600px);
+            --ball-size: clamp(58px, 14vw, 85px);
         }
 
         body {
             margin: 0; padding: 0;
-            /* Hintergrund: Tag am Meer (Sonnenaufgang) */
-            background: linear-gradient(180deg, var(--sunrise) 0%, #feb47b 30%, #86d3f4 70%, var(--ocean-dark) 100%);
-            color: #1a1a1a; font-family: 'Segoe UI', sans-serif;
+            background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
+            color: white; font-family: 'Segoe UI', sans-serif;
             min-height: 100vh; display: flex; flex-direction: column;
-            align-items: center; overflow-x: hidden;
+            align-items: center; overflow: hidden;
         }
 
-        /* Dynamische Wellen im Hintergrund */
-        .waves-container {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 150px;
-            z-index: -1; pointer-events: none;
-        }
-        .wave {
-            position: absolute; bottom: 0; width: 200%; height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C51.31,103.52,112.83,117.01,169,105,214.76,95.24,264.61,66.93,321.39,56.44Z" fill="rgba(255,255,255,0.3)"/></svg>');
-            background-size: 50% 100%; animation: move-wave 60s linear infinite;
-        }
-        @keyframes move-wave { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        /* Sterne-Effekt im Hintergrund */
+        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: url('https://www.transparenttextures.com/patterns/stardust.png'); opacity: 0.3; }
 
-        .hero { text-align: center; padding: 20px 10px; z-index: 10; }
-        h1 { font-size: clamp(1.6rem, 6vw, 2.8rem); color: var(--ocean-dark); margin: 0; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
+        .hero h1 { 
+            font-size: clamp(1.5rem, 6vw, 2.5rem); color: var(--gold); 
+            text-transform: uppercase; letter-spacing: 4px; margin: 20px 0;
+            text-shadow: 0 0 20px rgba(212,175,55,0.5);
+        }
 
-        /* ORAKEL CONTAINER */
         .oracle-container {
-            position: relative;
-            width: var(--circle-size);
-            height: var(--circle-size);
-            margin: 10px auto;
-            display: flex; align-items: center; justify-content: center;
+            position: relative; width: var(--circle-size); height: var(--circle-size);
+            margin: auto; display: flex; align-items: center; justify-content: center;
         }
 
         #zodiac-wrapper {
             position: absolute; width: 100%; height: 100%;
-            animation: rotate-ring var(--rotation-speed) linear infinite;
+            animation: rotate-ring 160s linear infinite;
         }
 
+        /* Plastisches Zentrum */
         .central-hub {
-            width: 70%; height: 70%;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(15px);
-            border-radius: 50%;
-            border: 2px solid white;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            padding: 25px; box-sizing: border-box;
-            z-index: 5; text-align: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            width: 65%; height: 65%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            backdrop-filter: blur(20px); border-radius: 50%;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 30px; box-sizing: border-box; z-index: 10;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(212,175,55,0.1);
         }
 
-        /* SLIDER STYLING */
-        .slider-group { width: 100%; margin: 8px 0; text-align: left; }
-        .slider-label { font-size: 0.75rem; font-weight: bold; color: var(--ocean-dark); display: flex; justify-content: space-between; }
+        .slider-group { width: 100%; margin: 8px 0; }
+        .slider-label { font-size: 0.75rem; color: var(--gold); display: flex; justify-content: space-between; font-weight: bold; }
         
-        input[type=range] {
-            width: 100%; margin: 8px 0; cursor: pointer; accent-color: var(--ocean-dark);
-        }
+        input[type=range] { width: 100%; margin: 10px 0; cursor: pointer; accent-color: var(--gold); }
 
         .oracle-btn {
-            background: var(--ocean-dark); color: white; border: none; 
-            padding: 12px 25px; border-radius: 50px; font-weight: bold;
-            cursor: pointer; margin-top: 15px; font-size: 1rem;
-            box-shadow: 0 5px 15px rgba(0,92,151,0.3); transition: 0.3s;
+            background: var(--gold); color: black; border: none; padding: 12px 25px;
+            border-radius: 50px; font-weight: bold; cursor: pointer; margin-top: 15px;
+            font-size: 1rem; box-shadow: 0 0 20px rgba(212,175,55,0.4); transition: 0.3s;
         }
-        .oracle-btn:hover { transform: scale(1.05); background: #004471; }
+        .oracle-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px var(--gold); }
 
-        /* ZODIAC BALLS */
+        /* Zodiac Balls */
         .zodiac-ball {
             position: absolute; width: var(--ball-size); height: var(--ball-size);
-            background: white; border: 2px solid var(--ocean-dark); border-radius: 50%;
+            background: rgba(0,0,0,0.8); border: 1px solid var(--gold); border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.3s; z-index: 6;
-            animation: counter-rotate var(--rotation-speed) linear infinite;
+            cursor: pointer; transition: 0.3s; z-index: 11;
+            animation: counter-rotate 160s linear infinite;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
         }
         .zodiac-ball span { 
-            line-height: 1; font-weight: bold; font-size: clamp(0.6rem, 2vw, 0.8rem); 
-            /* Fix für Wassermann & Co */
-            display: block; width: 90%; word-wrap: break-word; 
+            line-height: 1.1; font-weight: bold; text-align: center;
+            font-size: clamp(0.6rem, 2.5vw, 0.8rem); 
         }
         .zodiac-ball.selected {
-            background: var(--ocean-dark); color: white;
-            box-shadow: 0 0 20px var(--ocean-dark); transform: translate(-50%, -50%) scale(1.1) !important;
-        }
-
-        /* DESKTOP VS MOBILE UNTERSCHEIDUNG */
-        @media (min-width: 1024px) {
-            .central-hub { width: 60%; height: 60%; padding: 40px; }
-            .hero { padding: 40px 20px; }
+            background: var(--gold); color: black;
+            box-shadow: 0 0 30px var(--gold); transform: translate(-50%, -50%) scale(1.15) !important;
         }
 
         @keyframes rotate-ring { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -112,21 +88,14 @@
             to { transform: translate(-50%, -50%) rotate(-360deg); } 
         }
 
-        footer {
-            margin-top: auto; padding: 20px; width: 100%;
-            text-align: center; background: rgba(255,255,255,0.2);
-            backdrop-filter: blur(5px);
-        }
-        footer a { color: var(--ocean-dark); text-decoration: none; margin: 0 15px; font-size: 0.85rem; font-weight: bold; }
+        footer { margin-top: auto; padding: 15px; width: 100%; text-align: center; background: rgba(0,0,0,0.5); }
+        footer a { color: var(--gold); text-decoration: none; margin: 0 15px; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
-<div class="hero">
-    <h1>KI-Ferien Orakel</h1>
-</div>
-
-<div class="waves-container"><div class="wave"></div></div>
+<div class="stars"></div>
+<div class="hero"><h1>Das Orakel</h1></div>
 
 <div class="oracle-container">
     <div id="zodiac-wrapper"></div>
@@ -135,17 +104,15 @@
             <div class="slider-label"><span>Gefährten</span> <span id="val-p">2</span></div>
             <input type="range" id="participants" min="1" max="5" value="2" oninput="document.getElementById('val-p').innerText=this.value">
         </div>
-        
         <div class="slider-group">
             <div class="slider-label"><span>Distanz</span> <span id="val-d">Nachbarreiche</span></div>
             <input type="range" id="distance-slider" min="1" max="4" value="2" oninput="updateDistance(this.value)">
         </div>
-
         <button class="oracle-btn" id="ask-oracle">BEFRAGEN</button>
     </div>
 </div>
 
-<div id="status" style="font-weight: bold; color: var(--ocean-dark); margin-bottom: 10px;">Berühre Deine Zeichen</div>
+<div id="status" style="margin: 10px; font-size: 0.8rem; color: var(--gold);">Wähle Deine Zeichen</div>
 
 <footer>
     <a href="impressum.html">Impressum</a>
@@ -154,15 +121,10 @@
 
 <script>
     const distanzNamen = ["Heimatliche Gefilde", "Nachbarreiche", "Kontinentale Weite", "Ans Ende der Welt"];
-    function updateDistance(val) {
-        document.getElementById('val-d').innerText = distanzNamen[val-1];
-    }
+    function updateDistance(val) { document.getElementById('val-d').innerText = distanzNamen[val-1]; }
 
     document.addEventListener('DOMContentLoaded', () => {
         const wrapper = document.getElementById('zodiac-wrapper');
-        const status = document.getElementById('status');
-        const askButton = document.getElementById('ask-oracle');
-
         const signs = [
             { name: 'Widder', icon: '♈' }, { name: 'Stier', icon: '♉' },
             { name: 'Zwillinge', icon: '♊' }, { name: 'Krebs', icon: '♋' },
@@ -171,63 +133,44 @@
             { name: 'Schütze', icon: '♐' }, { name: 'Steinbock', icon: '♑' },
             { name: 'Wassermann', icon: '♒' }, { name: 'Fische', icon: '♓' }
         ];
-
         let selectedSigns = [];
 
         signs.forEach((sign, index) => {
             const ball = document.createElement('div');
             ball.className = 'zodiac-ball';
-            // Wassermann Fix: Kleinerer Text bei langen Namen
             const fontSize = sign.name.length > 9 ? '0.6rem' : '0.75rem';
-            ball.innerHTML = `<span style="font-size:${fontSize}">${sign.icon}<br>${sign.name}</span>`;
+            ball.innerHTML = `<span><span style="font-size:1.2rem">${sign.icon}</span><br><span style="font-size:${fontSize}">${sign.name}</span></span>`;
             
             const angle = (index / signs.length) * 2 * Math.PI - Math.PI / 2;
-            const radius = 42; 
+            const radius = 43; 
             const x = 50 + radius * Math.cos(angle);
             const y = 50 + radius * Math.sin(angle);
-            
-            ball.style.left = `${x}%`;
-            ball.style.top = `${y}%`;
+            ball.style.left = `${x}%`; ball.style.top = `${y}%`;
 
             ball.onclick = () => {
                 ball.classList.toggle('selected');
-                if (ball.classList.contains('selected')) selectedSigns.push(sign.name);
-                else selectedSigns = selectedSigns.filter(s => s !== sign.name);
+                const name = sign.name;
+                if (ball.classList.contains('selected')) selectedSigns.push(name);
+                else selectedSigns = selectedSigns.filter(s => s !== name);
             };
             wrapper.appendChild(ball);
         });
 
-        askButton.onclick = async () => {
-            if (selectedSigns.length === 0) {
-                status.textContent = "Wähle Deine Zeichen!";
-                return;
-            }
-
+        document.getElementById('ask-oracle').onclick = async function() {
+            if (selectedSigns.length === 0) return;
+            this.disabled = true;
             const payload = {
                 signs: selectedSigns,
                 participants: document.getElementById('participants').value,
                 distance: distanzNamen[document.getElementById('distance-slider').value - 1],
-                vibe: "Fließende Balance",
-                budget: "Goldene Mitte",
-                transport: "Gefährten der Straße"
+                vibe: "Astrologische Ferien"
             };
-
-            status.textContent = "Die Sterne ordnen sich...";
-            askButton.disabled = true;
-
             try {
-                const response = await fetch('/api/match', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await response.json();
+                const res = await fetch('/api/match', { method: 'POST', body: JSON.stringify(payload)});
+                const result = await res.json();
                 sessionStorage.setItem('orakelResult', JSON.stringify({ result }));
                 window.location.href = 'reise.html';
-            } catch (e) {
-                status.textContent = "Verbindung unterbrochen.";
-                askButton.disabled = false;
-            }
+            } catch (e) { this.disabled = false; }
         };
     });
 </script>
