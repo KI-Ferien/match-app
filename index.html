@@ -1,70 +1,157 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>KI-Ferien</title>
-  <link rel="icon" type="image/x-icon" href="favicon.ico" />
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KI-Ferien.de - Dein Astrologisches Orakel</title>
+    <style>
+        :root {
+            --gold: #d4af37;
+            --ocean: #005c97;
+            --sunrise: #ff7e5f;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(180deg, #0a0b1e 0%, #16213e 100%);
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 40px 20px;
+            max-width: 800px;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+
+        .zodiac-grid {
+            display: grid;
+            /* Automatische Anpassung der Spalten je nach Breite */
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 15px;
+            width: 100%;
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 10px;
+        }
+
+        .zodiac-ball {
+            width: clamp(60px, 15vw, 90px);
+            height: clamp(60px, 15vw, 90px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            text-align: center;
+            margin: auto; /* Zentrierung im Grid-Fach */
+        }
+
+        .zodiac-ball.selected {
+            background: var(--gold);
+            color: black;
+            box-shadow: 0 0 20px var(--gold);
+            transform: scale(1.1);
+        }
+
+        .config-section {
+            width: 90%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 20px;
+            margin-top: 20px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: 1px solid #444;
+            background: #1a1a1a;
+            color: white;
+            box-sizing: border-box; /* Wichtig für Mobile-Padding */
+        }
+
+        .oracle-btn {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            background: var(--gold);
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 30px 0;
+            transition: transform 0.2s;
+        }
+
+        .oracle-btn:active { transform: scale(0.95); }
+
+        footer { margin-top: auto; padding: 20px; opacity: 0.6; font-size: 0.8rem; }
+
+        /* Mobile Optimierung */
+        @media (max-width: 480px) {
+            .hero { padding: 20px 10px; }
+            .config-section { padding: 15px; }
+            .zodiac-grid { gap: 10px; }
+        }
+    </style>
 </head>
 <body>
-  <div id="space-background">
-    <div id="milky-way"></div>
-  </div>
-  
-  <svg id="magic-threads" preserveAspectRatio="none" aria-hidden="true"></svg>
 
-  <main id="delphi-stage">
-    
-    <div id="zodiac-ring"></div>
+<div class="hero">
+    <h1>Ferien-Orakel</h1>
+    <p>Wähle Deine Zeichen und befrage die Sterne.</p>
+</div>
 
-    <div id="oracle-center">
-      <div class="oracle-glass">
-        <h1>Das Orakel</h1>
-        
-        <div id="chosen-signs" class="chosen-signs-container">
-          <span id="signsPlaceholder" class="placeholder-text">Wähle die 2 Sternzeichen</span>
-        </div>
-
-        <div class="control-row">
-          <label>Reisende (<span id="participantsVal">2</span>)</label>
-          <input id="participants" type="range" min="1" max="12" value="2" />
-        </div>
-
-        <div class="control-row split">
-          <div>
-            <label>Erlebnis: <span id="vibeVal">Fließende Balance</span></label>
-            <input id="vibe" type="range" min="1" max="5" value="3" />
-          </div>
-          <div>
-            <label>Budget: <span id="budgetVal">Goldene Mitte</span></label>
-            <input id="budget" type="range" min="1" max="5" value="3" />
-          </div>
-        </div>
-
-        <div class="control-row split">
-          <div>
-            <label>Distanz: <span id="distanceVal">Kontinentale Weite</span></label>
-            <input id="distance" type="range" min="1" max="5" value="3" />
-          </div>
-          <div>
-            <label>Anreise: <span id="transportVal">Flug der Falken</span></label>
-            <input id="transport" type="range" min="1" max="5" value="5" />
-          </div>
-        </div>
-
-        <button id="askOrakel" class="primary">Orakel befragen</button>
-        <div id="status" role="status" aria-live="polite"></div>
-      </div>
+<div class="zodiac-grid" id="zodiac-container">
     </div>
 
-  </main>
+<div class="config-section">
+    <label>Reise-Vibe:</label>
+    <select id="vibe">
+        <option>Fließende Balance</option>
+        <option>Abenteuerliche Ekstase</option>
+        <option>Stille Einkehr</option>
+    </select>
 
-  <script src="app.js" type="module"></script>
-  <footer style="position: fixed; bottom: 15px; width: 100%; text-align: center; z-index: 100; font-size: 0.75rem; font-family: sans-serif;">
-  <a href="impressum.html" style="color: rgba(212, 175, 55, 0.5); text-decoration: none; margin: 0 12px; transition: color 0.3s;" onmouseover="this.style.color='#d4af37'" onmouseout="this.style.color='rgba(212, 175, 55, 0.5)'">Impressum</a>
-  <a href="datenschutz.html" style="color: rgba(212, 175, 55, 0.5); text-decoration: none; margin: 0 12px; transition: color 0.3s;" onmouseover="this.style.color='#d4af37'" onmouseout="this.style.color='rgba(212, 175, 55, 0.5)'">Datenschutz</a>
-  <span style="color: rgba(255,255,255,0.2); margin-left: 10px;">&copy; 2026 KI-Ferien</span>
-</footer>
+    <label>Budget-Pfad:</label>
+    <select id="budget">
+        <option>Goldene Mitte</option>
+        <option>Königlicher Luxus</option>
+        <option>Bescheidene Genügsamkeit</option>
+    </select>
+
+    <label>Entfernung:</label>
+    <select id="distance">
+        <option>Nachbarreiche</option>
+        <option>Kontinentale Weite</option>
+        <option>Ans Ende der Welt</option>
+    </select>
+</div>
+
+<button class="oracle-btn" id="ask-oracle">Das Orakel befragen</button>
+
+<footer id="status">Bereit für Deine Bestimmung.</footer>
+
+<script src="app.js"></script>
 </body>
 </html>
