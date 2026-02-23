@@ -51,14 +51,14 @@
             animation: rotate-ring var(--rotation-speed) linear infinite;
         }
 
-        /* DER ZENTRALE HUB - Optimiert für Mobile */
+        /* ZENTRALER HUB */
         .central-hub {
             width: 66%; height: 66%;
-            background: rgba(10, 25, 47, 0.88);
+            background: rgba(10, 25, 47, 0.9);
             backdrop-filter: blur(20px); border-radius: 50%;
             border: 1px solid rgba(212, 175, 55, 0.3);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: clamp(12px, 3.5vw, 35px); box-sizing: border-box; z-index: 5;
+            padding: clamp(12px, 3vw, 35px); box-sizing: border-box; z-index: 5;
             box-shadow: 0 0 50px rgba(0,0,0,0.9), inset 0 0 30px rgba(212,175,55,0.1);
         }
 
@@ -66,6 +66,21 @@
         .slider-group { width: 100%; }
         .slider-label { font-size: clamp(0.6rem, 1.5vw, 0.75rem); color: var(--gold); display: flex; justify-content: space-between; text-transform: uppercase; letter-spacing: 1px; }
         .slider-val { color: white; font-weight: bold; }
+        
+        /* KOMPAKTER GEFÄHRTEN-ZÄHLER */
+        .stepper-container {
+            display: flex; align-items: center; justify-content: center;
+            gap: 15px; margin: 5px 0 10px 0;
+        }
+        .stepper-btn {
+            background: rgba(212, 175, 55, 0.2); border: 1px solid var(--gold);
+            color: var(--gold); width: 30px; height: 30px; border-radius: 50%;
+            cursor: pointer; font-weight: bold; font-size: 1.2rem;
+            display: flex; align-items: center; justify-content: center; transition: 0.2s;
+        }
+        .stepper-btn:hover { background: var(--gold); color: black; }
+        #val-p { font-size: 1.3rem; color: white; min-width: 20px; text-align: center; }
+
         input[type=range] { width: 100%; margin: 4px 0; cursor: pointer; accent-color: var(--gold); height: 14px; }
 
         .oracle-btn {
@@ -83,19 +98,12 @@
             background: rgba(0,0,0,0.85); border: 1.5px solid var(--gold); border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 6; 
-            animation: counter-rotate var(--rotation-speed) linear infinite;
+            z-index: 6; animation: counter-rotate var(--rotation-speed) linear infinite;
         }
-        
-        .zodiac-ball span { 
-            line-height: 1.1; text-align: center; font-size: clamp(0.55rem, 1.8vw, 0.75rem); 
-            display: block; width: 100%; color: white; pointer-events: none;
-        }
-
+        .zodiac-ball span { line-height: 1.1; text-align: center; font-size: clamp(0.55rem, 1.8vw, 0.75rem); display: block; width: 100%; color: white; pointer-events: none; }
         .zodiac-ball.selected { background: var(--gold); border-color: white; box-shadow: 0 0 25px var(--gold); }
         .zodiac-ball.selected span { color: black; font-weight: bold; }
 
-        /* ANIMATIONEN */
         @keyframes rotate-ring { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes counter-rotate { 
             from { transform: translate(-50%, -50%) rotate(0deg); } 
@@ -125,17 +133,19 @@
 
 <div class="hero"><h1>KI-FERIEN ORAKEL</h1></div>
 
-<div class="briefing-text">
-    Wähle die Zeichen Deiner Bestimmung und justiere die Regler Deines Schicksals.
-</div>
+<div class="briefing-text">Wähle die Zeichen Deiner Bestimmung und justiere das Schicksal.</div>
 
 <div class="oracle-container">
     <div id="zodiac-wrapper"></div>
     <div class="central-hub">
         <div class="slider-area">
             <div class="slider-group">
-                <div class="slider-label">Gefährten <span class="slider-val" id="val-p">2</span></div>
-                <input type="range" id="participants" min="1" max="5" value="2" oninput="handleParticipantChange(this.value)">
+                <div class="slider-label" style="justify-content: center;">Gefährten</div>
+                <div class="stepper-container">
+                    <button class="stepper-btn" onclick="changeParticipants(-1)">−</button>
+                    <span id="val-p">2</span>
+                    <button class="stepper-btn" onclick="changeParticipants(1)">+</button>
+                </div>
             </div>
             <div class="slider-group">
                 <div class="slider-label">Vibe <span class="slider-val" id="val-v">Fließende Balance</span></div>
@@ -166,16 +176,21 @@
     let selectedSigns = [];
     let maxSigns = 2;
 
-    function handleParticipantChange(v) {
-        maxSigns = parseInt(v);
-        document.getElementById('val-p').innerText = v;
-        while (selectedSigns.length > maxSigns) {
-            const removedName = selectedSigns.shift();
-            document.querySelectorAll('.zodiac-ball').forEach(b => {
-                if (b.dataset.name === removedName) b.classList.remove('selected');
-            });
+    function changeParticipants(delta) {
+        let newVal = maxSigns + delta;
+        if (newVal >= 1 && newVal <= 5) {
+            maxSigns = newVal;
+            document.getElementById('val-p').innerText = maxSigns;
+            
+            // Überzählige Zeichen entfernen
+            while (selectedSigns.length > maxSigns) {
+                const removedName = selectedSigns.shift();
+                document.querySelectorAll('.zodiac-ball').forEach(b => {
+                    if (b.dataset.name === removedName) b.classList.remove('selected');
+                });
+            }
+            updateStatusText();
         }
-        updateStatusText();
     }
 
     function updateVibe(v) { document.getElementById('val-v').innerText = vibeNamen[v-1]; }
@@ -206,7 +221,7 @@
             ball.innerHTML = `<span><b style="font-size:1.2rem">${sign.icon}</b><br>${sign.name}</span>`;
             
             const angle = (index / signs.length) * 2 * Math.PI - Math.PI / 2;
-            const radius = 43.5; // Leicht erhöht für mehr Abstand zum Hub
+            const radius = 43.5; 
             const x = 50 + radius * Math.cos(angle);
             const y = 50 + radius * Math.sin(angle);
             ball.style.left = `${x}%`;
