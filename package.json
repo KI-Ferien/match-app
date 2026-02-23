@@ -1,6 +1,22 @@
 {
   "name": "ki-ferien-match-app",
   "version": "1.0.0",
+<<<<<<< Updated upstream
   "private": true,
   "dependencies": {}
+=======
+  "description": "Netlify Function with Resend Integration",
+  "main": "index.js",
+  "dependencies": {
+    "resend": "^3.2.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "netlify-cli": "^23.15.1"
+  }
+>>>>>>> Stashed changes
 }

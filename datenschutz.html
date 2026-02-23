@@ -6,6 +6,7 @@
     <title>Datenschutz | KI-FERIEN</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <style>
         body { font-family: 'Outfit', sans-serif; }
         .bg-gradient-main { background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%); }
@@ -29,28 +30,36 @@
             <div class="space-y-8 text-slate-600 leading-relaxed">
                 <section>
                     <h2 class="text-xl font-bold text-slate-800 mb-3">1. Datenschutz auf einen Blick</h2>
-                    <p>Verantwortlich für die Datenverarbeitung auf dieser Website ist Michael Strohmenger (siehe Impressum). Wir nehmen den Schutz Ihrer persönlichen Daten sehr ernst.</p>
+                    <p>Verantwortlich für die Datenverarbeitung auf dieser Website ist Michael Strohmenger (siehe Impressum). Wir nehmen den Schutz Ihrer persönlichen Daten sehr ernst. Diese Seite dient der Information über die Verarbeitung Ihrer Daten im Rahmen des KI-Ferien Orakels.</p>
                 </section>
 
                 <section>
-                    <h2 class="text-xl font-bold text-slate-800 mb-3">2. Datenerfassung beim "KI-Ferien Match"</h2>
-                    <p>Wenn Sie unser Formular nutzen, erfassen wir Ihren Vornamen, Ihre E-Mail-Adresse, Ihr gefühltes Alter sowie Ihre Reise-Präferenzen. Diese Daten werden ausschließlich verwendet, um Ihr persönliches Match zu berechnen und Ihnen das Ergebnis zuzusenden.</p>
+                    <h2 class="text-xl font-bold text-slate-800 mb-3">2. Datenerfassung beim "KI-Ferien Orakel"</h2>
+                    <p>Im Gegensatz zu früheren Versionen erheben wir <strong>keine E-Mail-Adressen oder Namen</strong>. Die Verarbeitung Ihrer Reise-Präferenzen (Sternzeichen, Budget, Teilnehmerzahl, gewünschte Distanz) erfolgt anonymisiert.</p>
                     <ul class="list-disc ml-6 mt-2 space-y-1">
-                        <li><strong>Mistral AI:</strong> Zur Analyse werden Präferenzen (ohne E-Mail) an Mistral AI übermittelt.</li>
-                        <li><strong>Resend:</strong> Zum Versand der E-Mail wird Ihre Adresse an den Dienst Resend übertragen.</li>
+                        <li><strong>Mistral AI:</strong> Die gewählten Parameter werden an Mistral AI übermittelt, um Ihre persönliche Ferien-Empfehlung zu generieren. Hierbei werden keine personenbezogenen Daten übertragen.</li>
+                        <li><strong>Session Storage:</strong> Das Ergebnis wird lediglich lokal in Ihrem Browser gespeichert, damit Sie es auf der Ergebnisseite sehen können. Sobald Sie den Tab schließen, werden diese Daten gelöscht.</li>
                     </ul>
                 </section>
 
                 <section>
                     <h2 class="text-xl font-bold text-slate-800 mb-3">3. Affiliate-Partnerprogramme</h2>
-                    <p>Wir nutzen Affiliate-Links von Partnern wie TUI. Beim Klick auf diese Links werden Sie zum Partner weitergeleitet, wobei Cookies zur Provisionsabrechnung gesetzt werden können.</p>
+                    <p>Wir nutzen Affiliate-Links der Plattform <strong>Travelpayouts</strong> (u.a. für Partner wie Klook, GetTransfer und Welcome Pickups). Beim Klick auf diese Links werden Sie zum Partner weitergeleitet. Dabei werden Cookies zur Provisionsabrechnung gesetzt. Für Sie entstehen dadurch keine Mehrkosten.</p>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-bold text-slate-800 mb-3">4. Ihre Rechte</h2>
+                    <p>Sie haben jederzeit das Recht auf unentgeltliche Auskunft über Herkunft, Empfänger und Zweck Ihrer gespeicherten personenbezogenen Daten. Da wir keine E-Mails oder Namen speichern, verfügen wir in der Regel über keine Daten, die wir Ihnen persönlich zuordnen könnten.</p>
                 </section>
             </div>
         </div>
     </main>
 
     <footer class="py-10 px-6 text-center text-xs text-slate-400">
-        <a href="/" class="hover:text-blue-600 underline mr-4">Zurück zur Startseite</a>
+        <div class="mb-4">
+            <a href="/" class="hover:text-blue-600 underline mx-2">Zurück zur Startseite</a>
+            <a href="impressum.html" class="hover:text-blue-600 underline mx-2">Impressum</a>
+        </div>
         <span>&copy; 2026 KI-FERIEN</span>
     </footer>
 

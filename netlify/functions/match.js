@@ -1,12 +1,18 @@
 // netlify/functions/match.js
 'use strict';
 
+<<<<<<< Updated upstream
 let fetchFn;
 if (typeof globalThis.fetch === 'function') {
   fetchFn = globalThis.fetch.bind(globalThis);
 } else {
   try { fetchFn = require('node-fetch'); } catch (err) { throw new Error('fetch missing'); }
 }
+=======
+// In Node.js 18+ (Standard bei Netlify) ist fetch global verfügbar.
+// Wir definieren fetchFn einfach als das native fetch.
+const fetchFn = globalThis.fetch;
+>>>>>>> Stashed changes
 
 exports.handler = async (event) => {
   const headers = {
@@ -31,10 +37,21 @@ exports.handler = async (event) => {
 
     const apiKey = process.env.MISTRAL_API_KEY;
     if (!apiKey) {
+<<<<<<< Updated upstream
       return {
         statusCode: 200, headers, body: JSON.stringify({
           destination: "Barcelona", explanation: "API nicht verbunden.", bestTimeTip: "Jederzeit",
           packliste: ["Rimowa Cabin Aluminiumkoffer", "Noise-Cancelling Kopfhörer", "Hochwertige Sonnenbrille"], cta_text: "Ferien planen",
+=======
+      // Fallback für lokale Tests ohne API Key
+      return {
+        statusCode: 200, headers, body: JSON.stringify({
+          destination: "Mallorca", 
+          explanation: "Das Orakel ruht gerade. Dies ist eine Test-Empfehlung.", 
+          bestTimeTip: "Mai bis September",
+          packliste: ["Sonnencreme", "Gute Laune", "Reisepass"], 
+          cta_text: "Ferien planen",
+>>>>>>> Stashed changes
           affiliate_suggestions: []
         })
       };
@@ -65,6 +82,10 @@ exports.handler = async (event) => {
       "cta_text": "Ferien Erlebnisse buchen"
     }`;
 
+<<<<<<< Updated upstream
+=======
+    // Hier nutzen wir das native fetchFn
+>>>>>>> Stashed changes
     const mistralRes = await fetchFn('https://api.mistral.ai/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
@@ -75,6 +96,10 @@ exports.handler = async (event) => {
     let rawText = mistralData.choices[0].message.content;
     
     let cleaned = rawText.trim();
+<<<<<<< Updated upstream
+=======
+    // Falls Mistral Markdown-Boxen mitschickt, diese entfernen
+>>>>>>> Stashed changes
     const fenceMatch = cleaned.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
     if (fenceMatch && fenceMatch[1]) cleaned = fenceMatch[1].trim();
     if (!cleaned.startsWith('{')) {
@@ -82,6 +107,7 @@ exports.handler = async (event) => {
       if (firstJson) cleaned = firstJson[0];
     }
 
+<<<<<<< Updated upstream
     let parsed = null;
     try { parsed = JSON.parse(cleaned); } catch(e) { 
       return { statusCode: 500, headers, body: JSON.stringify({ error: "Fehler beim Parsen." }) }; 
@@ -92,6 +118,16 @@ exports.handler = async (event) => {
     const destSlug = destRaw.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
     // GetTransfer sendet nun sicher auf die Startseite, um den 404 Fehler zu vermeiden.
+=======
+    let parsed = JSON.parse(cleaned);
+
+    // Ziel formatieren für die verschiedenen Partner-Strukturen
+    const destRaw = parsed.destination || 'Mallorca';
+    const destEnc = encodeURIComponent(destRaw);
+    const destSlug = destRaw.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+    // Deep-Links für Travelpayouts mit deinen IDs
+>>>>>>> Stashed changes
     const klookTarget = encodeURIComponent(`https://www.klook.com/search/result/?query=${destEnc}`);
     const getTransferTarget = encodeURIComponent(`https://gettransfer.com/`);
     const wpTarget = encodeURIComponent(`https://www.welcomepickups.com/${destSlug}/`);
@@ -117,6 +153,16 @@ exports.handler = async (event) => {
     return { statusCode: 200, headers, body: JSON.stringify(parsed) };
     
   } catch (error) {
+<<<<<<< Updated upstream
     return { statusCode: 500, headers, body: JSON.stringify({ error: error.message }) };
   }
 };
+=======
+    return { 
+      statusCode: 500, 
+      headers, 
+      body: JSON.stringify({ error: error.message, stack: "Fehler im Orakel-Backend" }) 
+    };
+  }
+};
+>>>>>>> Stashed changes
