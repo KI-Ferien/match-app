@@ -6,34 +6,34 @@
     <title>Deine Bestimmung - KI-Ferien.de</title>
     <style>
         :root {
-            --sunrise-glow: #ff9e2c;
+            --sunrise-orange: #ff7e5f;
+            --sunrise-peach: #feb47b;
             --ocean-blue: #005c97;
-            --sand-light: #f4e4bc;
-            --text-dark: #1a1a1a;
             --gold: #d4af37;
+            --glass: rgba(255, 255, 255, 0.88);
         }
 
         body {
             margin: 0;
             padding: 0;
-            /* Sonnenaufgang-Gradient */
-            background: linear-gradient(180deg, #ff7e5f 0%, #feb47b 30%, #86d3f4 60%, var(--ocean-blue) 100%);
-            color: var(--text-dark);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(180deg, var(--sunrise-orange) 0%, var(--sunrise-peach) 35%, #86d3f4 70%, var(--ocean-blue) 100%);
+            color: #1a1a1a;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
         }
 
-        /* Dynamische Wellen-Animation */
+        /* Verlangsamte Wellen-Animation */
         .waves-container {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 150px;
+            height: 180px;
             z-index: -1;
+            pointer-events: none;
         }
 
         .wave {
@@ -41,15 +41,15 @@
             bottom: 0;
             width: 200%;
             height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C51.31,103.52,112.83,117.01,169,105,214.76,95.24,264.61,66.93,321.39,56.44Z" fill="rgba(255,255,255,0.3)"/></svg>');
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C51.31,103.52,112.83,117.01,169,105,214.76,95.24,264.61,66.93,321.39,56.44Z" fill="rgba(255,255,255,0.4)"/></svg>');
             background-size: 50% 100%;
-            animation: move-wave 12s linear infinite;
+            animation: move-wave 25s linear infinite; /* Deutlich langsamer */
         }
 
         .wave:nth-child(2) {
-            opacity: 0.5;
-            animation: move-wave 8s linear infinite;
-            bottom: 10px;
+            opacity: 0.6;
+            animation: move-wave 18s linear infinite; /* Deutlich langsamer */
+            bottom: 15px;
         }
 
         @keyframes move-wave {
@@ -58,102 +58,113 @@
         }
 
         .container {
-            max-width: 850px;
-            margin: 60px auto;
+            max-width: 800px;
+            margin: 50px auto;
             padding: 20px;
             flex: 1;
+            z-index: 1;
         }
 
         .result-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
+            background: var(--glass);
+            backdrop-filter: blur(15px);
             border-radius: 40px;
             padding: 50px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-            border: 1px solid white;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.5);
         }
 
         h1 {
             font-size: 2.8rem;
             color: var(--ocean-blue);
-            margin: 0;
+            margin: 0 0 20px 0;
             text-align: center;
+            font-weight: 800;
         }
 
         #destExp {
-            font-size: 1.15rem;
+            font-size: 1.2rem;
             line-height: 1.8;
-            color: #333;
+            color: #2c3e50;
             margin: 30px 0;
+            text-align: left;
         }
 
-        /* FIX: Zeilenumbruch */
         #bestTimeTip {
             white-space: pre-line;
-            background: rgba(212, 175, 55, 0.15);
+            background: rgba(212, 175, 55, 0.12);
             padding: 25px;
-            border-radius: 20px;
+            border-radius: 24px;
             font-style: italic;
-            border-left: 6px solid var(--gold);
-            margin: 30px 0;
+            border-left: 8px solid var(--gold);
+            margin: 35px 0;
+            color: #444;
         }
 
         .packlist-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 15px;
             margin: 40px 0;
         }
 
         .pack-item {
             background: white;
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 18px;
+            border-radius: 16px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
             text-align: center;
-            border: 1px solid #eee;
+            border: 1px solid #f0f0f0;
+            font-weight: 500;
         }
 
         .affiliate-section {
-            display: grid;
+            display: flex;
+            flex-direction: column;
             gap: 15px;
+            margin-top: 40px;
         }
 
         .affiliate-btn {
             background: var(--ocean-blue);
             color: white;
-            padding: 18px;
+            padding: 20px;
             text-decoration: none;
-            border-radius: 50px;
+            border-radius: 60px;
             text-align: center;
             font-weight: bold;
-            transition: transform 0.3s, background 0.3s;
-            box-shadow: 0 4px 15px rgba(0, 92, 151, 0.3);
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0, 92, 151, 0.2);
+            font-size: 1.1rem;
         }
 
         .affiliate-btn:hover {
             background: #004471;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(0, 92, 151, 0.3);
         }
 
         footer {
-            padding: 40px;
+            padding: 50px 20px;
             text-align: center;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: white;
-            background: rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.15);
             margin-top: auto;
         }
 
         footer a {
             color: white;
-            margin: 0 10px;
-            text-decoration: underline;
+            margin: 0 15px;
+            text-decoration: none;
+            opacity: 0.8;
         }
 
+        footer a:hover { opacity: 1; text-decoration: underline; }
+
         @media (max-width: 600px) {
-            .result-card { padding: 30px 15px; }
-            h1 { font-size: 2rem; }
+            .result-card { padding: 35px 20px; }
+            h1 { font-size: 2.1rem; }
         }
     </style>
 </head>
@@ -166,25 +177,28 @@
 
 <div class="container">
     <div class="result-card">
-        <h1 id="destName">Deine Bestimmung</h1>
+        <h1 id="destName">Berechne Bestimmung...</h1>
         <p id="destExp"></p>
 
         <div id="bestTimeTip"></div>
 
-        <h3 style="color: var(--ocean-blue); text-align:center;">Die kosmische Packliste</h3>
+        <h3 style="color: var(--ocean-blue); text-align:center; margin-top:40px;">Die kosmische Packliste</h3>
         <div class="packlist-grid" id="packlist"></div>
 
         <div class="affiliate-section" id="affiliate-links"></div>
 
-        <div style="text-align: center; margin-top: 40px;">
-            <a href="index.html" style="color: var(--ocean-blue); font-weight: bold;">← Andere Ferien orakeln</a>
+        <div style="text-align: center; margin-top: 45px;">
+            <a href="index.html" style="color: var(--ocean-blue); font-weight: bold; text-decoration: none;">← Neue Ferien planen</a>
         </div>
     </div>
 </div>
 
 <footer>
-    <p>&copy; 2026 KI-Ferien.de – Dein Orakel für besondere Reisen.</p>
-    <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+    <p>&copy; 2026 KI-Ferien.de – Ferien-Orakel</p>
+    <div style="margin-top: 10px;">
+        <a href="impressum.html">Impressum</a>
+        <a href="datenschutz.html">Datenschutz</a>
+    </div>
 </footer>
 
 <script>
@@ -201,9 +215,9 @@
         document.getElementById('destName').textContent = result.destination;
         document.getElementById('destExp').textContent = result.explanation;
         
-        // FIX: Umbruch sicherstellen
+        // Umbruch für beste Reisezeit
         const timeTipEl = document.getElementById('bestTimeTip');
-        timeTipEl.textContent = "Der perfekte Moment für Deine Ferien:\n" + result.bestTimeTip;
+        timeTipEl.textContent = "Die ideale Zeit für Deine Ferien:\n" + result.bestTimeTip;
 
         // Packliste rendern
         const packlistContainer = document.getElementById('packlist');
@@ -211,13 +225,13 @@
         result.packliste.forEach(item => {
             const div = document.createElement('div');
             div.className = 'pack-item';
-            div.textContent = '🏖️ ' + item;
+            div.textContent = '☀️ ' + item;
             packlistContainer.appendChild(div);
         });
 
-        // Alle Affiliate Links (dynamisch)
+        // Alle 3 Affiliate Links rendern
         const affContainer = document.getElementById('affiliate-links');
-        if (result.affiliate_suggestions) {
+        if (result.affiliate_suggestions && result.affiliate_suggestions.length > 0) {
             affContainer.innerHTML = '';
             result.affiliate_suggestions.forEach(link => {
                 const a = document.createElement('a');
