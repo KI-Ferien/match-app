@@ -1,77 +1,78 @@
-<!doctype html>
-<html lang="de">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KI-Ferien</title>
-  
-  <link rel="icon" type="image/x-icon" href="favicon.ico?v=3" />
-  <link rel="stylesheet" href="reise.css" />
-</head>
-<body>
-  
-  <div id="beach-scene">
-    <div class="sky-layer">
-      <div class="sun-glow"></div>
-    </div>
-    <div class="ocean-layer">
-      <div class="glimmer-path"></div>
-      <div class="waves-container">
-        <div class="wave wave1"></div>
-        <div class="wave wave2"></div>
-      </div>
-    </div>
-  </div>
+document.addEventListener('DOMContentLoaded', () => {
+    const dataString = sessionStorage.getItem('orakelResult');
+    if (!dataString) {
+        window.location.href = 'index.html';
+        return;
+    }
 
-  <main id="resultApp">
-    <div class="glass-container">
-      
-      <header class="result-hero">
-        <p class="pre-title">Einatmen. Ausatmen. Die Ferien beginnen.</p>
-        <h1 id="destTitle">Deine Empfehlung</h1>
-        <p id="destSub" class="muted"></p>
-      </header>
+    const { payload, result } = JSON.parse(dataString);
 
-      <section id="resultCard">
-        <article id="explanation" class="oracle-text"></article>
-        
-        <div id="meta" class="meta-grid">
-          <div class="meta-box">
-            <span class="meta-icon">🌊</span>
-            <strong>Beste Zeit</strong>
-            <span id="bestTime" class="meta-value"></span>
-          </div>
-          <div class="meta-box">
-            <span class="meta-icon">🎒</span>
-            <strong>Ausrüstung</strong>
-            <ul id="packlist"></ul>
-          </div>
-        </div>
+    // 1. Grunddaten einfüllen
+    document.getElementById('destName').textContent = result.destination;
+    document.getElementById('destExp').textContent = result.explanation;
+    
+    // FIX: Umbruch ermöglichen durch CSS-Klasse oder direktes Style
+    const timeTipEl = document.getElementById('bestTimeTip');
+    timeTipEl.textContent = result.bestTimeTip;
+    timeTipEl.style.whiteSpace = "pre-line"; // Ermöglicht Zeilenumbrüche
 
-        <div id="ctaRow">
-          <button id="primaryCta" class="primary">Erlebnisse entdecken</button>
-        </div>
+    // 2. Packliste rendern
+    const listUl = document.getElementById('packlist');
+    listUl.innerHTML = '';
+    result.packliste.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        listUl.appendChild(li);
+    });
 
-        <div class="divider"></div>
-        
-        <h3 class="affiliate-title">Dein direkter Weg dorthin</h3>
-        <div id="affiliateCards" class="cards"></div>
+    // 3. FIX: Alle Affiliate Links dynamisch rendern (nicht nur zwei)
+    const affiliateContainer = document.getElementById('affiliate-links');
+    if (affiliateContainer && result.affiliate_suggestions) {
+        affiliateContainer.innerHTML = ''; // Container leeren
+        result.affiliate_suggestions.forEach(link => {
+            const a = document.createElement('a');
+            a.href = link.affiliate_url;
+            a.className = 'affiliate-btn';
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.innerHTML = `<span>${link.label}</span>`;
+            affiliateContainer.appendChild(a);
+        });
+    }
 
-        <footer class="disclosure" style="margin-top: 40px; text-align: center; border-top: 1px solid rgba(227, 168, 105, 0.2); padding-top: 20px;">
-          <small style="color: #94a3b8; display: block; margin-bottom: 10px;">
-            KI-Ferien.de – Hinweis: Wir erhalten ggf. eine Provision. Keine Mehrkosten für dich.
-          </small>
-          <div style="font-size: 0.8rem;">
-            <a href="impressum.html" style="color: #4B6584; text-decoration: underline; margin: 0 10px;">Impressum</a>
-            <a href="datenschutz.html" style="color: #4B6584; text-decoration: underline; margin: 0 10px;">Datenschutz</a>
-          </div>
-          <p style="font-size: 0.7rem; color: #cbd5e1; margin-top: 15px;">&copy; 2026 KI-Ferien</p>
-        </footer>
+    // 4. VISUELLE EFFEKTE (Sterne & Threads für die Ergebnisseite)
+    initVisualEffects();
+});
 
-      </section>
-    </div>
-  </main>
+function initVisualEffects() {
+    // Sterne erstellen
+    const bg = document.getElementById('space-background');
+    if (bg) {
+        for(let i=0; i < 150; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            const size = Math.random() * 2;
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+            star.style.left = `${x}%`;
+            star.style.top = `${y}%`;
+            star.style.animationDelay = `${Math.random() * 5}s`;
+            bg.appendChild(star);
+        }
+    }
 
-  <script src="reise.js" type="module"></script>
-</body>
-</html>
+    // Magische Fäden (Snaking Threads)
+    const svg = document.getElementById('magic-threads');
+    if (svg) {
+        let paths = '';
+        const colors = ['#d4af37', '#8E6CF6', '#a3c2ff'];
+        for(let i=0; i < 20; i++) {
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const d = `M ${Math.random()*100} -10 C ${Math.random()*100} ${Math.random()*100}, ${Math.random()*100} ${Math.random()*100}, ${Math.random()*100} 110`;
+            paths += `<path class="snaking-thread" d="${d}" stroke="${color}" stroke-width="0.2" fill="transparent" style="animation-duration: ${60 + Math.random()*40}s; animation-delay: -${Math.random()*50}s;" />`;
+        }
+        svg.innerHTML = paths;
+    }
+}
