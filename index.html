@@ -2,78 +2,144 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KI-Ferien.de - Orakel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KI-Ferien.de - Dein Orakel</title>
     <style>
-        :root { --gold: #d4af37; --ocean: #005c97; }
+        :root {
+            --gold: #d4af37;
+            --ocean: #0a192f;
+            --glass: rgba(255, 255, 255, 0.07);
+            /* Dynamische Größe basierend auf der Bildschirmbreite */
+            --circle-size: clamp(300px, 85vw, 600px);
+            --ball-size: clamp(55px, 12vw, 85px);
+        }
+
         body {
-            margin: 0; padding: 0; background: linear-gradient(180deg, #0a0b1e 0%, #16213e 100%);
-            color: white; font-family: 'Segoe UI', sans-serif; min-height: 100vh;
-            display: flex; flex-direction: column; align-items: center;
+            margin: 0; padding: 0;
+            background: radial-gradient(circle at center, #16213e 0%, #0a0b1e 100%);
+            color: white; font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh; display: flex; flex-direction: column;
+            align-items: center; overflow-x: hidden;
         }
-        .hero { text-align: center; padding: 30px 20px; }
-        h1 { font-size: clamp(1.8rem, 7vw, 3rem); color: var(--gold); }
 
-        /* RESPONSIVE GRID */
-        .zodiac-grid {
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            gap: 15px; width: 90%; max-width: 600px; margin: 20px auto;
-        }
-        .zodiac-ball {
-            width: 75px; height: 75px; background: rgba(255,255,255,0.1);
-            border: 1px solid var(--gold); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.3s; font-size: 0.8rem; text-align: center; margin: auto;
-        }
-        .zodiac-ball.selected { background: var(--gold); color: black; box-shadow: 0 0 15px var(--gold); transform: scale(1.1); }
+        .hero { text-align: center; padding: 20px; z-index: 10; }
+        h1 { font-size: clamp(1.5rem, 5vw, 2.5rem); color: var(--gold); margin: 10px 0; text-shadow: 0 0 15px rgba(212,175,55,0.3); }
 
-        .config-section { 
-            width: 90%; max-width: 500px; background: rgba(255,255,255,0.05); 
-            padding: 20px; border-radius: 20px; box-sizing: border-box; 
+        /* DER MAGISCHE KREIS */
+        .oracle-container {
+            position: relative;
+            width: var(--circle-size);
+            height: var(--circle-size);
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        label { display: block; margin-top: 15px; color: var(--gold); font-size: 0.9rem; }
-        select { 
-            width: 100%; padding: 12px; margin-top: 5px; border-radius: 10px; 
-            border: 1px solid #444; background: #1a1a1a; color: white; font-size: 1rem;
+
+        /* Die Mitte: Das Briefing */
+        .central-hub {
+            width: 60%; height: 60%;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 20px; box-sizing: border-box;
+            z-index: 5; text-align: center;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
         }
+
+        .config-area { width: 100%; display: flex; flex-direction: column; gap: 5px; }
+        
+        select {
+            background: #1a1a1a; color: white; border: 1px solid #444;
+            padding: 8px; border-radius: 8px; font-size: clamp(0.7rem, 2vw, 0.9rem);
+            width: 100%; cursor: pointer;
+        }
+
+        label { font-size: 0.7rem; color: var(--gold); margin-top: 5px; }
 
         .oracle-btn {
-            width: 90%; max-width: 400px; padding: 20px; background: var(--gold);
-            border: none; border-radius: 50px; font-size: 1.2rem; font-weight: bold;
-            cursor: pointer; margin: 30px 0;
+            background: var(--gold); border: none; padding: 10px 20px;
+            border-radius: 20px; font-weight: bold; cursor: pointer;
+            margin-top: 15px; font-size: clamp(0.8rem, 2.5vw, 1.1rem);
+            transition: transform 0.2s, box-shadow 0.3s;
         }
-        footer { padding: 20px; opacity: 0.5; font-size: 0.8rem; text-align: center; margin-top: auto; }
+        .oracle-btn:hover { box-shadow: 0 0 20px var(--gold); }
+
+        /* Die Satelliten (Zodiac Balls) */
+        .zodiac-ball {
+            position: absolute;
+            width: var(--ball-size); height: var(--ball-size);
+            background: rgba(0,0,0,0.6);
+            border: 1px solid var(--gold); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: clamp(0.6rem, 2vw, 0.8rem); text-align: center;
+            z-index: 6;
+        }
+        .zodiac-ball.selected {
+            background: var(--gold); color: black;
+            box-shadow: 0 0 20px var(--gold); transform: scale(1.15);
+        }
+
+        /* FOOTER */
+        footer {
+            margin-top: auto; padding: 20px; width: 100%;
+            text-align: center; background: rgba(0,0,0,0.3);
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        footer a { color: rgba(255,255,255,0.6); text-decoration: none; margin: 0 15px; font-size: 0.8rem; }
+        footer a:hover { color: var(--gold); }
+
+        #status { font-size: 0.8rem; margin-bottom: 10px; color: #888; }
+
+        /* Anpassung für sehr kleine Handys */
+        @media (max-width: 350px) {
+            :root { --circle-size: 280px; --ball-size: 45px; }
+            .central-hub { padding: 10px; }
+        }
     </style>
 </head>
 <body>
-    <div class="hero"><h1>Ferien-Orakel</h1></div>
-    <div class="zodiac-grid" id="zodiac-container"></div>
-    <div class="config-section">
-        <label>Teilnehmer:</label>
-        <select id="participants">
-            <option value="1">Einsame Seele (1)</option>
-            <option value="2" selected>Zwei Seelen (2)</option>
-            <option value="3">Drei Weggefährten (3)</option>
-            <option value="4">Vier Wanderer (4)</option>
-            <option value="5">Karawane (5+)</option>
-        </select>
-        <label>Vibe:</label>
-        <select id="vibe">
-            <option>Fließende Balance</option>
-            <option>Abenteuerliche Ekstase</option>
-            <option>Stille Einkehr</option>
-        </select>
-        <label>Entfernung:</label>
-        <select id="distance">
-            <option>Heimatliche Gefilde</option>
-            <option>Nachbarreiche</option>
-            <option>Kontinentale Weite</option>
-            <option>Ans Ende der Welt</option>
-        </select>
+
+<div class="hero">
+    <h1>Ferien-Orakel</h1>
+</div>
+
+<div class="oracle-container" id="oracle-ring">
+    <div class="central-hub">
+        <div class="config-area">
+            <label>Teilnehmer</label>
+            <select id="participants">
+                <option value="1">1 Person</option>
+                <option value="2" selected>2 Personen</option>
+                <option value="3">3 Personen</option>
+                <option value="4">4 Personen</option>
+                <option value="5">5+ Personen</option>
+            </select>
+            
+            <label>Entfernung</label>
+            <select id="distance">
+                <option>Heimatliche Gefilde</option>
+                <option selected>Nachbarreiche</option>
+                <option>Kontinentale Weite</option>
+                <option>Ans Ende der Welt</option>
+            </select>
+        </div>
+        <button class="oracle-btn" id="ask-oracle">BEFRAGEN</button>
     </div>
-    <button class="oracle-btn" id="ask-oracle">Das Orakel befragen</button>
-    <footer id="status">Bereit.</footer>
-    <script src="app.js"></script>
+    </div>
+
+<div id="status">Wähle Deine Zeichen...</div>
+
+<footer>
+    <a href="impressum.html">Impressum</a>
+    <a href="datenschutz.html">Datenschutz</a>
+    <p style="font-size: 0.7rem; color: #444; margin-top: 10px;">&copy; 2026 KI-Ferien.de</p>
+</footer>
+
+<script src="app.js"></script>
 </body>
 </html>
