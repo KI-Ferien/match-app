@@ -1,0 +1,136 @@
+:root {
+  --sky-top: #5dade2;
+  --sky-bottom: #f5c7a9;
+  --ocean-base: #2e86c1;
+  --ocean-dark: #1b4f72;
+  --sun-light: #fff9e3;
+  --accent: #e67e22;
+  --glass: rgba(255, 255, 255, 0.9);
+}
+
+* { box-sizing: border-box; }
+body, html { 
+  margin: 0; padding: 0; width: 100%; height: 100%; 
+  font-family: 'Segoe UI', Tahoma, sans-serif; 
+}
+
+/* --- Hintergrund-Szene --- */
+#beach-scene {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+  display: flex; flex-direction: column;
+}
+
+.sky-layer {
+  height: 60%; width: 100%;
+  background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 100%);
+  position: relative; overflow: hidden;
+}
+
+.sun-glow {
+  position: absolute; bottom: -80px; left: 50%; transform: translateX(-50%);
+  width: 350px; height: 350px;
+  background: radial-gradient(circle, var(--sun-light) 0%, transparent 75%);
+  animation: pulse 6s infinite alternate ease-in-out;
+}
+
+@keyframes pulse {
+  from { opacity: 0.6; transform: translateX(-50%) scale(0.95); }
+  to { opacity: 0.9; transform: translateX(-50%) scale(1.05); }
+}
+
+.ocean-layer {
+  height: 40%; width: 100%;
+  background: linear-gradient(180deg, var(--ocean-base) 0%, var(--ocean-dark) 100%);
+  position: relative; overflow: hidden;
+  border-top: 2px solid rgba(255,255,255,0.3);
+}
+
+.glimmer-path {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 200px; height: 100%;
+  background: linear-gradient(180deg, rgba(255,249,227,0.4) 0%, transparent 80%);
+  filter: blur(8px);
+}
+
+/* --- Sanfte Wellen --- */
+.waves-container {
+  position: absolute; top: 0; width: 100%; height: 100%;
+}
+
+.wave {
+  position: absolute; top: 10px; left: 0; width: 200%; height: 40px;
+  background: url('https://raw.githubusercontent.com/front-end-relative/beach-animation/master/wave.png'); /* Fallback URL für Wellenform */
+  background-repeat: repeat-x;
+  background-size: 50% 100%;
+  opacity: 0.2;
+  animation: moveWave 12s linear infinite;
+}
+
+.wave2 {
+  top: 25px; opacity: 0.1; animation-duration: 20s; animation-direction: reverse;
+}
+
+@keyframes moveWave {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* --- Content Container --- */
+#resultApp {
+  position: relative; padding: 60px 20px;
+  display: flex; justify-content: center; z-index: 10;
+}
+
+.glass-container {
+  background: var(--glass);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-radius: 25px; padding: 40px;
+  width: 100%; max-width: 850px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.7);
+}
+
+.result-hero { text-align: center; margin-bottom: 30px; }
+.result-hero h1 { font-size: 2.6rem; color: #1a5276; margin: 10px 0; font-family: 'Georgia', serif; }
+.pre-title { color: var(--accent); font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; font-size: 0.9rem; }
+
+.meta-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px; margin: 30px 0;
+}
+
+.meta-box {
+  background: white; border-radius: 15px; padding: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.03); border: 1px solid #f2f4f4;
+}
+
+.oracle-text {
+  font-size: 1.15rem; line-height: 1.7; font-style: italic;
+  text-align: center; color: #34495e; margin-bottom: 40px;
+}
+
+.cards {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px;
+}
+
+.card {
+  background: #fdfefe; border-radius: 12px; padding: 20px;
+  border: 1px solid #ebedef; text-align: center; transition: 0.3s;
+}
+.card:hover { transform: translateY(-5px); border-color: var(--accent); }
+
+button.primary {
+  background: var(--accent); color: white; border: none;
+  padding: 16px 40px; border-radius: 50px; font-weight: bold;
+  font-size: 1.1rem; width: 100%; cursor: pointer; transition: 0.3s;
+}
+button.primary:hover { background: #d35400; box-shadow: 0 8px 20px rgba(230, 126, 34, 0.4); }
+
+.divider { height: 1px; background: #eee; margin: 35px 0; }
+.affiliate-title { text-align: center; color: #1a5276; margin-bottom: 25px; }
+
+@media (max-width: 600px) {
+  .glass-container { padding: 25px 15px; }
+  .result-hero h1 { font-size: 1.9rem; }
+}
