@@ -12,33 +12,10 @@ exports.handler = async (event) => {
 
     return new Promise((resolve) => {
         const apiKey = process.env.MISTRAL_API_KEY;
-        if (!apiKey) {
-            return resolve({ 
-                statusCode: 500, 
-                headers, 
-                body: JSON.stringify({ error: "API-Key fehlt in Netlify Umgebungsvariablen" }) 
-            });
-        }
+        if (!apiKey) return resolve({ statusCode: 500, headers, body: JSON.stringify({ error: "API-Key fehlt" }) });
 
-        let payload;
-        try {
-            payload = JSON.parse(event.body || '{}');
-        } catch (e) {
-            return resolve({ statusCode: 400, headers, body: JSON.stringify({ error: "Ungültiger JSON-Body" }) });
-        }
-
-        const prompt = `Du bist ein astrologisches Reise-Orakel und erfahrener Reiseexperte. /astro
-Analysiere für ${payload.participants || 2} Personen (Sternzeichen: ${payload.signs || 'Unbekannt'}).
-Wunsch: ${payload.vibe}, Budget: ${payload.budget}, Entfernung: ${payload.distance}.
-WICHTIG: Nutze das Wort "Ferien". Binde Buddha (Yamamoto 1973) und das Atman-Konzept (Webster 2003) tiefgründig ein.
-Antworte NUR mit einem validen JSON-Objekt:
-{
-  "destination": "Stadt oder Insel",
-  "explanation": "Begründung...",
-  "bestTimeTip": "Reisezeit...",
-  "packliste": ["Item 1", "Item 2", "Item 3"],
-  "cta_text": "Ferien buchen"
-}`;
+        const payload = JSON.parse(event.body || '{}');
+        const prompt = `Analysiere für ${payload.participants || 2} Personen (${payload.signs || 'Reisende'}): Ziel, Begründung mit Buddha (Yamamoto 1973) und Atman (Webster 2003). Nutze das Wort Ferien. Antworte NUR als JSON: {"destination":"...","explanation":"...","bestTimeTip":"...","packliste":["...","...","..."]}`;
 
         const postData = JSON.stringify({
             model: "mistral-small-latest",
@@ -54,46 +31,30 @@ Antworte NUR mit einem validen JSON-Objekt:
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${apiKey}`,
                 'Content-Length': Buffer.byteLength(postData)
-            },
-            timeout: 15000 
+            }
         };
 
         const req = https.request(options, (res) => {
-            let responseBody = '';
-            res.on('data', (chunk) => responseBody += chunk);
+            let data = '';
+            res.on('data', (d) => data += d);
             res.on('end', () => {
                 try {
-                    const mistralData = JSON.parse(responseBody);
-                    if (!mistralData.choices) throw new Error("Keine Antwort von Mistral erhalten");
+                    const mistralData = JSON.parse(data);
+                    let content = mistralData.choices[0].message.content.trim();
+                    const start = content.indexOf('{'), end = content.lastIndexOf('}');
+                    if (start === -1) throw new Error("Kein JSON gefunden");
+                    content = content.substring(start, end + 1);
+                    const finalObj = JSON.parse(content);
                     
-                    let contentText = mistralData.choices[0].message.content.trim();
-                    
-                    // JSON-RETTUNG: Extrahiert alles zwischen den ersten und letzten geschweiften Klammern
-                    const start = contentText.indexOf('{');
-                    const end = contentText.lastIndexOf('}');
-                    if (start === -1 || end === -1) throw new Error("KI hat kein JSON geliefert");
-                    const cleanedJson = contentText.substring(start, end + 1);
-                    
-                    const finalResult = JSON.parse(cleanedJson);
-
-                    // Affiliate Links einfügen
-                    const dEnc = encodeURIComponent(finalResult.destination);
-                    finalResult.affiliate_suggestions = [
-                        { label: `Erlebnisse in ${finalResult.destination}`, affiliate_url: `https://tp.media/r?campaign_id=137&marker=698672&p=4110&trs=492044&u=${encodeURIComponent('https://www.klook.com/search/result/?query=' + dEnc)}` },
-                        { label: "Transfer buchen", affiliate_url: "https://tp.media/r?campaign_id=147&marker=698672&p=4439&trs=492044" }
+                    finalObj.affiliate_suggestions = [
+                        { label: "Erlebnisse", affiliate_url: `https://tp.media/r?campaign_id=137&marker=698672&trs=492044&u=${encodeURIComponent('https://www.klook.com/search/result/?query=' + encodeURIComponent(finalObj.destination))}` }
                     ];
-
-                    resolve({ statusCode: 200, headers, body: JSON.stringify(finalResult) });
-                } catch (err) {
-                    resolve({ 
-                        statusCode: 500, 
-                        headers, 
-                        body: JSON.stringify({ error: "JSON-Parsing Fehler", details: err.message, raw: responseBody }) 
-                    });
+                    resolve({ statusCode: 200, headers, body: JSON.stringify(finalObj) });
+                } catch (e) {
+                    resolve({ statusCode: 500, headers, body: JSON.stringify({ error: "Parsing Fehler", raw: data }) });
                 }
             });
         });
-
         req.on('error', (e) => resolve({ statusCode: 500, headers, body: JSON.stringify({ error: e.message }) }));
         req.write(postData);
         req.end();
