@@ -1,109 +1,127 @@
-/**
- * match.js - Frontend Logic
- * Supports: Budget, Singular/Plural, Gefühltes Alter
- */
+// netlify/functions/match.js
+'use strict';
 
-const ZODIACS = [
-    "Widder", "Stier", "Zwillinge", "Krebs", "Löwe", "Jungfrau", 
-    "Waage", "Skorpion", "Schütze", "Steinbock", "Wassermann", "Fische"
-];
+// In Node.js 18+ (Standard bei Netlify) ist fetch global verfügbar.
+// Wir definieren fetchFn einfach als das native fetch.
+const fetchFn = globalThis.fetch;
 
-document.addEventListener('DOMContentLoaded', () => {
-    renderCards();
-});
+exports.handler = async (event) => {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Content-Type': 'application/json'
+  };
 
-function renderCards() {
-    const countSelect = document.getElementById('personCount');
-    const container = document.getElementById('participants-grid');
-    const subtitle = document.querySelector('.subtitle');
+  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
+
+  try {
+    if (!event.body) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing body' }) };
     
-    if (!container || !countSelect) return;
+    const payload = JSON.parse(event.body);
+    const signs = Array.isArray(payload.signs) ? payload.signs.join(', ') : 'Keine spezifischen';
+    const participants = Number(payload.participants) || 2;
+    const vibe = payload.vibe || 'Fließende Balance';
+    const budget = payload.budget || 'Goldene Mitte';
+    const distance = payload.distance || 'Kontinentale Weite';
+    const transport = payload.transport || 'Flug der Falken';
+
+    const apiKey = process.env.MISTRAL_API_KEY;
+    if (!apiKey) {
+      // Fallback für lokale Tests ohne API Key
+      return {
+        statusCode: 200, headers, body: JSON.stringify({
+          destination: "Mallorca", 
+          explanation: "Das Orakel ruht gerade. Dies ist eine Test-Empfehlung.", 
+          bestTimeTip: "Mai bis September",
+          packliste: ["Sonnencreme", "Gute Laune", "Reisepass"], 
+          cta_text: "Ferien planen",
+          affiliate_suggestions: []
+        })
+      };
+    }
+
+    const prompt = `Du bist ein hochentwickeltes astrologisches Orakel für Ferien. /astro
+    Analysiere folgende Parameter für ${participants} Personen der Sternzeichen ${signs}:
+    Erlebnis-Wunsch: ${vibe}
+    Budget-Pfad: ${budget}
+    Gewünschte Entfernung: ${distance}
+    Art der Fortbewegung: ${transport}
     
-    const count = parseInt(countSelect.value);
+    WICHTIGE REGELN FÜR DEINE EMPFEHLUNG:
+    1. Geografische Bindung: "Heimatliche Gefilde" und "Nachbarreiche" bedeuten ZWINGEND DACH-Region. "Kontinentale Weite" bedeutet ZWINGEND Europa. Alles andere ist weltweit. 
+    2. Die Packliste MUSS 3 REALE, hochprofessionelle Ausrüstungsgegenstände enthalten. NENNE KEINE KAMERAS. Nenne stattdessen exklusives Premium-Gepäck, High-Tech Kleidung oder Gadgets. ERFINDE KEINE esoterischen Gegenstände.
+    3. Die Begründung ('explanation') MUSS ZWINGEND diese Quellen einbinden: 
+       - Wie Buddha es im Mahayana im Mahapäriniviranä Sutra erläutert (Übersetzer Kosho Yamamoto 1973).
+       - Das Konzept des Atman (Hinduismus, Merriam-Webster 2003).
+    4. Nutze immer das Wort "Ferien".
+    5. Beachte simulierte Reise- und Sicherheitswarnungen.
     
-    // UI Text Anpassung: Singular vs Plural
-    if (subtitle) {
-        subtitle.textContent = count === 1 
-            ? "Finde das perfekte Ziel für dich." 
-            : "Finde das perfekte Ziel für euch.";
+    Antworte AUSSCHLIESSLICH als JSON-Objekt ohne Markdown:
+    {
+      "destination": "Name des Ziels (NUR die Stadt oder Insel, z.B. 'Mallorca' oder 'Paris')",
+      "explanation": "Tiefgründige Begründung inkl. Sternzeichen, Buddha (Yamamoto 1973) und Atman (Webster 2003).",
+      "bestTimeTip": "Beste Reisezeit",
+      "packliste": ["Reales Profi-Item 1", "Reales Profi-Item 2", "Reales Profi-Item 3"],
+      "cta_text": "Ferien Erlebnisse buchen"
+    }`;
+
+    // Hier nutzen wir das native fetchFn
+    const mistralRes = await fetchFn('https://api.mistral.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({ model: "mistral-small-latest", messages: [{ role: "user", content: prompt }], temperature: 0.7 })
+    });
+
+    const mistralData = await mistralRes.json();
+    let rawText = mistralData.choices[0].message.content;
+    
+    let cleaned = rawText.trim();
+    // Falls Mistral Markdown-Boxen mitschickt, diese entfernen
+    const fenceMatch = cleaned.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+    if (fenceMatch && fenceMatch[1]) cleaned = fenceMatch[1].trim();
+    if (!cleaned.startsWith('{')) {
+      const firstJson = cleaned.match(/\{[\s\S]*?\}/);
+      if (firstJson) cleaned = firstJson[0];
     }
 
-    container.innerHTML = ''; 
+    let parsed = JSON.parse(cleaned);
 
-    for (let i = 1; i <= count; i++) {
-        const div = document.createElement('div');
-        div.className = 'card';
-        div.innerHTML = `
-            <h3>${count === 1 ? 'Reisende(r)' : `Reisende(r) ${i}`}</h3>
-            <label>Sternzeichen:</label>
-            <select class="participant-zodiac">
-                ${ZODIACS.map(z => `<option value="${z}">${z}</option>`).join('')}
-            </select>
-            <label>Gefühltes Alter:</label>
-            <input type="number" class="participant-age" value="25" min="1" max="99">
-        `;
-        container.appendChild(div);
-    }
-}
+    // Ziel formatieren für die verschiedenen Partner-Strukturen
+    const destRaw = parsed.destination || 'Mallorca';
+    const destEnc = encodeURIComponent(destRaw);
+    const destSlug = destRaw.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
-async function startMatching() {
-    const btn = document.querySelector('button');
-    const resultDiv = document.getElementById('result');
-    const emailField = document.getElementById('userEmail');
-    const vibeField = document.getElementById('vibeRange');
-    const budgetField = document.getElementById('budgetRange');
-    const hobbiesField = document.getElementById('hobbiesInput');
+    // Deep-Links für Travelpayouts mit deinen IDs
+    const klookTarget = encodeURIComponent(`https://www.klook.com/search/result/?query=${destEnc}`);
+    const getTransferTarget = encodeURIComponent(`https://gettransfer.com/`);
+    const wpTarget = encodeURIComponent(`https://www.welcomepickups.com/${destSlug}/`);
 
-    const email = emailField ? emailField.value : '';
-    if (!email || !email.includes('@')) {
-        alert("Bitte gib eine gültige Email-Adresse ein.");
-        if(emailField) emailField.focus();
-        return;
-    }
+    parsed.affiliate_suggestions = [
+      { 
+        type: 'activity', 
+        label: `Klook Erlebnisse in ${destRaw}`, 
+        affiliate_url: `https://tp.media/r?campaign_id=137&marker=698672&p=4110&trs=492044&u=${klookTarget}` 
+      },
+      { 
+        type: 'transfer', 
+        label: `GetTransfer Fahrt`, 
+        affiliate_url: `https://tp.media/r?campaign_id=147&marker=698672&p=4439&trs=492044&u=${getTransferTarget}` 
+      },
+      { 
+        type: 'pickup', 
+        label: `Welcome Pickups`, 
+        affiliate_url: `https://tp.media/r?campaign_id=627&marker=698672&p=8919&trs=492044&u=${wpTarget}` 
+      }
+    ];
 
-    const participants = Array.from(document.querySelectorAll('.participant-zodiac')).map((z, i) => ({
-        zodiac: z.value,
-        age: document.querySelectorAll('.participant-age')[i].value
-    }));
-
-    btn.disabled = true;
-    btn.innerHTML = "🚀 Wird gesendet...";
-    resultDiv.style.color = "#333"; 
-    resultDiv.innerHTML = "Verbindung wird aufgebaut...";
-
-    try {
-        const response = await fetch('/api/match', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                participants, 
-                vibe: vibeField ? vibeField.value : 50, 
-                budget: budgetField ? budgetField.value : 50,
-                hobbies: hobbiesField ? hobbiesField.value : '', 
-                email 
-            })
-        });
-
-        const data = await response.json();
-        
-        if (!response.ok) throw new Error(data.error || "Fehler beim Senden");
-
-        resultDiv.innerHTML = `
-            <div style="background: #e8f5e9; color: #2e7d32; padding: 20px; border-radius: 10px; border: 1px solid #2e7d32; text-align: left;">
-                <h3 style="margin-top:0;">✅ Email versendet!</h3>
-                <p>Checke dein Postfach: <strong>${email}</strong></p>
-                <hr style="opacity:0.2">
-                <small>Vorschau: ${data.preview}</small>
-            </div>`;
-
-    } catch (e) {
-        console.error(e);
-        resultDiv.innerHTML = `<div style="background:#ffebee; color:#c62828; padding:15px; border-radius:10px;">Fehler: ${e.message}</div>`;
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = "Neue Analyse anfordern";
-    }
-}
-
-window.renderCards = renderCards;
-window.startMatching = startMatching;
+    return { statusCode: 200, headers, body: JSON.stringify(parsed) };
+    
+  } catch (error) {
+    return { 
+      statusCode: 500, 
+      headers, 
+      body: JSON.stringify({ error: error.message, stack: "Fehler im Orakel-Backend" }) 
+    };
+  }
+};
