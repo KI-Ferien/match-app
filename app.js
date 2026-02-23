@@ -14,40 +14,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let selectedSigns = [];
 
-    // Erstelle die Kugeln
     signs.forEach(sign => {
         const ball = document.createElement('div');
         ball.className = 'zodiac-ball';
-        ball.innerHTML = `<div><span style="font-size: 1.5rem;">${sign.icon}</span><br><small>${sign.name}</small></div>`;
-        
-        ball.addEventListener('click', () => {
-            if (ball.classList.contains('selected')) {
-                ball.classList.remove('selected');
-                selectedSigns = selectedSigns.filter(s => s !== sign.name);
-            } else {
-                ball.classList.add('selected');
-                selectedSigns.push(sign.name);
-            }
-        });
+        ball.innerHTML = `<div>${sign.icon}<br><small>${sign.name}</small></div>`;
+        ball.onclick = () => {
+            ball.classList.toggle('selected');
+            const name = sign.name;
+            if (ball.classList.contains('selected')) selectedSigns.push(name);
+            else selectedSigns = selectedSigns.filter(s => s !== name);
+        };
         zodiacContainer.appendChild(ball);
     });
 
-    askButton.addEventListener('click', async () => {
-        if (selectedSigns.length === 0) {
-            status.textContent = "Wähle Deine Zeichen, bevor Du das Orakel weckst.";
-            return;
-        }
+    askButton.onclick = async () => {
+        if (selectedSigns.length === 0) return;
 
         const payload = {
             signs: selectedSigns,
             participants: document.getElementById('participants').value,
             vibe: document.getElementById('vibe').value,
-            budget: "Goldene Mitte", // Standardwert
             distance: document.getElementById('distance').value,
-            transport: "Gefährten der Straße" 
+            budget: "Goldene Mitte",
+            transport: "Gefährten der Straße"
         };
 
-        status.textContent = "Das Orakel befragt die Gezeiten...";
+        status.textContent = "Die Sterne ordnen sich...";
         askButton.disabled = true;
 
         try {
@@ -57,16 +49,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(payload)
             });
 
-            if (!response.ok) throw new Error('Kommunikationsfehler');
-
             const result = await response.json();
             sessionStorage.setItem('orakelResult', JSON.stringify({ result }));
             window.location.href = 'reise.html';
-
-        } catch (error) {
-            status.textContent = "Eine dunkle Wolke zieht auf. Versuche es erneut.";
-            console.error(error);
+        } catch (e) {
+            status.textContent = "Fehler. Bitte erneut versuchen.";
             askButton.disabled = false;
         }
-    });
+    };
 });
