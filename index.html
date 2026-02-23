@@ -22,7 +22,7 @@
             align-items: center; overflow-x: hidden;
         }
 
-        /* HINTERGRUND-MAGIE */
+        /* KOSMISCHE VISUALS */
         #space-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -3; }
         .milky-way {
             position: fixed; top: 50%; left: 50%; width: 150vmax; height: 150vmax;
@@ -55,7 +55,7 @@
             width: 70%; height: 70%;
             background: rgba(10, 25, 47, 0.85);
             backdrop-filter: blur(25px); border-radius: 50%;
-            border: 1px solid rgba(212, 175, 55, 0.3);
+            border: 1.5px solid rgba(212, 175, 55, 0.3);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             padding: clamp(15px, 4vw, 35px); box-sizing: border-box; z-index: 5;
             box-shadow: 0 0 50px rgba(0,0,0,0.9), inset 0 0 30px rgba(212,175,55,0.1);
@@ -85,7 +85,7 @@
         
         .zodiac-ball span { 
             line-height: 1.2; text-align: center; font-size: clamp(0.6rem, 2vw, 0.75rem); 
-            display: block; width: 100%; color: white;
+            display: block; width: 100%; color: white; pointer-events: none;
         }
 
         .zodiac-ball.selected {
@@ -134,7 +134,7 @@
         <div class="slider-area">
             <div class="slider-group">
                 <div class="slider-label">Gefährten <span class="slider-val" id="val-p">2</span></div>
-                <input type="range" id="participants" min="1" max="5" value="2" oninput="updateParticipants(this.value)">
+                <input type="range" id="participants" min="1" max="5" value="2" oninput="handleParticipantChange(this.value)">
             </div>
             <div class="slider-group">
                 <div class="slider-label">Vibe <span class="slider-val" id="val-v">Fließende Balance</span></div>
@@ -153,7 +153,7 @@
     </div>
 </div>
 
-<div id="status" style="margin-top: 15px; color: var(--gold); font-size: 0.85rem; height: 1.2rem;"></div>
+<div id="status" style="margin-top: 15px; color: var(--gold); font-size: 0.85rem; height: 1.2rem; z-index: 10;"></div>
 
 <footer><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a></footer>
 
@@ -165,31 +165,39 @@
     let selectedSigns = [];
     let maxSigns = 2;
 
-    function updateParticipants(v) {
+    function handleParticipantChange(v) {
         maxSigns = parseInt(v);
         document.getElementById('val-p').innerText = v;
-        // Falls mehr Zeichen gewählt sind als erlaubt, die Auswahl korrigieren
-        while(selectedSigns.length > maxSigns) {
-            const first = selectedSigns.shift();
+        
+        // Strikte Regel: Wenn Teilnehmer reduziert werden, müssen überzählige Zeichen entfernt werden
+        while (selectedSigns.length > maxSigns) {
+            const removedName = selectedSigns.shift();
             const balls = document.querySelectorAll('.zodiac-ball');
             balls.forEach(b => {
-                if(b.dataset.name === first) b.classList.remove('selected');
+                if (b.dataset.name === removedName) b.classList.remove('selected');
             });
         }
-        updateStatus();
+        updateStatusText();
     }
+
     function updateVibe(v) { document.getElementById('val-v').innerText = vibeNamen[v-1]; }
     function updateBudget(v) { document.getElementById('val-b').innerText = budgetNamen[v-1]; }
     function updateDistance(v) { document.getElementById('val-d').innerText = distanzNamen[v-1]; }
-    function updateStatus() {
-        const remaining = maxSigns - selectedSigns.length;
-        document.getElementById('status').innerText = remaining > 0 
-            ? `Wähle noch ${remaining} Zeichen Deiner Gefährten` 
-            : `Schicksal besiegelt. Befrage das Orakel.`;
+
+    function updateStatusText() {
+        const status = document.getElementById('status');
+        const diff = maxSigns - selectedSigns.length;
+        if (diff > 0) {
+            status.innerText = `Wähle noch ${diff} Zeichen für Deine Gruppe.`;
+        } else if (selectedSigns.length === 0) {
+            status.innerText = "Berühre die Zeichen Deiner Bestimmung.";
+        } else {
+            status.innerText = "Das Schicksal ist bereit zur Befragung.";
+        }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        initVisuals();
+        initCosmos();
         const wrapper = document.getElementById('zodiac-wrapper');
         const askButton = document.getElementById('ask-oracle');
 
@@ -215,28 +223,33 @@
 
             ball.onclick = () => {
                 if (ball.classList.contains('selected')) {
+                    // Abwählen immer erlaubt
                     ball.classList.remove('selected');
                     selectedSigns = selectedSigns.filter(s => s !== sign.name);
-                } else if (selectedSigns.length < maxSigns) {
-                    ball.classList.add('selected');
-                    selectedSigns.push(sign.name);
                 } else {
-                    // Verdrängungs-Logik: Ältestes Element entfernen
-                    const first = selectedSigns.shift();
-                    const balls = document.querySelectorAll('.zodiac-ball');
-                    balls.forEach(b => { if(b.dataset.name === first) b.classList.remove('selected'); });
-                    ball.classList.add('selected');
-                    selectedSigns.push(sign.name);
+                    // Neuwählen nur wenn Limit nicht erreicht
+                    if (selectedSigns.length < maxSigns) {
+                        ball.classList.add('selected');
+                        selectedSigns.push(sign.name);
+                    } else {
+                        // Optional: Ältestes abwählen um Platz zu machen (Flow-Logik)
+                        const oldest = selectedSigns.shift();
+                        document.querySelectorAll('.zodiac-ball').forEach(b => {
+                            if(b.dataset.name === oldest) b.classList.remove('selected');
+                        });
+                        ball.classList.add('selected');
+                        selectedSigns.push(sign.name);
+                    }
                 }
-                updateStatus();
+                updateStatusText();
             };
             wrapper.appendChild(ball);
         });
-        updateStatus();
+        updateStatusText();
 
         askButton.onclick = async () => {
             if (selectedSigns.length === 0) return;
-            askButton.innerText = "LESEN...";
+            askButton.innerText = "DIE STERNE LESEN...";
             const payload = {
                 signs: selectedSigns,
                 participants: maxSigns,
@@ -257,7 +270,7 @@
         };
     });
 
-    function initVisuals() {
+    function initCosmos() {
         const canvas = document.getElementById('space-canvas');
         for(let i=0; i<100; i++) {
             const star = document.createElement('div');
@@ -274,7 +287,7 @@
         for(let i=0; i<15; i++) {
             const color = colors[Math.floor(Math.random() * colors.length)];
             const d = `M ${Math.random()*100} -10 C ${Math.random()*100} ${Math.random()*100}, ${Math.random()*100} ${Math.random()*100}, ${Math.random()*100} 110`;
-            paths += `<path class="snaking-thread" d="${d}" stroke="${color}" stroke-width="0.1" style="animation-duration: ${40+Math.random()*30}s; animation-delay: -${Math.random()*20}s;" />`;
+            paths += `<path class="snaking-thread" d="${d}" stroke="${color}" stroke-width="0.15" style="animation-duration: ${40+Math.random()*30}s; animation-delay: -${Math.random()*20}s;" />`;
         }
         svg.innerHTML = paths;
     }
