@@ -26,7 +26,7 @@ exports.handler = async (event) => {
     REGELN:
     1. Nutze das Wort "Ferien".
     2. Binde Buddha (Yamamoto 1973) und Atman (Webster 2003) tiefgründig ein.
-    3. Die Packliste muss 3 reale Profi-Reise-Items enthalten (keine Kameras).
+    3. Die Packliste muss 3 reale Profi-Reise-Items enthalten.
     
     Antworte NUR mit validem JSON:
     {
@@ -54,20 +54,22 @@ exports.handler = async (event) => {
     if (start === -1) throw new Error("Kein JSON gefunden");
     const result = JSON.parse(content.substring(start, end + 1));
 
-    const dEnc = encodeURIComponent(result.destination);
-    const dSlug = result.destination.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const dRaw = result.destination;
+    const dEnc = encodeURIComponent(dRaw);
+    // Erstellt einen sauberen URL-Slug (z.B. "Gran Canaria" -> "gran-canaria")
+    const dSlug = dRaw.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
     result.affiliate_suggestions = [
       { 
-        label: `Erlebnisse in ${result.destination} prüfen`, 
-        affiliate_url: `https://tp.media/r?campaign_id=137&marker=698672&p=4110&trs=492044&u=${encodeURIComponent('https://www.klook.com/search/result/?query=' + dEnc)}` 
+        label: `Erlebnisse in ${dRaw} entdecken`, 
+        affiliate_url: `https://tp.media/r?campaign_id=137&marker=698672&p=4110&trs=492044&u=${encodeURIComponent('https://www.klook.com/de/search/result/?query=' + dEnc)}` 
       },
       { 
-        label: "Bequemen Transfer buchen", 
+        label: "Komfortablen Transfer buchen", 
         affiliate_url: `https://tp.media/r?campaign_id=147&marker=698672&p=4439&trs=492044&u=${encodeURIComponent('https://gettransfer.com/de')}` 
       },
       { 
-        label: "Persönlichen Guide finden", 
+        label: "Persönlichen Empfang reservieren", 
         affiliate_url: `https://tp.media/r?campaign_id=627&marker=698672&p=8919&trs=492044&u=${encodeURIComponent('https://www.welcomepickups.com/' + dSlug + '/')}` 
       }
     ];
