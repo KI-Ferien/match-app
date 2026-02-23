@@ -22,23 +22,23 @@ exports.handler = async (event) => {
     const prompt = `Du bist ein unfehlbares astrologisches Orakel und Reiseexperte für Ferien. /astro
     Parameter: Personen: ${payload.participants}, Zeichen: ${payload.signs}, Vibe: ${payload.vibe}, Budget: ${payload.budget}, Distanz: ${payload.distance}.
     
-    STRENGE GEOGRAFISCHE BEFEHLE (MISSREACHING IST EIN FEHLER):
-    1. "Heimatliche Gefilde" & "Nachbarreiche": Das Ziel soll in Deutschland, Österreich, Frankreich, Italien, Belgien,Niederlande oder der Schweiz liegen. (Beispiele: Rügen, Tirol, Zermatt, Spreewald). 
-    2. "Kontinentale Weite": Das Ziel DARF NUR in ganz Europa liegen. Keine Fernreisen!
-    3. NUR bei "Über die Meere" oder "Ans Ende der Welt" darfst du Japan, USA oder Bali wählen.
-    UNUMSTÖSSLICHE LOGIK- & GEOGRAFIE-REGELN:
-    PHYSISCHE ERREICHBARKEIT: Wenn Transport "Gefährten der Straße" (Bus/Auto) oder "Eiserne Pfade" (Zug) gewählt wurde, darf das Ziel NIEMALS auf einem anderen Kontinent oder einer Fernreise-Insel (wie Bali, Thailand, USA) liegen.
-    Es muss auf dem Landweg von Mitteleuropa erreichbar sein.
-    - NUR bei "Über die Meere" / "Ans Ende der Welt" + Transport "Flug der Falken" sind Fernziele wie Bali erlaubt.
+    STRENGE GEOGRAFISCHE BEFEHLE:
+    1. "Heimatliche Gefilde" & "Nachbarreiche": Ziel MUSS in Deutschland, Österreich, Frankreich, Italien, Belgien, Niederlande oder Schweiz liegen.
+    2. "Kontinentale Weite": Ziel DARF NUR in ganz Europa liegen. Keine Fernreisen!
+    3. NUR bei "Über die Meere" oder "Ans Ende der Welt" + Transport "Flug der Falken" sind Fernziele wie Japan, USA oder Bali erlaubt.
+    
+    UNUMSTÖSSLICHE LOGIK-REGELN:
+    - Wenn Transport "Gefährten der Straße" (Bus/Auto) oder "Eiserne Pfade" (Zug) gewählt wurde, darf das Ziel NIEMALS auf einem anderen Kontinent liegen.
+    - WICHTIG: Nenne als "destination" bevorzugt eine bekannte Stadt oder eine bekannte Insel (z.B. "Bozen" statt "Dolomiten"), damit Transfer-Dienste das Ziel finden.
     
     INHALTLICHE VORGABEN:
     - Nutze das Wort "Ferien".
-    - Binde Buddha (Yamamoto 1973) und Atman (Webster 2003) bei Deiner Empfehlung tiefgründig ein,erwähne Sie nicht namentlich in der Begründung.
-    - Die Packliste soll 3-4 nützliche reale Profi-Items und oder Tips enthalten.
+    - Binde Buddha (Yamamoto 1973) und Atman (Webster 2003) tiefgründig ein, ohne sie namentlich zu nennen.
+    - Die Packliste soll 3-4 nützliche reale Profi-Items oder Tipps enthalten.
     
     Antworte NUR mit validem JSON:
     {
-      "destination": "Name des Ziels (Stadt/Region/Insel)",
+      "destination": "Name des Ziels (Bevorzugt Stadt oder Insel)",
       "explanation": "Begründung...",
       "bestTimeTip": "Reisezeit-Tipp",
       "packliste": ["Item 1", "Item 2", "Item 3"],
@@ -51,7 +51,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         model: "mistral-small-latest",
         messages: [{ role: "user", content: prompt }],
-        temperature: 0.1 // Fast Null Kreativität bei der Geografie
+        temperature: 0.1 
       })
     });
 
@@ -62,7 +62,14 @@ exports.handler = async (event) => {
 
     const dRaw = result.destination;
     const dEnc = encodeURIComponent(dRaw);
-    const dSlug = dRaw.toLowerCase().trim().replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/ü/g, 'u').replace(/ß/g, 'ss').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    
+    // VERBESSERTE SLUG-LOGIK für Welcome Pickups:
+    // Nimmt nur den Teil vor Kommas oder Klammern und wandelt Umlaute um
+    let cleanBase = dRaw.split(',')[0].split('(')[0].trim();
+    const dSlug = cleanBase.toLowerCase()
+      .replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/ü/g, 'u').replace(/ß/g, 'ss')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
 
     result.affiliate_suggestions = [
       { 
