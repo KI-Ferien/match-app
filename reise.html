@@ -18,7 +18,7 @@
         }
 
         .waves-container {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 200px;
+            position: fixed; bottom: 0; left: 0; width: 100%; height: clamp(100px, 20vh, 200px);
             z-index: -1; pointer-events: none;
         }
 
@@ -33,37 +33,86 @@
 
         @keyframes move-wave { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-        .container { max-width: 800px; margin: 40px auto; padding: 20px; flex: 1; z-index: 1; }
+        .container { 
+            width: 95%;
+            max-width: 800px; 
+            margin: 20px auto; 
+            padding: 10px; 
+            flex: 1; 
+            z-index: 1; 
+            box-sizing: border-box;
+        }
 
         .result-card {
-            background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(15px);
-            border-radius: 40px; padding: 45px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1); border: 1px solid white;
+            background: rgba(255, 255, 255, 0.92); 
+            backdrop-filter: blur(15px);
+            border-radius: clamp(20px, 5vw, 40px); 
+            padding: clamp(20px, 5vw, 45px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
+            border: 1px solid white;
         }
 
-        h1 { font-size: 2.8rem; color: var(--ocean); margin: 0 0 20px 0; text-align: center; }
+        h1 { 
+            font-size: clamp(1.5rem, 6vw, 2.8rem); 
+            color: var(--ocean); 
+            margin: 0 0 20px 0; 
+            text-align: center; 
+        }
 
-        #destExp { font-size: 1.15rem; line-height: 1.8; color: #2c3e50; margin: 25px 0; text-align: justify; }
+        #destExp { 
+            font-size: clamp(1rem, 3.5vw, 1.15rem); 
+            line-height: 1.7; 
+            color: #2c3e50; 
+            margin: 20px 0; 
+            text-align: justify; 
+        }
 
         #bestTimeTip {
-            white-space: pre-line; background: rgba(212, 175, 55, 0.12);
-            padding: 25px; border-radius: 24px; font-style: italic;
-            border-left: 8px solid var(--gold); margin: 30px 0; color: #444;
+            white-space: pre-line; 
+            background: rgba(212, 175, 55, 0.12);
+            padding: clamp(15px, 4vw, 25px); 
+            border-radius: 20px; 
+            font-style: italic;
+            border-left: 6px solid var(--gold); 
+            margin: 25px 0; 
+            color: #444;
+            font-size: 0.95rem;
         }
 
-        .packlist-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin: 30px 0; }
-        .pack-item { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); text-align: center; }
+        .packlist-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+            gap: 10px; 
+            margin: 25px 0; 
+        }
 
-        .affiliate-section { display: flex; flex-direction: column; gap: 12px; margin-top: 35px; }
+        .pack-item { 
+            background: white; 
+            padding: 12px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03); 
+            text-align: center; 
+            font-size: 0.9rem;
+        }
+
+        .affiliate-section { display: flex; flex-direction: column; gap: 10px; margin-top: 30px; }
 
         .affiliate-btn {
-            background: var(--ocean); color: white; padding: 18px; text-decoration: none;
-            border-radius: 50px; text-align: center; font-weight: bold; transition: all 0.3s ease;
+            background: var(--ocean); 
+            color: white; 
+            padding: 15px; 
+            text-decoration: none;
+            border-radius: 50px; 
+            text-align: center; 
+            font-weight: bold; 
+            transition: all 0.3s ease;
             box-shadow: 0 6px 15px rgba(0, 92, 151, 0.2);
+            font-size: 0.95rem;
         }
+
         .affiliate-btn:hover { background: #004471; transform: translateY(-3px); }
 
-        footer { padding: 40px 20px; text-align: center; font-size: 0.9rem; color: white; background: rgba(0,0,0,0.1); margin-top: auto; }
+        footer { padding: 30px 20px; text-align: center; font-size: 0.8rem; color: white; background: rgba(0,0,0,0.1); margin-top: auto; }
         footer a { color: white; margin: 0 10px; text-decoration: none; opacity: 0.8; }
     </style>
 </head>
@@ -71,14 +120,14 @@
     <div class="waves-container"><div class="wave"></div><div class="wave"></div></div>
     <div class="container">
         <div class="result-card">
-            <h1 id="destName">Suche Bestimmung...</h1>
+            <h1 id="destName">Bestimmung finden...</h1>
             <p id="destExp"></p>
             <div id="bestTimeTip"></div>
-            <h3 style="color: var(--ocean); text-align:center;">Die Reise-Ausrüstung</h3>
+            <h3 style="color: var(--ocean); text-align:center;">Reise-Ausrüstung</h3>
             <div class="packlist-grid" id="packlist"></div>
             <div id="affiliate-links" class="affiliate-section"></div>
-            <div style="text-align: center; margin-top: 40px;">
-                <a href="index.html" style="color: var(--ocean); font-weight: bold; text-decoration: none;">← Neue Ferien planen</a>
+            <div style="text-align: center; margin-top: 35px;">
+                <a href="index.html" style="color: var(--ocean); font-weight: bold; text-decoration: none; font-size: 0.9rem;">← Andere Ferien planen</a>
             </div>
         </div>
     </div>
@@ -99,7 +148,7 @@
             packlistContainer.innerHTML = '';
             result.packliste.forEach(item => {
                 const div = document.createElement('div');
-                div.className = 'pack-item'; div.textContent = '🏖️ ' + item;
+                div.className = 'pack-item'; div.textContent = '☀️ ' + item;
                 packlistContainer.appendChild(div);
             });
             const affContainer = document.getElementById('affiliate-links');
