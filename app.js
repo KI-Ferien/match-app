@@ -1,4 +1,4 @@
-// app.js
+// app.js - Finale Version für KI-Ferien.de
 
 const zodiacs = [
   { name: 'Widder', date: '21.03.-20.04.', info: 'Feuerzeichen: Braucht Aktion, Abenteuer und Unabhängigkeit in den Ferien.' }, 
@@ -72,7 +72,6 @@ function initZodiacs() {
       const maxAllowed = parseInt(document.getElementById('participants').value);
       const statusEl = document.getElementById('status');
 
-      // Verhindert, dass mehr Sternzeichen gewählt werden, als Teilnehmer eingestellt sind
       if (isActivating && currentActiveCount >= maxAllowed) {
         statusEl.style.color = '#ff7676';
         statusEl.textContent = maxAllowed === 1 ? 'Du kannst nur ein Zeichen wählen.' : `Du kannst maximal ${maxAllowed} Zeichen wählen.`;
@@ -80,7 +79,7 @@ function initZodiacs() {
       }
 
       el.classList.toggle('active');
-      statusEl.textContent = ''; // Fehlermeldung löschen, wenn alles passt
+      statusEl.textContent = ''; 
       updateChosenSignsDisplay();
     });
 
@@ -89,22 +88,17 @@ function initZodiacs() {
 }
 initZodiacs();
 
-// Event Listener für den Teilnehmer-Slider
 const participants = document.getElementById('participants');
 if (participants) {
   participants.addEventListener('input', () => {
     const newCount = parseInt(participants.value);
     document.getElementById('participantsVal').textContent = newCount;
-    
-    // Logik: Überschüssige Sternzeichen abwählen, wenn Slider verringert wird
     const activeElements = Array.from(document.querySelectorAll('.zodiac-item.active'));
     if (activeElements.length > newCount) {
-      // Entfernt den "active" Status von den zuletzt gewählten, bis die Zahl wieder stimmt
       for (let i = newCount; i < activeElements.length; i++) {
         activeElements[i].classList.remove('active');
       }
     }
-    
     document.getElementById('status').textContent = '';
     updateChosenSignsDisplay(); 
   });
@@ -188,18 +182,29 @@ function createSnakingThreads() {
 }
 createSnakingThreads();
 
+// DIE ENTSCHEIDENDE FUNKTION MIT KORREKTEM PFAD
 async function callMatch(payload){
   const status = document.getElementById('status');
   status.style.color = 'var(--delphi-gold)';
   status.textContent = 'Die Sterne weisen den Weg...';
+  
   try {
-    const res = await fetch('/api/match', {
+    // Geänderter Pfad für Netlify Functions
+    const res = await fetch('/.netlify/functions/match', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify(payload)
     });
+
+    if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Server-Fehler Details:", errorText);
+        throw new Error(`Server antwortet mit Status ${res.status}`);
+    }
+
     return await res.json();
   } catch (err){
+    console.error("Kommunikationsfehler mit dem Orakel:", err);
     throw err;
   } finally {
     status.textContent = '';
