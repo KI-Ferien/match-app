@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const status = document.getElementById('status');
     const askButton = document.getElementById('ask-oracle');
 
-    // Die 12 Gefährten des Tierkreises
     const signs = [
         { name: 'Widder', icon: '♈' }, { name: 'Stier', icon: '♉' },
         { name: 'Zwillinge', icon: '♊' }, { name: 'Krebs', icon: '♋' },
@@ -15,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let selectedSigns = [];
 
-    // Kugeln dynamisch erstellen
+    // Sternzeichen-Kugeln erstellen
     signs.forEach(sign => {
         const ball = document.createElement('div');
         ball.className = 'zodiac-ball';
@@ -33,23 +32,23 @@ document.addEventListener('DOMContentLoaded', () => {
         zodiacContainer.appendChild(ball);
     });
 
-    // Das Orakel befragen
+    // Orakel-Anfrage
     askButton.addEventListener('click', async () => {
         if (selectedSigns.length === 0) {
-            status.textContent = "Bitte wähle mindestens ein Sternzeichen!";
+            status.textContent = "Wähle Deine Sternzeichen, um das Schicksal zu rufen.";
             return;
         }
 
         const payload = {
             signs: selectedSigns,
+            participants: document.getElementById('participants').value,
             vibe: document.getElementById('vibe').value,
             budget: document.getElementById('budget').value,
             distance: document.getElementById('distance').value,
-            participants: 2, // Standardwert
-            transport: "Gefährten der Straße" // Standardwert
+            transport: "Gefährten der Straße" // Kann bei Bedarf auch als Select ergänzt werden
         };
 
-        status.textContent = "Die Sterne ordnen sich... einen Augenblick.";
+        status.textContent = "Das Orakel liest in den Linien der Zeit...";
         askButton.disabled = true;
 
         try {
@@ -59,16 +58,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(payload)
             });
 
-            if (!response.ok) throw new Error('Kosmische Unterbrechung');
+            if (!response.ok) throw new Error('Kosmische Störung im Backend');
 
             const result = await response.json();
             
-            // Ergebnis für die reise.html speichern
+            // Speichern und Weiterleiten
             sessionStorage.setItem('orakelResult', JSON.stringify({ result }));
             window.location.href = 'reise.html';
 
         } catch (error) {
-            status.textContent = "Eine dunkle Wolke verdeckt die Sicht. Versuche es gleich noch einmal.";
+            status.textContent = "Die Sterne sind getrübt. Versuche es erneut.";
             console.error(error);
         } finally {
             askButton.disabled = false;
