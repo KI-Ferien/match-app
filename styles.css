@@ -1,0 +1,102 @@
+:root {
+  --delphi-bg: #02050a;
+  --delphi-gold: #d4af37;
+  --delphi-glow: rgba(212, 175, 55, 0.6);
+  --mystic-purple: #2b124c;
+  --text: #f8f8f8;
+}
+
+* { box-sizing: border-box; }
+
+body, html {
+  margin: 0; height: 100%; background: var(--delphi-bg); color: var(--text);
+  font-family: Inter, system-ui, Segoe UI, sans-serif; overflow: hidden; 
+}
+
+#space-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; background: radial-gradient(circle at center, #0a1128 0%, #02050a 100%); overflow: hidden; }
+
+#milky-way {
+  position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+  background: radial-gradient(ellipse at center, rgba(74, 35, 90, 0.3) 0%, rgba(10, 21, 38, 0.15) 40%, transparent 60%);
+  filter: blur(60px); opacity: 0.8; pointer-events: none; animation: drift 80s infinite linear alternate;
+}
+@keyframes drift { 0% { transform: rotate(0deg) scale(1); } 100% { transform: rotate(10deg) scale(1.1); } }
+
+.star { position: absolute; border-radius: 50%; animation: twinkle infinite alternate, orbit infinite linear; transform-origin: center center; }
+@keyframes twinkle { 0% { opacity: 0.2; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.3); } }
+@keyframes orbit { from { transform: rotate(0deg) translateX(var(--radius)) rotate(0deg); } to { transform: rotate(360deg) translateX(var(--radius)) rotate(-360deg); } }
+
+#magic-threads { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+.snaking-thread { fill: none; stroke-linecap: round; animation: snakeFlow infinite linear; }
+@keyframes snakeFlow { 0% { stroke-dashoffset: 2000; opacity: 0; } 30% { opacity: 0.7; } 70% { opacity: 0.7; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+
+#delphi-stage { position: relative; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; z-index: 2; }
+
+/* --- Sternzeichen sehr nah ans Orakel gezogen --- */
+#zodiac-ring { position: absolute; width: 760px; height: 760px; max-width: 98vmin; max-height: 98vmin; border-radius: 50%; pointer-events: none; z-index: 3; }
+
+.zodiac-item {
+  position: absolute; top: 50%; left: 50%; 
+  width: 100px; height: 100px; margin: -50px 0 0 -50px; 
+  border-radius: 50%; background: radial-gradient(circle, #1a2a40 0%, #0a1526 100%);
+  border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; cursor: pointer; pointer-events: auto; transition: all 0.3s ease; box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+}
+.zodiac-item:hover { transform: scale(1.1); border-color: rgba(212, 175, 55, 0.5); z-index: 10; }
+.zodiac-item.active { border-color: var(--delphi-gold); box-shadow: 0 0 20px var(--delphi-glow), inset 0 0 15px var(--delphi-gold); transform: scale(1.15); z-index: 5; }
+.z-name { font-weight: bold; font-size: 0.85rem; z-index: 1; color: var(--delphi-gold); }
+.z-date { font-size: 0.6rem; color: #9aa4b2; z-index: 1; margin-top: 5px; }
+
+.z-tooltip {
+  position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
+  background: rgba(5, 10, 21, 0.95); border: 1px solid var(--delphi-gold); color: #e2e8f0;
+  padding: 12px; border-radius: 8px; width: 220px; font-size: 0.75rem; line-height: 1.4;
+  opacity: 0; visibility: hidden; transition: opacity 0.3s; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.8); pointer-events: none;
+}
+.zodiac-item:hover .z-tooltip { opacity: 1; visibility: visible; }
+
+#oracle-center {
+  position: relative; width: 550px; height: 550px; max-width: 85vmin; max-height: 85vmin; z-index: 4; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #4a235a, #030712 80%);
+  box-shadow: inset -20px -20px 50px rgba(0,0,0,0.9), inset 15px 15px 40px rgba(212, 175, 55, 0.25), 0 0 80px rgba(212, 175, 55, 0.15);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.oracle-glass {
+  width: 95%; height: 95%; background: rgba(10, 20, 35, 0.55);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-radius: 50%; padding: 30px 45px; text-align: center;
+  display: flex; flex-direction: column; justify-content: center; border: 1px solid rgba(255,255,255,0.08);
+}
+
+.oracle-glass h1 { margin: 0; color: var(--delphi-gold); font-size: 2.2rem; font-family: serif; text-shadow: 0 0 10px rgba(212,175,55,0.3); }
+
+.chosen-signs-container {
+  min-height: 40px; margin: 5px 0 15px 0; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; align-items: center;
+}
+.placeholder-text { color: #64748b; font-size: 0.9rem; font-style: italic; transition: color 0.3s; }
+.chosen-badge {
+  background: rgba(212, 175, 55, 0.15); border: 1px solid var(--delphi-gold); color: #fff;
+  padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold;
+  box-shadow: 0 0 10px rgba(212,175,55,0.2); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+
+.control-row { margin-bottom: 12px; text-align: left; }
+.control-row label { display: block; font-size: 0.8rem; margin-bottom: 4px; color: #ccc; }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; padding: 0; margin: 6px 0; outline: none; }
+input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: rgba(0,0,0,0.6); border-radius: 3px; border: 1px solid rgba(212, 175, 55, 0.3); }
+input[type=range]::-webkit-slider-thumb { height: 20px; width: 20px; border-radius: 50%; background: radial-gradient(circle, #ffe175, #d4af37); cursor: pointer; -webkit-appearance: none; margin-top: -8px; box-shadow: 0 0 10px var(--delphi-glow); border: 2px solid #fff; }
+input[type=range]:focus::-webkit-slider-runnable-track { background: rgba(212, 175, 55, 0.15); }
+input[type=range]::-moz-range-track { width: 100%; height: 6px; cursor: pointer; background: rgba(0,0,0,0.6); border-radius: 3px; border: 1px solid rgba(212, 175, 55, 0.3); }
+input[type=range]::-moz-range-thumb { height: 20px; width: 20px; border-radius: 50%; background: radial-gradient(circle, #ffe175, #d4af37); cursor: pointer; box-shadow: 0 0 10px var(--delphi-glow); border: 2px solid #fff; }
+
+button.primary {
+  margin-top: 10px; background: linear-gradient(90deg, #d4af37, #b8962e);
+  color: #000; border: none; padding: 14px 24px; border-radius: 30px;
+  font-weight: bold; font-size: 1rem; cursor: pointer; transition: all 0.3s;
+}
+button.primary:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 10px 25px var(--delphi-glow); }
+#status { margin-top: 10px; font-size: 0.85rem; height: 18px; font-weight: bold; }
