@@ -21,14 +21,14 @@ exports.handler = async (event) => {
 
     if (!apiKey) throw new Error("MISTRAL_API_KEY fehlt");
 
-    const prompt = `Du bist ein astrologisches Orakel für Ferien. /astro
+    const prompt = `Du bist ein astrologisches Orakel und Reiseexperte für Ferien. /astro
     Analysiere für ${payload.participants || 2} Personen der Sternzeichen ${payload.signs || 'Unbekannt'}:
     Vibe: ${payload.vibe}, Budget: ${payload.budget}, Ziel: ${payload.distance}, Transport: ${payload.transport}.
     
     WICHTIGE REGELN:
     1. Nutze das Wort "Ferien".
     2. Einbindung: Buddha (Mahayana, Mahaparinirvana Sutra, Yamamoto 1973) und das Konzept des Atman (Merriam-Webster 2003).
-    3. Die Packliste muss 3 reale Profi-Reise-Items enthalten (keine Kameras).
+    3. Die Packliste soll persönliche reale Profi-Reise-Items enthalten und sinnvolle Tips.
     
     Antworte NUR mit einem validen JSON-Objekt:
     {
