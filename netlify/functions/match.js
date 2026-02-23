@@ -1,18 +1,8 @@
 // netlify/functions/match.js
 'use strict';
 
-<<<<<<< Updated upstream
-let fetchFn;
-if (typeof globalThis.fetch === 'function') {
-  fetchFn = globalThis.fetch.bind(globalThis);
-} else {
-  try { fetchFn = require('node-fetch'); } catch (err) { throw new Error('fetch missing'); }
-}
-=======
-// In Node.js 18+ (Standard bei Netlify) ist fetch global verfügbar.
-// Wir definieren fetchFn einfach als das native fetch.
+// Nutzt das native fetch von Node.js 20
 const fetchFn = globalThis.fetch;
->>>>>>> Stashed changes
 
 exports.handler = async (event) => {
   const headers = {
@@ -22,147 +12,82 @@ exports.handler = async (event) => {
     'Content-Type': 'application/json'
   };
 
+  // CORS Preflight
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
 
   try {
-    if (!event.body) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing body' }) };
-    
-    const payload = JSON.parse(event.body);
-    const signs = Array.isArray(payload.signs) ? payload.signs.join(', ') : 'Keine spezifischen';
-    const participants = Number(payload.participants) || 2;
-    const vibe = payload.vibe || 'Fließende Balance';
-    const budget = payload.budget || 'Goldene Mitte';
-    const distance = payload.distance || 'Kontinentale Weite';
-    const transport = payload.transport || 'Flug der Falken';
-
+    const payload = JSON.parse(event.body || '{}');
     const apiKey = process.env.MISTRAL_API_KEY;
-    if (!apiKey) {
-<<<<<<< Updated upstream
-      return {
-        statusCode: 200, headers, body: JSON.stringify({
-          destination: "Barcelona", explanation: "API nicht verbunden.", bestTimeTip: "Jederzeit",
-          packliste: ["Rimowa Cabin Aluminiumkoffer", "Noise-Cancelling Kopfhörer", "Hochwertige Sonnenbrille"], cta_text: "Ferien planen",
-=======
-      // Fallback für lokale Tests ohne API Key
-      return {
-        statusCode: 200, headers, body: JSON.stringify({
-          destination: "Mallorca", 
-          explanation: "Das Orakel ruht gerade. Dies ist eine Test-Empfehlung.", 
-          bestTimeTip: "Mai bis September",
-          packliste: ["Sonnencreme", "Gute Laune", "Reisepass"], 
-          cta_text: "Ferien planen",
->>>>>>> Stashed changes
-          affiliate_suggestions: []
-        })
-      };
-    }
 
-    const prompt = `Du bist ein hochentwickeltes astrologisches Orakel für Ferien. /astro
-    Analysiere folgende Parameter für ${participants} Personen der Sternzeichen ${signs}:
-    Erlebnis-Wunsch: ${vibe}
-    Budget-Pfad: ${budget}
-    Gewünschte Entfernung: ${distance}
-    Art der Fortbewegung: ${transport}
+    if (!apiKey) throw new Error("MISTRAL_API_KEY fehlt");
+
+    const prompt = `Du bist ein astrologisches Orakel für Ferien. /astro
+    Analysiere für ${payload.participants || 2} Personen der Sternzeichen ${payload.signs || 'Unbekannt'}:
+    Vibe: ${payload.vibe}, Budget: ${payload.budget}, Ziel: ${payload.distance}, Transport: ${payload.transport}.
     
-    WICHTIGE REGELN FÜR DEINE EMPFEHLUNG:
-    1. Geografische Bindung: "Heimatliche Gefilde" und "Nachbarreiche" bedeuten ZWINGEND DACH-Region. "Kontinentale Weite" bedeutet ZWINGEND Europa. Alles andere ist weltweit. 
-    2. Die Packliste MUSS 3 REALE, hochprofessionelle Ausrüstungsgegenstände enthalten. NENNE KEINE KAMERAS. Nenne stattdessen exklusives Premium-Gepäck, High-Tech Kleidung oder Gadgets. ERFINDE KEINE esoterischen Gegenstände.
-    3. Die Begründung ('explanation') MUSS ZWINGEND diese Quellen einbinden: 
-       - Wie Buddha es im Mahayana im Mahapäriniviranä Sutra erläutert (Übersetzer Kosho Yamamoto 1973).
-       - Das Konzept des Atman (Hinduismus, Merriam-Webster 2003).
-    4. Nutze immer das Wort "Ferien".
-    5. Beachte simulierte Reise- und Sicherheitswarnungen.
+    WICHTIGE REGELN:
+    1. Nutze das Wort "Ferien".
+    2. Einbindung: Buddha (Mahayana, Mahaparinirvana Sutra, Yamamoto 1973) und das Konzept des Atman (Merriam-Webster 2003).
+    3. Die Packliste muss 3 reale Profi-Reise-Items enthalten (keine Kameras).
     
-    Antworte AUSSCHLIESSLICH als JSON-Objekt ohne Markdown:
+    Antworte NUR mit einem validen JSON-Objekt:
     {
-      "destination": "Name des Ziels (NUR die Stadt oder Insel, z.B. 'Mallorca' oder 'Paris')",
-      "explanation": "Tiefgründige Begründung inkl. Sternzeichen, Buddha (Yamamoto 1973) und Atman (Webster 2003).",
-      "bestTimeTip": "Beste Reisezeit",
-      "packliste": ["Reales Profi-Item 1", "Reales Profi-Item 2", "Reales Profi-Item 3"],
+      "destination": "Name des Ziels",
+      "explanation": "Tiefgründige Begründung...",
+      "bestTimeTip": "Reisezeit-Tipp",
+      "packliste": ["Item 1", "Item 2", "Item 3"],
       "cta_text": "Ferien Erlebnisse buchen"
     }`;
 
-<<<<<<< Updated upstream
-=======
-    // Hier nutzen wir das native fetchFn
->>>>>>> Stashed changes
-    const mistralRes = await fetchFn('https://api.mistral.ai/v1/chat/completions', {
+    const response = await fetchFn('https://api.mistral.ai/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-      body: JSON.stringify({ model: "mistral-small-latest", messages: [{ role: "user", content: prompt }], temperature: 0.7 })
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: "mistral-small-latest",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.2
+      })
     });
 
-    const mistralData = await mistralRes.json();
-    let rawText = mistralData.choices[0].message.content;
-    
-    let cleaned = rawText.trim();
-<<<<<<< Updated upstream
-=======
-    // Falls Mistral Markdown-Boxen mitschickt, diese entfernen
->>>>>>> Stashed changes
-    const fenceMatch = cleaned.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
-    if (fenceMatch && fenceMatch[1]) cleaned = fenceMatch[1].trim();
-    if (!cleaned.startsWith('{')) {
-      const firstJson = cleaned.match(/\{[\s\S]*?\}/);
-      if (firstJson) cleaned = firstJson[0];
-    }
+    const data = await response.json();
+    let content = data.choices[0].message.content.trim();
 
-<<<<<<< Updated upstream
-    let parsed = null;
-    try { parsed = JSON.parse(cleaned); } catch(e) { 
-      return { statusCode: 500, headers, body: JSON.stringify({ error: "Fehler beim Parsen." }) }; 
-    }
+    // Falls die KI Text um das JSON herum baut, filtern wir es hier
+    const start = content.indexOf('{');
+    const end = content.lastIndexOf('}');
+    if (start === -1) throw new Error("Kein JSON gefunden");
+    content = content.substring(start, end + 1);
 
-    const destRaw = parsed.destination || 'Berlin';
-    const destEnc = encodeURIComponent(destRaw);
-    const destSlug = destRaw.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const result = JSON.parse(content);
 
-    // GetTransfer sendet nun sicher auf die Startseite, um den 404 Fehler zu vermeiden.
-=======
-    let parsed = JSON.parse(cleaned);
-
-    // Ziel formatieren für die verschiedenen Partner-Strukturen
-    const destRaw = parsed.destination || 'Mallorca';
-    const destEnc = encodeURIComponent(destRaw);
-    const destSlug = destRaw.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-
-    // Deep-Links für Travelpayouts mit deinen IDs
->>>>>>> Stashed changes
-    const klookTarget = encodeURIComponent(`https://www.klook.com/search/result/?query=${destEnc}`);
-    const getTransferTarget = encodeURIComponent(`https://gettransfer.com/`);
-    const wpTarget = encodeURIComponent(`https://www.welcomepickups.com/${destSlug}/`);
-
-    parsed.affiliate_suggestions = [
+    // Affiliate-Links mit deinen IDs (698672 & 492044)
+    const dEnc = encodeURIComponent(result.destination);
+    result.affiliate_suggestions = [
       { 
-        type: 'activity', 
-        label: `Klook Erlebnisse in ${destRaw}`, 
-        affiliate_url: `https://tp.media/r?campaign_id=137&marker=698672&p=4110&trs=492044&u=${klookTarget}` 
+        label: `Aktivitäten in ${result.destination}`, 
+        affiliate_url: `https://tp.media/r?campaign_id=137&marker=698672&p=4110&trs=492044&u=${encodeURIComponent('https://www.klook.com/search/result/?query=' + dEnc)}` 
       },
       { 
-        type: 'transfer', 
-        label: `GetTransfer Fahrt`, 
-        affiliate_url: `https://tp.media/r?campaign_id=147&marker=698672&p=4439&trs=492044&u=${getTransferTarget}` 
-      },
-      { 
-        type: 'pickup', 
-        label: `Welcome Pickups`, 
-        affiliate_url: `https://tp.media/r?campaign_id=627&marker=698672&p=8919&trs=492044&u=${wpTarget}` 
+        label: "Transfer finden", 
+        affiliate_url: "https://tp.media/r?campaign_id=147&marker=698672&p=4439&trs=492044" 
       }
     ];
 
-    return { statusCode: 200, headers, body: JSON.stringify(parsed) };
-    
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify(result)
+    };
+
   } catch (error) {
-<<<<<<< Updated upstream
-    return { statusCode: 500, headers, body: JSON.stringify({ error: error.message }) };
-  }
-};
-=======
-    return { 
-      statusCode: 500, 
-      headers, 
-      body: JSON.stringify({ error: error.message, stack: "Fehler im Orakel-Backend" }) 
+    console.error("Orakel-Fehler:", error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: "Kosmische Störung", details: error.message })
     };
   }
 };
->>>>>>> Stashed changes
