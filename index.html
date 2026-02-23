@@ -2,81 +2,72 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KI-Ferien.de - Kosmisches Orakel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>KI-Ferien.de - Orakel</title>
     <style>
         :root {
             --gold: #d4af37;
-            --space-black: #05060f;
-            --cosmic-blue: #1a1c3a;
-            --glass: rgba(255, 255, 255, 0.05);
-            --circle-size: clamp(300px, 88vw, 600px);
-            --ball-size: clamp(58px, 14vw, 85px);
+            --cosmic-blue: #0a192f;
+            --ball-size: clamp(55px, 12vw, 85px);
+            --circle-size: clamp(300px, 85vw, 600px);
         }
 
         body {
             margin: 0; padding: 0;
             background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
-            color: white; font-family: 'Segoe UI', sans-serif;
-            min-height: 100vh; display: flex; flex-direction: column;
-            align-items: center; overflow: hidden;
+            color: white; font-family: 'Optima', 'Segoe UI', serif;
+            min-height: 100vh; display: flex; flex-direction: column; align-items: center; overflow-x: hidden;
         }
 
-        /* Sterne-Effekt im Hintergrund */
-        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: url('https://www.transparenttextures.com/patterns/stardust.png'); opacity: 0.3; }
-
         .hero h1 { 
-            font-size: clamp(1.5rem, 6vw, 2.5rem); color: var(--gold); 
-            text-transform: uppercase; letter-spacing: 4px; margin: 20px 0;
-            text-shadow: 0 0 20px rgba(212,175,55,0.5);
+            font-size: clamp(1.8rem, 6vw, 3rem); color: var(--gold); 
+            text-transform: uppercase; letter-spacing: 4px; margin: 30px 0;
+            text-shadow: 0 0 20px rgba(212,175,55,0.4);
         }
 
         .oracle-container {
             position: relative; width: var(--circle-size); height: var(--circle-size);
-            margin: auto; display: flex; align-items: center; justify-content: center;
+            display: flex; align-items: center; justify-content: center; margin: 20px auto;
         }
 
+        /* Das rotierende System */
         #zodiac-wrapper {
             position: absolute; width: 100%; height: 100%;
-            animation: rotate-ring 160s linear infinite;
+            animation: rotate-ring 140s linear infinite;
         }
 
-        /* Plastisches Zentrum */
+        /* Die Mitte: Das plastische Hub */
         .central-hub {
             width: 65%; height: 65%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
-            backdrop-filter: blur(20px); border-radius: 50%;
-            border: 1px solid rgba(212, 175, 55, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border-radius: 50%; border: 1px solid rgba(212, 175, 55, 0.3);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             padding: 30px; box-sizing: border-box; z-index: 10;
             box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(212,175,55,0.1);
         }
 
-        .slider-group { width: 100%; margin: 8px 0; }
-        .slider-label { font-size: 0.75rem; color: var(--gold); display: flex; justify-content: space-between; font-weight: bold; }
+        .slider-group { width: 100%; margin: 10px 0; }
+        .slider-label { font-size: 0.8rem; color: var(--gold); display: flex; justify-content: space-between; font-weight: bold; }
         
         input[type=range] { width: 100%; margin: 10px 0; cursor: pointer; accent-color: var(--gold); }
 
         .oracle-btn {
-            background: var(--gold); color: black; border: none; padding: 12px 25px;
+            background: var(--gold); color: black; border: none; padding: 12px 30px;
             border-radius: 50px; font-weight: bold; cursor: pointer; margin-top: 15px;
-            font-size: 1rem; box-shadow: 0 0 20px rgba(212,175,55,0.4); transition: 0.3s;
+            font-size: 1.1rem; box-shadow: 0 0 20px rgba(212,175,55,0.4); transition: 0.3s;
         }
         .oracle-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px var(--gold); }
 
-        /* Zodiac Balls */
+        /* Sternzeichen-Kugeln */
         .zodiac-ball {
             position: absolute; width: var(--ball-size); height: var(--ball-size);
-            background: rgba(0,0,0,0.8); border: 1px solid var(--gold); border-radius: 50%;
+            background: rgba(0,0,0,0.85); border: 1.5px solid var(--gold); border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.3s; z-index: 11;
-            animation: counter-rotate 160s linear infinite;
-            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            cursor: pointer; transition: 0.4s; z-index: 11;
+            animation: counter-rotate 140s linear infinite;
         }
-        .zodiac-ball span { 
-            line-height: 1.1; font-weight: bold; text-align: center;
-            font-size: clamp(0.6rem, 2.5vw, 0.8rem); 
-        }
+        .zodiac-ball span { line-height: 1.2; text-align: center; font-size: 0.75rem; }
         .zodiac-ball.selected {
             background: var(--gold); color: black;
             box-shadow: 0 0 30px var(--gold); transform: translate(-50%, -50%) scale(1.15) !important;
@@ -88,13 +79,12 @@
             to { transform: translate(-50%, -50%) rotate(-360deg); } 
         }
 
-        footer { margin-top: auto; padding: 15px; width: 100%; text-align: center; background: rgba(0,0,0,0.5); }
-        footer a { color: var(--gold); text-decoration: none; margin: 0 15px; font-size: 0.8rem; }
+        footer { margin-top: auto; padding: 20px; width: 100%; text-align: center; background: rgba(0,0,0,0.4); border-top: 1px solid rgba(255,255,255,0.1); }
+        footer a { color: var(--gold); text-decoration: none; margin: 0 15px; font-size: 0.85rem; }
     </style>
 </head>
 <body>
 
-<div class="stars"></div>
 <div class="hero"><h1>Das Orakel</h1></div>
 
 <div class="oracle-container">
@@ -112,7 +102,7 @@
     </div>
 </div>
 
-<div id="status" style="margin: 10px; font-size: 0.8rem; color: var(--gold);">Wähle Deine Zeichen</div>
+<div id="status" style="margin: 15px; font-size: 0.85rem; color: var(--gold); letter-spacing: 1px;">Berühre Deine Bestimmung</div>
 
 <footer>
     <a href="impressum.html">Impressum</a>
@@ -139,7 +129,7 @@
             const ball = document.createElement('div');
             ball.className = 'zodiac-ball';
             const fontSize = sign.name.length > 9 ? '0.6rem' : '0.75rem';
-            ball.innerHTML = `<span><span style="font-size:1.2rem">${sign.icon}</span><br><span style="font-size:${fontSize}">${sign.name}</span></span>`;
+            ball.innerHTML = `<span><b style="font-size:1.3rem">${sign.icon}</b><br><span style="font-size:${fontSize}">${sign.name}</span></span>`;
             
             const angle = (index / signs.length) * 2 * Math.PI - Math.PI / 2;
             const radius = 43; 
@@ -149,9 +139,8 @@
 
             ball.onclick = () => {
                 ball.classList.toggle('selected');
-                const name = sign.name;
-                if (ball.classList.contains('selected')) selectedSigns.push(name);
-                else selectedSigns = selectedSigns.filter(s => s !== name);
+                if (ball.classList.contains('selected')) selectedSigns.push(sign.name);
+                else selectedSigns = selectedSigns.filter(s => s !== sign.name);
             };
             wrapper.appendChild(ball);
         });
@@ -159,11 +148,11 @@
         document.getElementById('ask-oracle').onclick = async function() {
             if (selectedSigns.length === 0) return;
             this.disabled = true;
+            document.getElementById('status').innerText = "Die Sterne ordnen sich...";
             const payload = {
                 signs: selectedSigns,
                 participants: document.getElementById('participants').value,
-                distance: distanzNamen[document.getElementById('distance-slider').value - 1],
-                vibe: "Astrologische Ferien"
+                distance: distanzNamen[document.getElementById('distance-slider').value - 1]
             };
             try {
                 const res = await fetch('/api/match', { method: 'POST', body: JSON.stringify(payload)});
