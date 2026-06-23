@@ -19,7 +19,7 @@
         .dest-title { font-size: 1.5rem; color: var(--gold); font-weight: bold; margin: 0; }
         .dest-reason { font-size: 1rem; color: rgba(255,255,255,0.8); line-height: 1.6; margin: 0; }
         .booking-btn { background: linear-gradient(135deg, #d4af37 0%, #aa841b 100%); color: black; text-decoration: none; text-align: center; padding: 15px; border-radius: 16px; font-weight: bold; display: block; }
-        .no-data { text-align: center; padding: 40px; color: rgba(255,255,255,0.5); }
+        .error-msg { text-align: center; color: #ff6b6b; padding: 40px; font-size: 1.2rem; }
         footer { margin-top: auto; padding: 15px; text-align: center; width: 100%; }
         footer a { color: rgba(255,255,255,0.4); text-decoration: none; margin: 0 10px; font-size: 0.75rem; }
     </style>
@@ -32,7 +32,7 @@
         <h1>Dein Kosmisches Ziel</h1>
     </div>
     <div id="vibe-container"></div>
-    <div id="results-wrapper"><div class="no-data">Analysiere kosmische Konstellationen...</div></div>
+    <div id="results-wrapper"></div>
 </div>
 <footer><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a></footer>
 
@@ -42,51 +42,43 @@
         const vibeContainer = document.getElementById('vibe-container');
         const rawData = sessionStorage.getItem('orakelResult');
 
-        // Strenges Parsing der synchronisierten Struktur aus match.js
-        if (rawData) {
-            try {
-                const parsed = JSON.parse(rawData);
-                
-                // Wir navigieren direkt zum "result" Objekt, das unsere match.js zurückgibt
-                if (parsed && parsed.result && Array.isArray(parsed.result.destinationen)) {
-                    const data = parsed.result;
-                    
-                    if (data.vibe_keynote) {
-                        vibeContainer.innerHTML = `<div class="vibe-card"><p>"${data.vibe_keynote}"</p></div>`;
-                    }
-                    
-                    wrapper.innerHTML = ''; 
-                    data.destinationen.forEach(dest => {
-                        const card = document.createElement('div');
-                        card.className = 'destination-card';
-                        const encodedOrt = encodeURIComponent(dest.ort);
-                        const klookUrl = `https://www.klook.com/de/search/result/?keyword=${encodedOrt}&aid=492044`;
-
-                        card.innerHTML = `
-                            <div class="dest-meta"><div class="dest-title">${dest.ort}</div></div>
-                            <p class="dest-reason">${dest.astro_matching_grund}</p>
-                            <a href="${klookUrl}" target="_blank" rel="noopener noreferrer" class="booking-btn" data-type="${dest.link_type || 'in_app_browser'}">
-                                Erlebnisse in ${dest.ort.split(',')[0]} entdecken ✨
-                            </a>
-                        `;
-                        wrapper.appendChild(card);
-                    });
-                    return; // Erfolgreich gerendert, Abbruch.
-                }
-            } catch (err) {
-                console.error("Datenverarbeitung fehlgeschlagen:", err);
-            }
+        if (!rawData) {
+            wrapper.innerHTML = '<div class="error-msg">Keine Daten empfangen. Bitte befrage das Orakel erneut.</div>';
+            return;
         }
 
-        // Wird nur erreicht, wenn API fehlschlägt oder Seite direkt aufgerufen wird
-        wrapper.innerHTML = `
-            <div class="no-data" style="color: #ff6b6b; margin-bottom: 20px;">Die Sterne antworten nicht. Bitte befrage das Orakel erneut auf der Startseite.</div>
-            <div class="destination-card">
-                <div class="dest-meta"><div class="dest-title">Kyōto, Japan (Offline Fallback)</div></div>
-                <p class="dest-reason">Die harmonischen Steingärten bieten der Seele die perfekte Balance.</p>
-                <a href="https://www.klook.com/de/search/result/?keyword=Kyoto&aid=492044" target="_blank" class="booking-btn" data-type="in_app_browser">Erlebnisse in Kyōto entdecken ✨</a>
-            </div>
-        `;
+        try {
+            const parsed = JSON.parse(rawData);
+            // Wir lesen die Daten exakt so aus, wie dein ursprüngliches Setup sie bereitgestellt hat
+            const data = parsed.result;
+
+            if (data.vibe_keynote) {
+                vibeContainer.innerHTML = `<div class="vibe-card"><p>"${data.vibe_keynote}"</p></div>`;
+            }
+
+            if (data.destinationen && data.destinationen.length > 0) {
+                data.destinationen.forEach(dest => {
+                    const card = document.createElement('div');
+                    card.className = 'destination-card';
+                    const encodedOrt = encodeURIComponent(dest.ort);
+                    const klookUrl = `https://www.klook.com/de/search/result/?keyword=${encodedOrt}&aid=492044`;
+
+                    card.innerHTML = `
+                        <div class="dest-meta"><div class="dest-title">${dest.ort}</div></div>
+                        <p class="dest-reason">${dest.astro_matching_grund}</p>
+                        <a href="${klookUrl}" target="_blank" rel="noopener noreferrer" class="booking-btn" data-type="${dest.link_type || 'in_app_browser'}">
+                            Ferien in ${dest.ort.split(',')[0]} entdecken ✨
+                        </a>
+                    `;
+                    wrapper.appendChild(card);
+                });
+            } else {
+                wrapper.innerHTML = '<div class="error-msg">Mistral konnte keine passenden Ziele finden.</div>';
+            }
+        } catch (e) {
+            console.error("Fehler beim Auslesen:", e);
+            wrapper.innerHTML = '<div class="error-msg">Ein Fehler ist aufgetreten. Bitte versuche es erneut.</div>';
+        }
     });
 </script>
 </body>
