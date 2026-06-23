@@ -206,7 +206,8 @@
             };
             
             try {
-                const response = await fetch('/api/match', { 
+                // HIER IST DER ENTSCHEIDENDE PFAD FÜR NETLIFY!
+                const response = await fetch('/.netlify/functions/match', { 
                     method: 'POST', 
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload) 
