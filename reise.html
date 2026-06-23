@@ -2,45 +2,31 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dein Kosmisches Ziel - KI-Ferien.de</title>
+    <title>Deine Reise</title>
     <style>
-        :root { --gold: #d4af37; }
-        body { margin: 0; background: #05060f; color: white; font-family: 'Optima', serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        .container { max-width: 600px; width: 90%; margin: 40px auto; }
-        .vibe-card { background: rgba(10, 25, 47, 0.6); border: 1px solid rgba(212, 175, 55, 0.2); padding: 25px; border-radius: 20px; text-align: center; margin-bottom: 20px; }
-        .destination-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 30px; }
-        .dest-title { font-size: 1.8rem; color: var(--gold); margin-bottom: 10px; }
-        .btn { display: block; background: var(--gold); color: black; padding: 15px; border-radius: 12px; text-decoration: none; font-weight: bold; text-align: center; margin-top: 15px; }
+        body { background: #05060f; color: white; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
+        .card { background: #111; padding: 20px; border-radius: 15px; border: 1px solid #333; max-width: 500px; }
+        .btn { display: block; background: #d4af37; color: black; padding: 15px; text-decoration: none; text-align: center; border-radius: 10px; margin-top: 15px; }
     </style>
 </head>
 <body>
-<div class="container">
-    <div id="results"></div>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
+    <div id="content">Lade Bestimmung...</div>
+    <script>
         const rawData = sessionStorage.getItem('orakelResult');
-        if (!rawData) return;
+        const data = JSON.parse(rawData);
+        const result = data.result || data;
 
-        const parsed = JSON.parse(rawData);
-        // Wir holen uns das "result" Objekt
-        const data = parsed.result;
+        const ort = result.destination || result.ort || "Unbekannt";
+        const text = result.explanation || result.astro_matching_grund || "Keine Info.";
+        const url = `https://www.klook.com/de/?aid=492044`; // Stabile URL
 
-        // Feld-Mapping: Wir schauen, ob Mistral neue oder alte Feldnamen genutzt hat
-        const ort = data.destination || data.ort || "Unbekannt";
-        const grund = data.explanation || data.astro_matching_grund || "";
-        const affiliate = data.affiliate_suggestions && data.affiliate_suggestions.length > 0 ? data.affiliate_suggestions[0].affiliate_url : "#";
-
-        document.getElementById('results').innerHTML = `
-            <div class="destination-card">
-                <div class="dest-title">${ort}</div>
-                <p>${grund}</p>
-                <a href="${affiliate}" target="_blank" class="btn">Ferien buchen</a>
+        document.getElementById('content').innerHTML = `
+            <div class="card">
+                <h2>${ort}</h2>
+                <p>${text}</p>
+                <a href="${url}" class="btn">Ferien entdecken</a>
             </div>
         `;
-    });
-</script>
+    </script>
 </body>
 </html>
