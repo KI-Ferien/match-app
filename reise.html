@@ -5,192 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Deine Kosmische Reise - KI-Ferien.de</title>
     <style>
-        :root {
-            --gold: #d4af37;
-            --cosmic-blue: #0a192f;
-            --glass: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(212, 175, 55, 0.2);
-        }
-
-        body {
-            margin: 0; padding: 0;
-            background: #05060f;
-            color: white; font-family: 'Optima', 'Segoe UI', serif;
-            min-height: 100vh; display: flex; flex-direction: column;
-            align-items: center; overflow-x: hidden;
-        }
-
-        /* HINTERGRUND-ELEMENTE */
-        .nebula {
-            position: fixed; top: 30%; left: 50%; width: 120vmax; height: 120vmax;
-            background: radial-gradient(circle at center, rgba(142, 108, 246, 0.08) 0%, rgba(0, 92, 151, 0.03) 40%, transparent 70%);
-            transform: translate(-50%, -50%); z-index: -2; pointer-events: none; filter: blur(100px);
-        }
-
-        .container {
-            max-width: 600px; width: 90%; margin: 40px auto; z-index: 10;
-            display: flex; flex-direction: column; gap: 25px;
-        }
-
-        /* HEADER */
+        :root { --gold: #d4af37; --glass-border: rgba(212, 175, 55, 0.2); }
+        body { margin: 0; padding: 0; background: #05060f; color: white; font-family: 'Optima', 'Segoe UI', serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
+        .nebula { position: fixed; top: 30%; left: 50%; width: 120vmax; height: 120vmax; background: radial-gradient(circle at center, rgba(142, 108, 246, 0.08) 0%, rgba(0, 92, 151, 0.03) 40%, transparent 70%); transform: translate(-50%, -50%); z-index: -2; pointer-events: none; filter: blur(100px); }
+        .container { max-width: 600px; width: 90%; margin: 40px auto; z-index: 10; display: flex; flex-direction: column; gap: 25px; }
         .header { text-align: center; margin-bottom: 10px; }
-        .back-btn {
-            background: transparent; border: 1px solid var(--gold); color: var(--gold);
-            padding: 8px 18px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
-            transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;
-        }
-        .back-btn:hover { background: var(--gold); color: black; }
-
-        h1 { font-size: clamp(1.6rem, 5vw, 2.5rem); color: var(--gold); margin: 15px 0 5px 0; text-shadow: 0 0 20px rgba(212,175,55,0.3); }
-        
-        /* KEYNOTE CARD */
-        .vibe-card {
-            background: rgba(10, 25, 47, 0.6); backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border); padding: 25px; border-radius: 20px;
-            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .vibe-card p { font-style: italic; font-size: clamp(1rem, 3vw, 1.3rem); color: #fff; margin: 0; line-height: 1.5; }
-
-        /* DESTINATION CARDS */
-        .destination-card {
-            background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.05); border-radius: 24px;
-            padding: 30px; display: flex; flex-direction: column; gap: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6); transition: transform 0.3s ease;
-        }
-        .destination-card:hover { border-color: var(--glass-border); }
-
-        .dest-meta { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,175,55,0.1); padding-bottom: 12px; }
-        .dest-title { font-size: clamp(1.3rem, 4vw, 1.8rem); color: var(--gold); font-weight: bold; margin: 0; }
-        
-        .dest-reason { font-size: clamp(0.9rem, 2.5vw, 1.05rem); color: rgba(255,255,255,0.8); line-height: 1.6; margin: 0; }
-
-        /* PREMIUM BUTTON (KLOOK) */
-        .booking-btn {
-            background: linear-gradient(135deg, #d4af37 0%, #aa841b 100%);
-            color: black; text-decoration: none; text-align: center;
-            padding: 15px; border-radius: 16px; font-weight: bold;
-            font-size: 1rem; cursor: pointer; transition: 0.3s;
-            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.2);
-            display: flex; justify-content: center; align-items: center; gap: 10px;
-        }
-        .booking-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4); }
-
-        /* ERROR / EMPTY STATE */
+        .back-btn { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 8px 18px; border-radius: 20px; cursor: pointer; text-transform: uppercase; }
+        h1 { font-size: 2rem; color: var(--gold); margin: 15px 0 5px 0; }
+        .vibe-card { background: rgba(10, 25, 47, 0.6); border: 1px solid var(--glass-border); padding: 25px; border-radius: 20px; text-align: center; }
+        .vibe-card p { font-style: italic; font-size: 1.2rem; margin: 0; }
+        .destination-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; padding: 30px; display: flex; flex-direction: column; gap: 20px; }
+        .dest-meta { border-bottom: 1px solid rgba(212,175,55,0.1); padding-bottom: 12px; }
+        .dest-title { font-size: 1.5rem; color: var(--gold); font-weight: bold; margin: 0; }
+        .dest-reason { font-size: 1rem; color: rgba(255,255,255,0.8); line-height: 1.6; margin: 0; }
+        .booking-btn { background: linear-gradient(135deg, #d4af37 0%, #aa841b 100%); color: black; text-decoration: none; text-align: center; padding: 15px; border-radius: 16px; font-weight: bold; display: block; }
         .no-data { text-align: center; padding: 40px; color: rgba(255,255,255,0.5); }
-
-        footer { margin-top: auto; padding: 15px; width: 100%; text-align: center; box-sizing: border-box; }
+        footer { margin-top: auto; padding: 15px; text-align: center; width: 100%; }
         footer a { color: rgba(255,255,255,0.4); text-decoration: none; margin: 0 10px; font-size: 0.75rem; }
     </style>
 </head>
 <body>
-
 <div class="nebula"></div>
-
 <div class="container">
     <div class="header">
-        <button class="back-btn" onclick="window.location.href='index.html'">← Zurück zum Orakel</button>
-        <h1 id="page-title">Deine Bestimmung</h1>
+        <button class="back-btn" onclick="window.location.href='index.html'">← Zurück</button>
+        <h1>Dein Kosmisches Ziel</h1>
     </div>
-
     <div id="vibe-container"></div>
-
-    <div id="results-wrapper">
-        <div class="no-data">Das Schicksal wird geladen...</div>
-    </div>
+    <div id="results-wrapper"><div class="no-data">Analysiere kosmische Konstellationen...</div></div>
 </div>
-
-<footer>
-    <a href="impressum.html">Impressum</a>
-    <a href="datenschutz.html">Datenschutz</a>
-</footer>
+<footer><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a></footer>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const wrapper = document.getElementById('results-wrapper');
         const vibeContainer = document.getElementById('vibe-container');
-        const pageTitle = document.getElementById('page-title');
-
-        // Absolut krisensichere Fallback-Daten für erstklassiges UX-Verhalten
-        let finalData = {
-            "vibe_keynote": "Die kosmischen Energien weisen den Weg zu Orten der Kraft und Inspiration.",
-            "destinationen": [
-                {
-                    "ort": "Kyōto, Japan",
-                    "astro_matching_grund": "Die harmonischen Steingärten und alten Tempel bieten der Seele die perfekte Balance und tiefe, ungestörte Reflexion.",
-                    "link_type": "in_app_browser"
-                },
-                {
-                    "ort": "Reykjavík, Island",
-                    "astro_matching_grund": "Das Zusammenspiel aus vulkanischer Energie und weiten Eislandschaften triggert den inneren Pioniergeist auf spektakuläre Weise.",
-                    "link_type": "in_app_browser"
-                }
-            ]
-        };
-
         const rawData = sessionStorage.getItem('orakelResult');
 
+        // Strenges Parsing der synchronisierten Struktur aus match.js
         if (rawData) {
             try {
                 const parsed = JSON.parse(rawData);
-                let targetObj = null;
-
-                // Schrittweise Extraktion unabhängig vom Netlify-Verschachtelungsgrad
-                if (parsed && typeof parsed === 'object') {
-                    if (parsed.result) {
-                        targetObj = parsed.result.result ? parsed.result.result : parsed.result;
-                    } else {
-                        targetObj = parsed;
+                
+                // Wir navigieren direkt zum "result" Objekt, das unsere match.js zurückgibt
+                if (parsed && parsed.result && Array.isArray(parsed.result.destinationen)) {
+                    const data = parsed.result;
+                    
+                    if (data.vibe_keynote) {
+                        vibeContainer.innerHTML = `<div class="vibe-card"><p>"${data.vibe_keynote}"</p></div>`;
                     }
-                }
+                    
+                    wrapper.innerHTML = ''; 
+                    data.destinationen.forEach(dest => {
+                        const card = document.createElement('div');
+                        card.className = 'destination-card';
+                        const encodedOrt = encodeURIComponent(dest.ort);
+                        const klookUrl = `https://www.klook.com/de/search/result/?keyword=${encodedOrt}&aid=492044`;
 
-                // Falls der Inhalt als serialisierter JSON-String vorliegt
-                if (typeof targetObj === 'string') {
-                    targetObj = JSON.parse(targetObj);
-                }
-
-                if (targetObj && Array.isArray(targetObj.destinationen) && targetObj.destinationen.length > 0) {
-                    finalData = targetObj; // Überschreiben mit echten Live-Daten erfolgreich
+                        card.innerHTML = `
+                            <div class="dest-meta"><div class="dest-title">${dest.ort}</div></div>
+                            <p class="dest-reason">${dest.astro_matching_grund}</p>
+                            <a href="${klookUrl}" target="_blank" rel="noopener noreferrer" class="booking-btn" data-type="${dest.link_type || 'in_app_browser'}">
+                                Erlebnisse in ${dest.ort.split(',')[0]} entdecken ✨
+                            </a>
+                        `;
+                        wrapper.appendChild(card);
+                    });
+                    return; // Erfolgreich gerendert, Abbruch.
                 }
             } catch (err) {
-                console.error("Daten-Struktur wurde repariert:", err);
+                console.error("Datenverarbeitung fehlgeschlagen:", err);
             }
         }
 
-        // UI-Generierung auslösen (Garantiert immer Inhalt auf dem Schirm)
-        if (finalData.vibe_keynote) {
-            vibeContainer.innerHTML = `
-                <div class="vibe-card">
-                    <p>" ${finalData.vibe_keynote} "</p>
-                </div>
-            `;
-        }
-
-        pageTitle.innerText = "Dein Kosmisches Ziel";
-        wrapper.innerHTML = ''; 
-        
-        finalData.destinationen.forEach(dest => {
-            const card = document.createElement('div');
-            card.className = 'destination-card';
-
-            const encodedOrt = encodeURIComponent(dest.ort);
-            const klookUrl = `https://www.klook.com/de/search/result/?keyword=${encodedOrt}&aid=492044`;
-
-            card.innerHTML = `
-                <div class="dest-meta">
-                    <div class="dest-title">${dest.ort}</div>
-                </div>
-                <p class="dest-reason">${dest.astro_matching_grund}</p>
-                <a href="${klookUrl}" 
-                   target="_blank" 
-                   rel="noopener noreferrer" 
-                   class="booking-btn"
-                   data-type="${dest.link_type || 'in_app_browser'}">
-                   Erlebnisse in ${dest.ort.split(',')[0]} entdecken ✨
-                </a>
-            `;
-            wrapper.appendChild(card);
-        });
+        // Wird nur erreicht, wenn API fehlschlägt oder Seite direkt aufgerufen wird
+        wrapper.innerHTML = `
+            <div class="no-data" style="color: #ff6b6b; margin-bottom: 20px;">Die Sterne antworten nicht. Bitte befrage das Orakel erneut auf der Startseite.</div>
+            <div class="destination-card">
+                <div class="dest-meta"><div class="dest-title">Kyōto, Japan (Offline Fallback)</div></div>
+                <p class="dest-reason">Die harmonischen Steingärten bieten der Seele die perfekte Balance.</p>
+                <a href="https://www.klook.com/de/search/result/?keyword=Kyoto&aid=492044" target="_blank" class="booking-btn" data-type="in_app_browser">Erlebnisse in Kyōto entdecken ✨</a>
+            </div>
+        `;
     });
 </script>
 </body>
