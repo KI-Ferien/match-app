@@ -49,18 +49,37 @@
 
         try {
             const parsed = JSON.parse(rawData);
-            // Wir lesen die Daten exakt so aus, wie dein ursprüngliches Setup sie bereitgestellt hat
-            const data = parsed.result;
+            let data = parsed.result;
 
-            if (data.vibe_keynote) {
+            // Der "Markdown-Staubsauger": Falls Mistral das JSON in Chat-Text oder Code-Blöcke verpackt hat
+            if (typeof data === 'string') {
+                // Entfernt ```json und ``` Formatierungen
+                let cleanString = data.replace(/```json/gi, '').replace(/```/gi, '').trim();
+                try {
+                    data = JSON.parse(cleanString);
+                } catch (err) {
+                    console.log("Bereinigung fehlgeschlagen, Rohtext war:", cleanString);
+                }
+            }
+
+            // Falls das Backend die Antwort noch einmal in "result" verschachtelt hat
+            if (data && data.result) {
+                data = data.result;
+            }
+
+            // Jetzt rendern wir das saubere Ergebnis
+            if (data && data.vibe_keynote) {
                 vibeContainer.innerHTML = `<div class="vibe-card"><p>"${data.vibe_keynote}"</p></div>`;
             }
 
-            if (data.destinationen && data.destinationen.length > 0) {
+            if (data && data.destinationen && data.destinationen.length > 0) {
+                wrapper.innerHTML = ''; // Vorherige Fehler löschen
                 data.destinationen.forEach(dest => {
                     const card = document.createElement('div');
                     card.className = 'destination-card';
                     const encodedOrt = encodeURIComponent(dest.ort);
+                    
+                    // Klook Affiliate Link mit deiner ID
                     const klookUrl = `https://www.klook.com/de/search/result/?keyword=${encodedOrt}&aid=492044`;
 
                     card.innerHTML = `
@@ -73,11 +92,13 @@
                     wrapper.appendChild(card);
                 });
             } else {
-                wrapper.innerHTML = '<div class="error-msg">Mistral konnte keine passenden Ziele finden.</div>';
+                // Falls Mistral tatsächlich echten Müll geschickt hat
+                console.log("Mistral Rohdaten:", data);
+                wrapper.innerHTML = '<div class="error-msg">Mistral konnte keine passenden Ziele finden. Bitte versuche eine andere Konstellation.</div>';
             }
         } catch (e) {
             console.error("Fehler beim Auslesen:", e);
-            wrapper.innerHTML = '<div class="error-msg">Ein Fehler ist aufgetreten. Bitte versuche es erneut.</div>';
+            wrapper.innerHTML = '<div class="error-msg">Ein Fehler beim Verarbeiten der Sternendaten ist aufgetreten.</div>';
         }
     });
 </script>
