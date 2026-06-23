@@ -1,114 +1,70 @@
-// netlify/functions/match.js
-// Komplett eigenständige und lauffähige Engine für KI-Ferien.de
+// match.js - KI-Ferien.de Backend Engine
+// Rein für die Datenübergabe und Prompt-Erstellung
 
 const ASTR_DATA = {
-  widder: { name: "Widder", element: "Feuer" },
-  stier: { name: "Stier", element: "Erde" },
-  zwillinge: { name: "Zwillinge", element: "Luft" },
-  krebs: { name: "Krebs", element: "Wasser" },
-  loewe: { name: "Löwe", element: "Feuer" },
-  jungfrau: { name: "Jungfrau", element: "Erde" },
-  waage: { name: "Waage", element: "Luft" },
-  skorpion: { name: "Skorpion", element: "Wasser" },
-  schuetze: { name: "Schütze", element: "Feuer" },
-  steinbock: { name: "Steinbock", element: "Erde" },
-  wassermann: { name: "Wassermann", element: "Luft" },
-  fische: { name: "Fische", element: "Wasser" }
+  widder: { name: "Widder", von: "21. März", bis: "19. April", symbol: "♈", element: "Feuer" },
+  stier: { name: "Stier", von: "20. April", bis: "20. Mai", symbol: "♉", element: "Erde" },
+  zwillinge: { name: "Zwillinge", von: "21. Mai", bis: "21. Juni", symbol: "♊", element: "Luft" },
+  krebs: { name: "Krebs", von: "22. Juni", bis: "22. Juli", symbol: "♋", element: "Wasser" },
+  loewe: { name: "Löwe", von: "23. Juli", bis: "22. August", symbol: "♌", element: "Feuer" },
+  jungfrau: { name: "Jungfrau", von: "23. August", bis: "22. September", symbol: "♍", element: "Erde" },
+  waage: { name: "Waage", von: "23. September", bis: "23. Oktober", symbol: "♎", element: "Luft" },
+  skorpion: { name: "Skorpion", von: "24. Oktober", bis: "22. November", symbol: "♏", element: "Wasser" },
+  schuetze: { name: "Schütze", von: "23. November", bis: "21. Dezember", symbol: "♐", element: "Feuer" },
+  steinbock: { name: "Steinbock", von: "22. Dezember", bis: "19. Januar", symbol: "♑", element: "Erde" },
+  wassermann: { name: "Wassermann", von: "20. Januar", bis: "18. Februar", symbol: "♒", element: "Luft" },
+  fische: { name: "Fische", von: "19. Februar", bis: "20. März", symbol: "♓", element: "Wasser" }
 };
 
-exports.handler = async (event) => {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Content-Type': 'application/json'
+function getAstroUiDefinition(signKey) {
+  const sign = ASTR_DATA[signKey.toLowerCase()];
+  if (!sign) return null;
+
+  return {
+    symbol: sign.symbol,
+    label: sign.name,
+    dateRange: `${sign.von} – ${sign.bis}`,
+    element: sign.element
+  };
+}
+
+function generateMistralPrompt(signKey, userPreferences = {}) {
+  const sign = ASTR_DATA[signKey.toLowerCase()];
+  if (!sign) throw new Error("Ungültiges Sternzeichen übergeben.");
+
+  const elementFocus = {
+    Feuer: "Physische Herausforderung, Pionier-Erlebnisse, weite Landschaften und absolute Dynamik.",
+    Erde: "Natur-Resonanz, Entschleunigung, erdende Rückzugsorte und authentische Kulinarik.",
+    Luft: "Kultureller Intellekt, urbane Vielfalt, Architektur und inspirierender Austausch.",
+    Wasser: "Tiefe Reflexion, Küsten- oder Seenlandschaften, absolute Ruhe und emotionale Regeneration."
   };
 
-  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
-  if (event.httpMethod !== 'POST') return { statusCode: 405, headers, body: JSON.stringify({ error: 'Nur POST erlaubt.' }) };
-
-  try {
-    const payload = JSON.parse(event.body);
-    const { signs, participants, vibe, budget, distance } = payload;
-
-    if (!signs || !Array.isArray(signs) || signs.length === 0) {
-      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Keine Sternzeichen übergeben.' }) };
-    }
-
-    const primarySignName = signs[0].toLowerCase();
-    const signInfo = ASTR_DATA[primarySignName] || { name: signs[0], element: "Universell" };
-
-    const elementFocus = {
-      Feuer: "Physische Herausforderung, Pionier-Erlebnisse, weite Landschaften und Dynamik.",
-      Erde: "Natur-Resonanz, Entschleunigung, erdende Rückzugsorte und Kulinarik.",
-      Luft: "Kultureller Intellekt, urbane Vielfalt, Architektur und inspirierender Austausch.",
-      Wasser: "Tiefe Reflexion, Küsten- oder Seenlandschaften, absolute Ruhe und emotionale Regeneration.",
-      Universell: "Harmonische Balance aus Entdeckung und Erholung."
-    };
-
-    const finalPrompt = `
+  return `
 Du bist die astrologische KI-Engine von KI-Ferien.de. Generiere eine maßgeschneiderte Reiseanalyse.
-Fokus-Sternzeichen: ${signInfo.name} (Element: ${signInfo.element})
-Psychografischer Fokus: ${elementFocus[signInfo.element]}
+Sternzeichen: ${sign.name} (Element: ${sign.element})
+Fokus: ${elementFocus[sign.element]}
 
-ZUSÄTZLICHE PARAMETER (Strikt beachten für die Empfehlungen):
-- Anzahl der Reisenden: ${participants}
-- Gewünschter Vibe: ${vibe}
-- Budget: ${budget}
-- Maximale Distanz: ${distance}
+STRIKTE ANTI-REDUNDANZ-REGELN:
+1. Schlage NIEMALS Standard-Ziele ohne tiefen Bezug vor. Jede Destination muss exklusiv wirken.
+2. Nutze keine oberflächlichen Klischees. Begründe die Auswahl psychologisch fundiert anhand des Elements (${sign.element}).
 
-STRIKTE REGELN:
-1. Keine oberflächlichen Klischees. Begründe psychologisch fundiert anhand des Elements.
-2. Schlage konkrete, existierende Orte vor (Stadt, Land).
-3. Gib das Ergebnis ZWINGEND als JSON-Objekt in exakt folgendem Format zurück, ohne weiteren Text:
+Gib das Ergebnis zwingend als valides JSON-Objekt in folgendem Format zurück:
 {
   "vibe_keynote": "Ein prägnanter Satz zum aktuellen Reise-Mantra.",
   "destinationen": [
     {
       "ort": "Stadt, Land",
-      "astro_matching_grund": "Detaillierte, psychologische Begründung (Max. 3 Sätze).",
-      "link_type": "in_app_browser"
+      "astro_matching_grund": "Detaillierte, psychologische Begründung.",
+      "partner_id": 492044,
+      "link_type": "in_app_browser" 
     }
   ]
 }
 `.trim();
+}
 
-    const apiKey = process.env.MISTRAL_API_KEY;
-    if (!apiKey) throw new Error("MISTRAL_API_KEY fehlt.");
-
-    // Globale Fetch API (Standard in modernen Netlify Node-Umgebungen)
-    const mistralResponse = await fetch('https://api.mistral.ai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: 'mistral-large-latest',
-        messages: [{ role: 'user', content: finalPrompt }],
-        response_format: { type: 'json_object' },
-        temperature: 0.7
-      })
-    });
-
-    if (!mistralResponse.ok) throw new Error(`Mistral API Fehler: ${mistralResponse.status}`);
-
-    const mistralData = await mistralResponse.json();
-    const cleanResult = JSON.parse(mistralData.choices[0].message.content);
-
-    // Garantiert die exakte Rückgabe an die App
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ result: cleanResult })
-    };
-
-  } catch (error) {
-    console.error("Netlify Function Error:", error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: 'Serverfehler.', details: error.message })
-    };
-  }
+module.exports = {
+  getAstroUiDefinition,
+  generateMistralPrompt,
+  astroData: ASTR_DATA
 };
