@@ -19,7 +19,8 @@
         .dest-title { font-size: 1.5rem; color: var(--gold); font-weight: bold; margin: 0; }
         .dest-reason { font-size: 1rem; color: rgba(255,255,255,0.8); line-height: 1.6; margin: 0; }
         .booking-btn { background: linear-gradient(135deg, #d4af37 0%, #aa841b 100%); color: black; text-decoration: none; text-align: center; padding: 15px; border-radius: 16px; font-weight: bold; display: block; }
-        .error-msg { text-align: center; color: #ff6b6b; padding: 40px; font-size: 1.2rem; }
+        .error-msg { text-align: center; color: #ff6b6b; padding: 20px; font-size: 1.2rem; }
+        .debug-box { background: #111; color: #0f0; padding: 15px; border-radius: 10px; font-family: monospace; font-size: 0.8rem; overflow-x: auto; text-align: left; white-space: pre-wrap; word-break: break-all; border: 1px solid #333; margin-top: 10px;}
         footer { margin-top: auto; padding: 15px; text-align: center; width: 100%; }
         footer a { color: rgba(255,255,255,0.4); text-decoration: none; margin: 0 10px; font-size: 0.75rem; }
     </style>
@@ -51,54 +52,45 @@
             const parsed = JSON.parse(rawData);
             let data = parsed.result;
 
-            // Der "Markdown-Staubsauger": Falls Mistral das JSON in Chat-Text oder Code-Blöcke verpackt hat
             if (typeof data === 'string') {
-                // Entfernt ```json und ``` Formatierungen
                 let cleanString = data.replace(/```json/gi, '').replace(/```/gi, '').trim();
                 try {
                     data = JSON.parse(cleanString);
-                } catch (err) {
-                    console.log("Bereinigung fehlgeschlagen, Rohtext war:", cleanString);
-                }
+                } catch (err) {}
             }
 
-            // Falls das Backend die Antwort noch einmal in "result" verschachtelt hat
-            if (data && data.result) {
-                data = data.result;
-            }
+            if (data && data.result) data = data.result;
 
-            // Jetzt rendern wir das saubere Ergebnis
-            if (data && data.vibe_keynote) {
-                vibeContainer.innerHTML = `<div class="vibe-card"><p>"${data.vibe_keynote}"</p></div>`;
-            }
-
+            // Wenn das Ziel erfolgreich extrahiert wird, wird es normal angezeigt
             if (data && data.destinationen && data.destinationen.length > 0) {
-                wrapper.innerHTML = ''; // Vorherige Fehler löschen
+                if (data.vibe_keynote) {
+                    vibeContainer.innerHTML = '<div class="vibe-card"><p>"' + data.vibe_keynote + '"</p></div>';
+                }
+                wrapper.innerHTML = ''; 
                 data.destinationen.forEach(dest => {
                     const card = document.createElement('div');
                     card.className = 'destination-card';
                     const encodedOrt = encodeURIComponent(dest.ort);
-                    
-                    // Klook Affiliate Link mit deiner ID
-                    const klookUrl = `https://www.klook.com/de/search/result/?keyword=${encodedOrt}&aid=492044`;
+                    const klookUrl = 'https://www.klook.com/de/search/result/?keyword=' + encodedOrt + '&aid=492044';
 
-                    card.innerHTML = `
-                        <div class="dest-meta"><div class="dest-title">${dest.ort}</div></div>
-                        <p class="dest-reason">${dest.astro_matching_grund}</p>
-                        <a href="${klookUrl}" target="_blank" rel="noopener noreferrer" class="booking-btn" data-type="${dest.link_type || 'in_app_browser'}">
-                            Ferien in ${dest.ort.split(',')[0]} entdecken ✨
-                        </a>
-                    `;
+                    card.innerHTML = 
+                        '<div class="dest-meta"><div class="dest-title">' + dest.ort + '</div></div>' +
+                        '<p class="dest-reason">' + dest.astro_matching_grund + '</p>' +
+                        '<a href="' + klookUrl + '" target="_blank" rel="noopener noreferrer" class="booking-btn" data-type="' + (dest.link_type || 'in_app_browser') + '">' +
+                            'Ferien in ' + dest.ort.split(',')[0] + ' entdecken ✨' +
+                        '</a>';
                     wrapper.appendChild(card);
                 });
             } else {
-                // Falls Mistral tatsächlich echten Müll geschickt hat
-                console.log("Mistral Rohdaten:", data);
-                wrapper.innerHTML = '<div class="error-msg">Mistral konnte keine passenden Ziele finden. Bitte versuche eine andere Konstellation.</div>';
+                // DER RÖNTGENBLICK: Zeigt exakt an, was Mistral uns wirklich geschickt hat
+                wrapper.innerHTML = 
+                    '<div class="error-msg">Mistral hat geantwortet, aber die Struktur weicht ab. Hier sind die Rohdaten, um den Fehler zu beheben:</div>' +
+                    '<div class="debug-box">' + JSON.stringify(parsed, null, 2) + '</div>';
             }
         } catch (e) {
-            console.error("Fehler beim Auslesen:", e);
-            wrapper.innerHTML = '<div class="error-msg">Ein Fehler beim Verarbeiten der Sternendaten ist aufgetreten.</div>';
+            wrapper.innerHTML = 
+                '<div class="error-msg">Parsing-Fehler. Hier sind die Rohdaten:</div>' +
+                '<div class="debug-box">' + rawData + '</div>';
         }
     });
 </script>
