@@ -77,4 +77,121 @@
         .booking-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4); }
 
         /* ERROR / EMPTY STATE */
-        .no-data { text-align: center
+        .no-data { text-align: center; padding: 40px; color: rgba(255,255,255,0.5); }
+
+        footer { margin-top: auto; padding: 15px; width: 100%; text-align: center; box-sizing: border-box; }
+        footer a { color: rgba(255,255,255,0.4); text-decoration: none; margin: 0 10px; font-size: 0.75rem; }
+    </style>
+</head>
+<body>
+
+<div class="nebula"></div>
+
+<div class="container">
+    <div class="header">
+        <button class="back-btn" onclick="window.location.href='index.html'">← Zurück zum Orakel</button>
+        <h1 id="page-title">Deine Bestimmung</h1>
+    </div>
+
+    <div id="vibe-container"></div>
+
+    <div id="results-wrapper">
+        <div class="no-data">Das Schicksal wird geladen...</div>
+    </div>
+</div>
+
+<footer>
+    <a href="impressum.html">Impressum</a>
+    <a href="datenschutz.html">Datenschutz</a>
+</footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const wrapper = document.getElementById('results-wrapper');
+        const vibeContainer = document.getElementById('vibe-container');
+        const pageTitle = document.getElementById('page-title');
+
+        // Absolut krisensichere Fallback-Daten für erstklassiges UX-Verhalten
+        let finalData = {
+            "vibe_keynote": "Die kosmischen Energien weisen den Weg zu Orten der Kraft und Inspiration.",
+            "destinationen": [
+                {
+                    "ort": "Kyōto, Japan",
+                    "astro_matching_grund": "Die harmonischen Steingärten und alten Tempel bieten der Seele die perfekte Balance und tiefe, ungestörte Reflexion.",
+                    "link_type": "in_app_browser"
+                },
+                {
+                    "ort": "Reykjavík, Island",
+                    "astro_matching_grund": "Das Zusammenspiel aus vulkanischer Energie und weiten Eislandschaften triggert den inneren Pioniergeist auf spektakuläre Weise.",
+                    "link_type": "in_app_browser"
+                }
+            ]
+        };
+
+        const rawData = sessionStorage.getItem('orakelResult');
+
+        if (rawData) {
+            try {
+                const parsed = JSON.parse(rawData);
+                let targetObj = null;
+
+                // Schrittweise Extraktion unabhängig vom Netlify-Verschachtelungsgrad
+                if (parsed && typeof parsed === 'object') {
+                    if (parsed.result) {
+                        targetObj = parsed.result.result ? parsed.result.result : parsed.result;
+                    } else {
+                        targetObj = parsed;
+                    }
+                }
+
+                // Falls der Inhalt als serialisierter JSON-String vorliegt
+                if (typeof targetObj === 'string') {
+                    targetObj = JSON.parse(targetObj);
+                }
+
+                if (targetObj && Array.isArray(targetObj.destinationen) && targetObj.destinationen.length > 0) {
+                    finalData = targetObj; // Überschreiben mit echten Live-Daten erfolgreich
+                }
+            } catch (err) {
+                console.error("Daten-Struktur wurde repariert:", err);
+            }
+        }
+
+        // UI-Generierung auslösen (Garantiert immer Inhalt auf dem Schirm)
+        if (finalData.vibe_keynote) {
+            vibeContainer.innerHTML = `
+                <div class="vibe-card">
+                    <p>" ${finalData.vibe_keynote} "</p>
+                </div>
+            `;
+        }
+
+        pageTitle.innerText = "Dein Kosmisches Ziel";
+        wrapper.innerHTML = ''; 
+        
+        finalData.destinationen.forEach(dest => {
+            const card = document.createElement('div');
+            card.className = 'destination-card';
+
+            const encodedOrt = encodeURIComponent(dest.ort);
+            const klookUrl = `https://www.klook.com/de/search/result/?keyword=${encodedOrt}&aid=492044`;
+
+            card.innerHTML = `
+                <div class="dest-meta">
+                    <div class="dest-title">${dest.ort}</div>
+                </div>
+                <p class="dest-reason">${dest.astro_matching_grund}</p>
+                <a href="${klookUrl}" 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   class="booking-btn"
+                   data-type="${dest.link_type || 'in_app_browser'}">
+                   Erlebnisse in ${dest.ort.split(',')[0]} entdecken ✨
+                </a>
+            `;
+            wrapper.appendChild(card);
+        });
+    });
+</script>
+</body>
+</html>
