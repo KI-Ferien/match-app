@@ -2,147 +2,178 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deine Bestimmung - KI-Ferien.de</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Deine Kosmische Reise - KI-Ferien.de</title>
     <style>
         :root {
-            --sunrise: #ff7e5f; --peach: #feb47b;
-            --ocean: #005c97; --gold: #d4af37;
+            --gold: #d4af37;
+            --cosmic-blue: #0a192f;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(212, 175, 55, 0.2);
         }
 
         body {
             margin: 0; padding: 0;
-            background: linear-gradient(180deg, var(--sunrise) 0%, var(--peach) 30%, #86d3f4 65%, var(--ocean) 100%);
-            color: #1a1a1a; font-family: 'Segoe UI', sans-serif;
-            min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden;
+            background: #05060f;
+            color: white; font-family: 'Optima', 'Segoe UI', serif;
+            min-height: 100vh; display: flex; flex-direction: column;
+            align-items: center; overflow-x: hidden;
         }
 
-        /* WELLEN ANIMATION */
-        .waves-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 160px; z-index: -1; }
-        .wave {
-            position: absolute; bottom: 0; width: 200%; height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C51.31,103.52,112.83,117.01,169,105,214.76,95.24,264.61,66.93,321.39,56.44Z" fill="rgba(255,255,255,0.4)"/></svg>');
-            background-size: 50% 100%; animation: move-wave 45s linear infinite;
-        }
-        @keyframes move-wave { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-
-        .container { width: 92%; max-width: 800px; margin: 40px auto; flex: 1; z-index: 1; }
-
-        .result-card {
-            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(15px);
-            border-radius: 40px; padding: clamp(25px, 5vw, 50px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid white;
+        /* HINTERGRUND-ELEMENTE */
+        .nebula {
+            position: fixed; top: 30%; left: 50%; width: 120vmax; height: 120vmax;
+            background: radial-gradient(circle at center, rgba(142, 108, 246, 0.08) 0%, rgba(0, 92, 151, 0.03) 40%, transparent 70%);
+            transform: translate(-50%, -50%); z-index: -2; pointer-events: none; filter: blur(100px);
         }
 
-        h1 { font-size: clamp(1.8rem, 6vw, 2.8rem); color: var(--ocean); text-align: center; margin: 0 0 20px 0; }
-        #destExp { font-size: 1.1rem; line-height: 1.7; text-align: justify; }
-
-        #bestTimeTip {
-            white-space: pre-line; background: rgba(212, 175, 55, 0.1);
-            padding: 20px; border-radius: 20px; border-left: 6px solid var(--gold); margin: 30px 0;
+        .container {
+            max-width: 600px; width: 90%; margin: 40px auto; z-index: 10;
+            display: flex; flex-direction: column; gap: 25px;
         }
 
-        .packlist-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 20px 0; }
-        .pack-item { background: white; padding: 12px; border-radius: 12px; text-align: center; box-shadow: 0 3px 6px rgba(0,0,0,0.05); }
-
-        /* TEILEN SEKTION */
-        .share-section {
-            margin: 30px 0; padding: 20px; background: rgba(0, 92, 151, 0.05);
-            border-radius: 25px; text-align: center;
+        /* HEADER */
+        .header { text-align: center; margin-bottom: 10px; }
+        .back-btn {
+            background: transparent; border: 1px solid var(--gold); color: var(--gold);
+            padding: 8px 18px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;
+            transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;
         }
-        .share-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
+        .back-btn:hover { background: var(--gold); color: black; }
+
+        h1 { font-size: clamp(1.6rem, 5vw, 2.5rem); color: var(--gold); margin: 15px 0 5px 0; text-shadow: 0 0 20px rgba(212,175,55,0.3); }
         
-        .share-btn {
-            padding: 10px 20px; border-radius: 20px; border: none; font-weight: bold;
-            cursor: pointer; transition: 0.3s; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;
-            text-decoration: none;
+        /* KEYNOTE CARD */
+        .vibe-card {
+            background: rgba(10, 25, 47, 0.6); backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border); padding: 25px; border-radius: 20px;
+            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .btn-copy { background: var(--gold); color: black; }
-        .btn-whatsapp { background: #25D366; color: white; }
+        .vibe-card p { font-style: italic; font-size: clamp(1rem, 3vw, 1.3rem); color: #fff; margin: 0; line-height: 1.5; }
 
-        .affiliate-section { display: flex; flex-direction: column; gap: 12px; margin-top: 30px; }
-        .affiliate-btn {
-            background: var(--ocean); color: white; padding: 18px; text-decoration: none;
-            border-radius: 50px; text-align: center; font-weight: bold; transition: 0.3s;
+        /* DESTINATION CARDS */
+        .destination-card {
+            background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.05); border-radius: 24px;
+            padding: 30px; display: flex; flex-direction: column; gap: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6); transition: transform 0.3s ease;
         }
+        .destination-card:hover { border-color: var(--glass-border); }
 
-        footer { padding: 40px; text-align: center; font-size: 0.85rem; color: white; background: rgba(0,0,0,0.1); }
-        footer a { color: white; margin: 0 10px; text-decoration: none; }
+        .dest-meta { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,175,55,0.1); padding-bottom: 12px; }
+        .dest-title { font-size: clamp(1.3rem, 4vw, 1.8rem); color: var(--gold); font-weight: bold; margin: 0; }
+        
+        .dest-reason { font-size: clamp(0.9rem, 2.5vw, 1.05rem); color: rgba(255,255,255,0.8); line-height: 1.6; margin: 0; }
+
+        /* PREMIUM BUTTON (KLOOK) */
+        .booking-btn {
+            background: linear-gradient(135deg, #d4af37 0%, #aa841b 100%);
+            color: black; text-decoration: none; text-align: center;
+            padding: 15px; border-radius: 16px; font-weight: bold;
+            font-size: 1rem; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.2);
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+        .booking-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4); }
+
+        /* ERROR / EMPTY STATE */
+        .no-data { text-align: center; padding: 40px; color: rgba(255,255,255,0.5); }
+
+        footer { margin-top: auto; padding: 15px; width: 100%; text-align: center; box-sizing: border-box; }
+        footer a { color: rgba(255,255,255,0.4); text-decoration: none; margin: 0 10px; font-size: 0.75rem; }
     </style>
 </head>
 <body>
-    <div class="waves-container"><div class="wave"></div></div>
-    <div class="container">
-        <div class="result-card">
-            <h1 id="destName">Lädt...</h1>
-            <p id="destExp"></p>
-            
-            <div id="bestTimeTip"></div>
 
-            <h3 style="text-align:center; color: var(--ocean);">Kosmisches Reisegepäck</h3>
-            <div class="packlist-grid" id="packlist"></div>
+<div class="nebula"></div>
 
-            <div class="share-section">
-                <span style="font-weight: bold; color: var(--ocean);">Schicksal teilen</span>
-                <div class="share-buttons">
-                    <button class="share-btn btn-copy" onclick="copyResult()">📋 Kopieren</button>
-                    <a id="whatsapp-link" href="#" class="share-btn btn-whatsapp" target="_blank">🟢 WhatsApp</a>
-                </div>
-            </div>
-
-            <div id="affiliate-links" class="affiliate-section"></div>
-            
-            <div style="text-align: center; margin-top: 40px;">
-                <a href="index.html" style="color: var(--ocean); font-weight: bold; text-decoration: none;">← Neue Ferien orakeln</a>
-            </div>
-        </div>
+<div class="container">
+    <div class="header">
+        <button class="back-btn" onclick="window.location.href='index.html'">← Zurück zum Orakel</button>
+        <h1 id="page-title">Deine Bestimmung</h1>
     </div>
-    <footer>
-        <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
-    </footer>
 
-    <script>
-        let shareText = "";
+    <div id="vibe-container"></div>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const data = JSON.parse(sessionStorage.getItem('orakelResult'));
-            if (!data) return;
-            const res = data.result;
-            
-            document.getElementById('destName').textContent = res.destination;
-            document.getElementById('destExp').textContent = res.explanation;
-            document.getElementById('bestTimeTip').textContent = "Die ideale Zeit:\n" + res.bestTimeTip;
-            
-            const pack = document.getElementById('packlist');
-            res.packliste.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'pack-item'; div.textContent = '🏖️ ' + item;
-                pack.appendChild(div);
-            });
+    <div id="results-wrapper">
+        <div class="no-data">Das Schicksal wird geladen...</div>
+    </div>
+</div>
 
-            const aff = document.getElementById('affiliate-links');
-            res.affiliate_suggestions.forEach(link => {
-                const a = document.createElement('a');
-                a.href = link.affiliate_url; a.className = 'affiliate-btn';
-                a.target = '_blank'; a.textContent = link.label;
-                aff.appendChild(a);
-            });
+<footer>
+    <a href="impressum.html">Impressum</a>
+    <a href="datenschutz.html">Datenschutz</a>
+</footer>
 
-            // Share Text vorbereiten
-            shareText = `Das Orakel hat gesprochen! Meine Bestimmung sind Ferien in ${res.destination}. 🌌✨\n\nBefrage auch du die Sterne auf: https://ki-ferien.de`;
-            
-            // WhatsApp Link aktualisieren
-            document.getElementById('whatsapp-link').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
-        });
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const rawData = sessionStorage.getItem('orakelResult');
+        const wrapper = document.getElementById('results-wrapper');
+        const vibeContainer = document.getElementById('vibe-container');
+        const pageTitle = document.getElementById('page-title');
 
-        function copyResult() {
-            navigator.clipboard.writeText(shareText).then(() => {
-                const btn = document.querySelector('.btn-copy');
-                const original = btn.innerText;
-                btn.innerText = "✅ Kopiert!";
-                setTimeout(() => btn.innerText = original, 2000);
-            });
+        if (!rawData) {
+            wrapper.innerHTML = '<div class="no-data">Keine Daten vom Orakel empfangen. Bitte starte die Befragung erneut.</div>';
+            return;
         }
-    </script>
+
+        try {
+            const parsed = JSON.parse(rawData);
+            // Der Match-Endpunkt liefert das JSON verschachtelt in result oder result.result
+            const data = parsed.result?.result ? parsed.result.result : parsed.result;
+
+            if (!data || !data.destinationen || data.destinationen.length === 0) {
+                wrapper.innerHTML = '<div class="no-data">Die Sterne sind unklar. Bitte versuche es noch einmal.</div>';
+                return;
+            }
+
+            // 1. Vibe Keynote setzen
+            if (data.vibe_keynote) {
+                vibeContainer.innerHTML = `
+                    <div class="vibe-card">
+                        <p>" ${data.vibe_keynote} "</p>
+                    </div>
+                `;
+            }
+
+            // Titel dynamisch anpassen, falls Sternzeichen-Infos mitgesendet werden
+            if (sessionStorage.getItem('orakelResult')) {
+                pageTitle.innerText = "Dein Kosmisches Ziel";
+            }
+
+            // 2. Destinationen rendern (Reine Klook-Anbindung, absolut KEIN Welcome Pickups)
+            wrapper.innerHTML = ''; // Clear loading state
+            
+            data.destinationen.forEach(dest => {
+                const card = document.createElement('div');
+                card.className = 'destination-card';
+
+                // Klook Affiliate URL generieren mit deiner ID 492044
+                const encodedOrt = encodeURIComponent(dest.ort);
+                const klookUrl = `https://www.klook.com/de/search/result/?keyword=${encodedOrt}&aid=492044`;
+
+                card.innerHTML = `
+                    <div class="dest-meta">
+                        <div class="dest-title">${dest.ort}</div>
+                    </div>
+                    <p class="dest-reason">${dest.astro_matching_grund}</p>
+                    <a href="${klookUrl}" 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       class="booking-btn"
+                       data-type="${dest.link_type || 'in_app_browser'}">
+                       Erlebnisse in ${dest.ort.split(',')[0]} entdecken ✨
+                    </a>
+                `;
+                
+                wrapper.appendChild(card);
+            });
+
+        } catch (e) {
+            console.error("Fehler beim Verarbeiten der Orakel-Daten:", e);
+            wrapper.innerHTML = '<div class="no-data">Fehler bei der kosmischen Übertragung.</div>';
+        }
+    });
+</script>
 </body>
 </html>
