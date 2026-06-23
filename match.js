@@ -1,70 +1,82 @@
-// match.js - KI-Ferien.de Backend Engine
-// Rein für die Datenübergabe und Prompt-Erstellung
+/**
+ * match.js - Das Herzstück für 'Das KI-Ferien Match'
+ * Hochglanz-Version für Einzelvorschläge mit Affiliate-Logik
+ */
 
-const ASTR_DATA = {
-  widder: { name: "Widder", von: "21. März", bis: "19. April", symbol: "♈", element: "Feuer" },
-  stier: { name: "Stier", von: "20. April", bis: "20. Mai", symbol: "♉", element: "Erde" },
-  zwillinge: { name: "Zwillinge", von: "21. Mai", bis: "21. Juni", symbol: "♊", element: "Luft" },
-  krebs: { name: "Krebs", von: "22. Juni", bis: "22. Juli", symbol: "♋", element: "Wasser" },
-  loewe: { name: "Löwe", von: "23. Juli", bis: "22. August", symbol: "♌", element: "Feuer" },
-  jungfrau: { name: "Jungfrau", von: "23. August", bis: "22. September", symbol: "♍", element: "Erde" },
-  waage: { name: "Waage", von: "23. September", bis: "23. Oktober", symbol: "♎", element: "Luft" },
-  skorpion: { name: "Skorpion", von: "24. Oktober", bis: "22. November", symbol: "♏", element: "Wasser" },
-  schuetze: { name: "Schütze", von: "23. November", bis: "21. Dezember", symbol: "♐", element: "Feuer" },
-  steinbock: { name: "Steinbock", von: "22. Dezember", bis: "19. Januar", symbol: "♑", element: "Erde" },
-  wassermann: { name: "Wassermann", von: "20. Januar", bis: "18. Februar", symbol: "♒", element: "Luft" },
-  fische: { name: "Fische", von: "19. Februar", bis: "20. März", symbol: "♓", element: "Wasser" }
-};
-
-function getAstroUiDefinition(signKey) {
-  const sign = ASTR_DATA[signKey.toLowerCase()];
-  if (!sign) return null;
-
-  return {
-    symbol: sign.symbol,
-    label: sign.name,
-    dateRange: `${sign.von} – ${sign.bis}`,
-    element: sign.element
-  };
-}
-
-function generateMistralPrompt(signKey, userPreferences = {}) {
-  const sign = ASTR_DATA[signKey.toLowerCase()];
-  if (!sign) throw new Error("Ungültiges Sternzeichen übergeben.");
-
-  const elementFocus = {
-    Feuer: "Physische Herausforderung, Pionier-Erlebnisse, weite Landschaften und absolute Dynamik.",
-    Erde: "Natur-Resonanz, Entschleunigung, erdende Rückzugsorte und authentische Kulinarik.",
-    Luft: "Kultureller Intellekt, urbane Vielfalt, Architektur und inspirierender Austausch.",
-    Wasser: "Tiefe Reflexion, Küsten- oder Seenlandschaften, absolute Ruhe und emotionale Regeneration."
-  };
-
-  return `
-Du bist die astrologische KI-Engine von KI-Ferien.de. Generiere eine maßgeschneiderte Reiseanalyse.
-Sternzeichen: ${sign.name} (Element: ${sign.element})
-Fokus: ${elementFocus[sign.element]}
-
-STRIKTE ANTI-REDUNDANZ-REGELN:
-1. Schlage NIEMALS Standard-Ziele ohne tiefen Bezug vor. Jede Destination muss exklusiv wirken.
-2. Nutze keine oberflächlichen Klischees. Begründe die Auswahl psychologisch fundiert anhand des Elements (${sign.element}).
-
-Gib das Ergebnis zwingend als valides JSON-Objekt in folgendem Format zurück:
-{
-  "vibe_keynote": "Ein prägnanter Satz zum aktuellen Reise-Mantra.",
-  "destinationen": [
-    {
-      "ort": "Stadt, Land",
-      "astro_matching_grund": "Detaillierte, psychologische Begründung.",
-      "partner_id": 492044,
-      "link_type": "in_app_browser" 
+const AffiliateConfig = {
+    KLOOK: {
+        baseUrl: "https://www.klook.com/de/search/",
+        param: "query=",
+        id: "492044" // Dein Travelpayouts Projekt ID
+    },
+    TUI: {
+        baseUrl: "https://www.tui.com/search/",
+        param: "destination=",
+        id: "698672"
     }
-  ]
-}
-`.trim();
+};
+
+/**
+ * Erzeugt einen sauberen Affiliate-Link
+ * @param {string} destination - Das Ziel
+ * @param {string} partner - 'KLOOK' oder 'TUI'
+ */
+function generateAffiliateLink(destination, partner) {
+    const config = AffiliateConfig[partner];
+    const encodedDest = encodeURIComponent(destination);
+    // Hier wird die Affiliate-ID korrekt integriert
+    return `${config.baseUrl}?${config.param}${encodedDest}&aid=${config.id}`;
 }
 
-module.exports = {
-  getAstroUiDefinition,
-  generateMistralPrompt,
-  astroData: ASTR_DATA
-};
+/**
+ * Hauptfunktion zur Generierung und Anzeige des Ferien-Matches
+ * @param {Object} userData - Daten aus dem Formular/Sternzeichen/Slider
+ */
+async function generateFerienMatch(userData) {
+    const container = document.getElementById('match-container');
+    
+    // 1. UI: Loading State aktivieren (Hochglanz-UX)
+    container.innerHTML = `
+        <div class="skeleton-card">
+            <div class="spinner"></div>
+            <p>Einen Moment, wir kuratieren deine perfekten Ferien...</p>
+        </div>`;
+
+    try {
+        // Hier würde normalerweise der Fetch zu deinem KI-Endpunkt erfolgen
+        // Simuliert: Daten-Objekt
+        const suggestion = {
+            destination: "Teneriffa", // Beispiel-Resultat der KI
+            description: "Ein Ort, an dem das Licht des Südens mit deiner Krebs-Natur harmoniert.",
+            imageUrl: "path/to/image.jpg"
+        };
+
+        // 2. UI: Ergebnis rendern
+        container.innerHTML = `
+            <div class="result-card fade-in">
+                <img src="${suggestion.imageUrl}" alt="${suggestion.destination}" class="card-image">
+                <h3>${suggestion.destination}</h3>
+                <p>${suggestion.description}</p>
+                <div class="action-buttons">
+                    <a href="${generateAffiliateLink(suggestion.destination, 'KLOOK')}" 
+                       target="_blank" class="btn-primary">Jetzt bei Klook entdecken</a>
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        container.innerHTML = `<p class="error">Die Verbindung zum Horizont war kurzzeitig gestört. Bitte versuche es erneut.</p>`;
+        console.error("Fehler bei der Matching-Logik:", error);
+    }
+}
+
+// Event Listener für die UI-Interaktion
+document.addEventListener('DOMContentLoaded', () => {
+    const submitBtn = document.getElementById('search-trigger');
+    if (submitBtn) {
+        submitBtn.addEventListener('click', () => {
+            // Beispielhafte User-Daten (Sternzeichen etc.)
+            const userData = { sign: "Krebs", vibe: "entspannt" };
+            generateFerienMatch(userData);
+        });
+    }
+});
