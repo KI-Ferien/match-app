@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KI-Ferien.de - Kosmisches Orakel</title>
+
     <script nowprocket data-noptimize="1" data-cfasync="false" data-wpfc-render="false" seraph-accel-crit="1" data-no-defer="1">
       (function () {
           var script = document.createElement("script");
@@ -9,10 +13,7 @@
           document.head.appendChild(script);
       })();
     </script>
-</head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KI-Ferien.de - Kosmisches Orakel</title>
+
     <style>
         :root {
             --gold: #d4af37;
@@ -230,7 +231,6 @@
             const ball = document.createElement('div');
             ball.className = 'zodiac-ball';
             ball.dataset.name = sign.name;
-            // Datum hinzugefügt
             ball.innerHTML = `<span><b style="font-size:1.2rem">${sign.icon}</b><br>${sign.name}<br><span style="font-size:0.55rem; opacity:0.6; display:block; margin-top:2px;">${sign.date}</span></span>`;
             
             const angle = (index / signs.length) * 2 * Math.PI - Math.PI / 2;
@@ -264,18 +264,28 @@
             if (selectedSigns.length === 0) return;
             askButton.innerText = "LESEN...";
             const payload = {
-                signs: selectedSigns, participants: maxSigns,
+                signs: selectedSigns, 
+                participants: maxSigns,
                 vibe: vibeNamen[document.getElementById('vibe-slider').value - 1],
                 budget: budgetNamen[document.getElementById('budget-slider').value - 1],
                 distance: distanzNamen[document.getElementById('distance-slider').value - 1]
             };
             try {
-                const response = await fetch('/api/match', { method: 'POST', body: JSON.stringify(payload) });
+                const response = await fetch('/api/match', { 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload) 
+                });
+                
+                if (!response.ok) throw new Error("API Fehler");
+                
                 const result = await response.json();
-                // Wiederherstellung deiner Original-Speichermethode!
                 sessionStorage.setItem('orakelResult', JSON.stringify({ result }));
                 window.location.href = 'reise.html';
-            } catch (e) { askButton.innerText = "BEFRAGEN"; }
+            } catch (e) { 
+                console.error(e);
+                askButton.innerText = "BEFRAGEN"; 
+            }
         };
     });
 
@@ -292,11 +302,4 @@
         const svg = document.getElementById('magic-threads');
         let paths = '';
         for(let i=0; i<12; i++) {
-            const d = `M ${Math.random()*100} -10 C ${Math.random()*100} ${Math.random()*100}, ${Math.random()*100} ${Math.random()*100}, ${Math.random()*100} 110`;
-            paths += `<path class="snaking-thread" d="${d}" stroke="rgba(212,175,55,0.3)" stroke-width="0.1" style="animation-duration: ${40+Math.random()*30}s;" />`;
-        }
-        svg.innerHTML = paths;
-    }
-</script>
-</body>
-</html>
+            const d = `M ${Math.random()*100} -10 C ${Math.random()*100} ${Math.random
