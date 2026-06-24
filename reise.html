@@ -61,7 +61,7 @@
             margin-bottom: 30px; border: 1px solid rgba(0, 150, 255, 0.3); background: #000;
             box-shadow: 0 0 25px rgba(0, 150, 255, 0.2);
         }
-        .dest-image img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.8s ease; }
+        .dest-image img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1s ease; }
         .dest-image img.visible { opacity: 0.85; }
 
         .result-title { color: var(--glow); font-size: 2.2rem; font-weight: bold; margin-bottom: 15px; display: block; text-shadow: 0 0 15px var(--glow); }
@@ -136,7 +136,6 @@
                 const klookBox = document.getElementById('klook-box');
                 const klookLink = document.getElementById('link-klook');
 
-                // Konvertiert den übergebenen Namen absolut sicher in Kleinschreibung
                 let firstSign = 'widder';
                 if (signs.length > 0 && signs[0]) {
                     firstSign = signs[0].toLowerCase().trim();
@@ -149,7 +148,7 @@
                     krebs: { t: "Cornwall Küste", search: "Cornwall", d: "Romantische Cottages, verträumte Fischerdörfer und die tiefe Geborgenheit am wilden, weiten Meer bilden den perfekten Rückzugsort für deine Seele. Tanke Kraft an den alten, mystischen Kraftorten direkt an der felsigen Atlantikküste.", i: "https://images.unsplash.com/photo-1510253451774-67f781f8f782?w=800" },
                     loewe: { t: "Safari Namibia", search: "Windhuk", d: "Majestätische Weiten, ungezähmte Wildnis und exklusiver Luxus unter dem funkelnden afrikanischen Sternenhimmel erwarten dich. Ein stolzer und kraftvoller Ort, der deiner inneren Energie und deinem Sinn für das Besondere absolut gerecht wird.", i: "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=800" },
                     jungfrau: { t: "Schweizer Alpen", search: "Zürich", d: "Kristallklare Luft, majestätische Berggipfel und eine perfekte, beruhigende Stille bieten dir die ideale Struktur zum Durchatmen. Finde Klarheit bei ausgedehnten Wanderungen und genieße die makellose Naturkulisse abseits des Alltagsstresses.", i: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800" },
-                    waage: { t: "Santorini Design", search: "Santorini", d: "Ästhetik in ihrer reinste Form. Das harmonische Zusammenspiel aus azurblauem Meer, strahlend weißen Mauern und eleganten Design-Hotels bringt deine innere Balance zum Schwingen. Perfekt für Ruhesuchende mit einem Blick fürs Schöne.", i: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800" },
+                    waage: { t: "Santorini Design", search: "Santorini", d: "Ästhetik in ihrer reinsten Form. Das harmonische Zusammenspiel aus azurblauem Meer, strahlend weißen Mauern und eleganten Design-Hotels bringt deine innere Balance zum Schwingen. Perfekt für Ruhesuchende mit einem Blick fürs Schöne.", i: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800" },
                     skorpion: { t: "Marrakesch Mystik", search: "Marrakesch", d: "Geheimnisvolle Gassen, intensive orientalische Gewürze und tiefe, magische Sinneserlebnisse in den Palästen der Medina. Ein Ort voller Geheimnisse und emotionaler Tiefe, der dich magisch anziehen und so schnell nicht mehr loslassen wird.", i: "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=800" },
                     schuetze: { t: "Patagonien Freiheit", search: "Punta Arenas", d: "Grenzenlose Expeditionen am wilden Ende der Welt. Die unendliche Freiheit zwischen Gletschern und windgepeitschten Steppen füttert deine philosophische Reiselust und deinen unstillbaren Drang, das Unbekannte zu erforschen.", i: "https://images.unsplash.com/photo-1513407030348-c983a97b98d8?w=800" },
                     steinbock: { t: "Südtirol Gipfel", search: "Bozen", d: "Beständigkeit, traditionelle Werte und stolze Erfolge in den höchsten Höhen der Dolomiten. Die Ruhe der Berge und die bodenständige Exzellenz der Region bieten dir genau den anspruchsvollen Raum, den du zum Regenerieren brauchst.", i: "https://images.unsplash.com/photo-1533560225433-87593c6f9664?w=800" },
@@ -159,7 +158,6 @@
 
                 let choice = presets[firstSign];
                 
-                // Fallback, falls die String-Konvertierung dennoch fehlschlägt
                 if (!choice) {
                     choice = presets['widder'];
                 }
@@ -170,9 +168,15 @@
 
                 if (title) title.innerText = choice.t;
                 if (text) text.innerText = choice.d;
+                
                 if (img) {
                     img.src = choice.i;
-                    img.onload = () => img.classList.add('visible');
+                    // Erzwingt die Sichtbarkeit des Bildes sofort, falls der Browser-Cache greift
+                    if (img.complete) {
+                        img.classList.add('visible');
+                    } else {
+                        img.onload = () => img.classList.add('visible');
+                    }
                 }
 
                 if (klookLink) {
