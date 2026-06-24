@@ -36,7 +36,7 @@
                 radial-gradient(1px 1px at 25px 35px, #fff, transparent),
                 radial-gradient(1.5px 1.5px at 160px 260px, #fff, transparent),
                 radial-gradient(1px 1px at 410px 110px, #fff, transparent),
-                radial-gradient(2px 2px at 65% 35% #fff, transparent),
+                radial-gradient(2px 2px at 65% 35%, #fff, transparent),
                 radial-gradient(1.2px 1.2px at 85% 75%, #fff, transparent);
             background-size: 320px 320px; opacity: 0.65; z-index: -2; animation: twinkle 6s infinite alternate;
         }
@@ -111,10 +111,14 @@
     </div>
 
     <script>
+        // Absolut sicheres Auslesen mit harten Fallbacks gegen "missing argument" Fehler
         const params = new URLSearchParams(window.location.search);
         const rawSigns = params.get('signs') || "";
         const signs = rawSigns ? rawSigns.split(',').filter(Boolean) : [];
         const vibe = parseInt(params.get('v') || 50);
+        
+        // Personen-Parameter 'p' abfangen. Wenn missing, wird 1 gesetzt.
+        const persons = parseInt(params.get('p') || 1);
 
         const tagBox = document.getElementById('tag-box');
         if (tagBox && signs.length > 0) {
@@ -141,7 +145,6 @@
                     firstSign = signs[0].toLowerCase().trim();
                 }
 
-                // 'search' enthält jetzt die harten, echten Städtenamen, die Klooks Suchschlitz versteht!
                 const presets = {
                     widder: { t: "Vulkane Islands", search: "Reykjavik", d: "Pure Action, raue Naturgewalten und epische Geysire warten auf dich. Dieses Reiseziel passt perfekt zu deinem unbändigen Tatendrang und deiner Abenteuerlust. Erlebe unvergessliche Momente inmitten einer magischen Kulisse aus Eis und Feuer.", i: "https://images.unsplash.com/photo-1476610182048-b716b8518aae?w=800" },
                     stier: { t: "Toskana Genuss", search: "Florenz", d: "Sinnliche Hügellandschaften, erstklassige kulinarische Genüsse und tiefenentspannende Wellness-Oasen erwarten dich hier. Lass die Seele baumeln und genieße die feine Ästhetik und Ruhe, die perfekt auf deine Komfortansprüche abgestimmt sind.", i: "https://images.unsplash.com/photo-1534445867742-43195f401b6c?w=800" },
@@ -170,7 +173,7 @@
                     img.onload = () => img.classList.add('visible');
                 }
 
-                // Generierung des unblockbaren Travelpayouts-Deeplinks über das korrekte Suchfeld
+                // Generierung des Travelpayouts-Deeplinks über den tp.media-Endpunkt
                 if (klookLink) {
                     const rawTargetUrl = `https://www.klook.com/de/search/?keyword=${choice.search.trim()}`;
                     const encodedTargetUrl = encodeURIComponent(rawTargetUrl);
