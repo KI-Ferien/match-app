@@ -1,82 +1,81 @@
 /**
- * match.js - Das Herzstück für 'Das KI-Ferien Match'
- * Hochglanz-Version für Einzelvorschläge mit Affiliate-Logik
+ * match.js - Hochglanz-Affiliate-Übergabe
+ * Verarbeitet das Mistral-Ergebnis und öffnet Klook direkt mit dem Zielort
  */
 
 const AffiliateConfig = {
     KLOOK: {
         baseUrl: "https://www.klook.com/de/search/",
-        param: "query=",
-        id: "492044" // Dein Travelpayouts Projekt ID
-    },
-    TUI: {
-        baseUrl: "https://www.tui.com/search/",
-        param: "destination=",
-        id: "698672"
+        queryParam: "keyword=", // Klook benötigt 'keyword' für die interne Suche
+        aid: "492044" // Deine Travelpayouts Projekt-ID
     }
 };
 
 /**
- * Erzeugt einen sauberen Affiliate-Link
- * @param {string} destination - Das Ziel
- * @param {string} partner - 'KLOOK' oder 'TUI'
+ * Erzeugt den dynamischen Deep-Link für die Partnerseite
+ * @param {string} destination - Das von der KI gefundene Ziel (z.B. "Strassburg")
+ * @returns {string} - Der fertige Affiliate-Link mit Suchbegriff
  */
-function generateAffiliateLink(destination, partner) {
-    const config = AffiliateConfig[partner];
-    const encodedDest = encodeURIComponent(destination);
-    // Hier wird die Affiliate-ID korrekt integriert
-    return `${config.baseUrl}?${config.param}${encodedDest}&aid=${config.id}`;
+function generatePartnerLink(destination) {
+    if (!destination) return "#";
+    
+    const config = AffiliateConfig.KLOOK;
+    
+    // encodeURIComponent sorgt dafür, dass Sonderzeichen/Leerzeichen die URL nicht zerschießen
+    const encodedDestination = encodeURIComponent(destination.trim());
+    
+    // Setzt die URL zusammen: Basis + Suche + Zielort + Deine Affiliate-ID
+    return `${config.baseUrl}?${config.queryParam}${encodedDestination}&aid=${config.aid}`;
 }
 
 /**
- * Hauptfunktion zur Generierung und Anzeige des Ferien-Matches
- * @param {Object} userData - Daten aus dem Formular/Sternzeichen/Slider
+ * Liest das Ergebnis aus dem sessionStorage und bringt die UI auf Hochglanz
  */
-async function generateFerienMatch(userData) {
-    const container = document.getElementById('match-container');
+function initMatchPage() {
+    const container = document.getElementById('match-container'); // Falls dein Container so heißt
     
-    // 1. UI: Loading State aktivieren (Hochglanz-UX)
-    container.innerHTML = `
-        <div class="skeleton-card">
-            <div class="spinner"></div>
-            <p>Einen Moment, wir kuratieren deine perfekten Ferien...</p>
-        </div>`;
-
     try {
-        // Hier würde normalerweise der Fetch zu deinem KI-Endpunkt erfolgen
-        // Simuliert: Daten-Objekt
-        const suggestion = {
-            destination: "Teneriffa", // Beispiel-Resultat der KI
-            description: "Ein Ort, an dem das Licht des Südens mit deiner Krebs-Natur harmoniert.",
-            imageUrl: "path/to/image.jpg"
-        };
+        // Daten aus dem Orakel-SessionStorage holen
+        const rawData = sessionStorage.getItem('orakelResult');
+        if (!rawData) {
+            console.warn("Keine Orakel-Daten im Speicher gefunden.");
+            return;
+        }
 
-        // 2. UI: Ergebnis rendern
-        container.innerHTML = `
-            <div class="result-card fade-in">
-                <img src="${suggestion.imageUrl}" alt="${suggestion.destination}" class="card-image">
-                <h3>${suggestion.destination}</h3>
-                <p>${suggestion.description}</p>
-                <div class="action-buttons">
-                    <a href="${generateAffiliateLink(suggestion.destination, 'KLOOK')}" 
-                       target="_blank" class="btn-primary">Jetzt bei Klook entdecken</a>
-                </div>
-            </div>
-        `;
+        const parsed = JSON.parse(rawData);
+        // Flexibler Zugriff, falls die Struktur verschachtelt ist (z.B. parsed.result)
+        const data = parsed.result || parsed; 
+
+        if (data && data.destination) {
+            const destination = data.destination;
+            const description = data.description || "";
+            
+            // Generiere den exakten Klook-Suchlink für dieses Ziel
+            const klookAffiliateUrl = generatePartnerLink(destination);
+
+            // Hier wird deine reise.html dynamisch befüllt
+            // Der Button leitet direkt auf die Klook-Suche weiter!
+            if (container) {
+                container.innerHTML = `
+                    <div class="result-card fade-in">
+                        <h2>Dein kosmisches Ziel: ${destination}</h2>
+                        <p class="description">${description}</p>
+                        <div class="action-area">
+                            <a href="${klookAffiliateUrl}" 
+                               target="_blank" 
+                               rel="noopener noreferrer" 
+                               class="btn-gold">
+                               Ferien in ${destination} buchen
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }
+        }
     } catch (error) {
-        container.innerHTML = `<p class="error">Die Verbindung zum Horizont war kurzzeitig gestört. Bitte versuche es erneut.</p>`;
-        console.error("Fehler bei der Matching-Logik:", error);
+        console.error("Fehler beim Verarbeiten des Reiseziels:", error);
     }
 }
 
-// Event Listener für die UI-Interaktion
-document.addEventListener('DOMContentLoaded', () => {
-    const submitBtn = document.getElementById('search-trigger');
-    if (submitBtn) {
-        submitBtn.addEventListener('click', () => {
-            // Beispielhafte User-Daten (Sternzeichen etc.)
-            const userData = { sign: "Krebs", vibe: "entspannt" };
-            generateFerienMatch(userData);
-        });
-    }
-});
+// Startet die Logik, sobald die reise.html geladen ist
+document.addEventListener('DOMContentLoaded', initMatchPage);
