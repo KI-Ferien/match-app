@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -45,14 +46,14 @@
                 radial-gradient(2px 2px at 65% 35%, #fff, transparent),
                 radial-gradient(1.2px 1.2px at 85% 75%, #fff, transparent);
             background-size: 320px 320px; opacity: 0.5; z-index: -2;
-            animation: twinkle 6s infinite alternate; /* Dynamisches Funkeln hinzugefügt */
+            animation: twinkle 6s infinite alternate;
         }
         @keyframes twinkle {
           0% { opacity: 0.4; }
           100% { opacity: 0.6; }
         }
         
-        /* --- DYNAMISCHES KREISFÖRMIGES ASTRO-LAYOUT --- */
+        /* --- KREISFÖRMIGES ASTRO-LAYOUT --- */
         .orbit-wrapper {
             position: relative;
             width: 850px;
@@ -81,10 +82,9 @@
             height: 100%;
             top: 0; left: 0;
             pointer-events: none;
-            animation: cosmicRotation 120s linear infinite; /* Optionale sehr langsame Rotation */
+            animation: cosmicRotation 120s linear infinite;
         }
         
-        /* Deaktiviere die Rotation beim Hovern über eine Karte */
         .zodiac-orbit-container:hover {
           animation-play-state: paused;
         }
@@ -116,7 +116,6 @@
         .zodiac-date { font-size: 0.6rem; color: #8a99ad; display: block; margin-top: 2px; font-weight: normal; }
 
         /* Perfekte mathematische Verteilung: 12 Kacheln alle 30° auf einem 380px Radius */
-        /* Die innere Rotation hebt die äußere auf, damit die Karten gerade bleiben */
         .zodiac-card:nth-child(1)  { transform: rotate(0deg) translate(380px) rotate(0deg); }
         .zodiac-card:nth-child(2)  { transform: rotate(30deg) translate(380px) rotate(-30deg); }
         .zodiac-card:nth-child(3)  { transform: rotate(60deg) translate(380px) rotate(-60deg); }
@@ -154,10 +153,9 @@
         .cta-btn:hover { background: #ee5253; transform: scale(1.02); box-shadow: 0 4px 20px rgba(255, 107, 107, 0.5); }
         .cta-btn:disabled { background: #444; color: #777; cursor: wait; box-shadow: none; }
 
-        /* Mobile-Optimierung bricht das Rad sauber in eine Liste auf */
         @media (max-width: 880px) { 
             .orbit-wrapper { width: 100%; height: auto; flex-direction: column; padding-top: 20px; }
-            .zodiac-orbit-container { display: flex; flex-wrap: wrap; position: relative; gap: 10px; justify-content: center; height: auto; margin-bottom: 20px; animation: none; /* Keine Rotation auf Mobile */ }
+            .zodiac-orbit-container { display: flex; flex-wrap: wrap; position: relative; gap: 10px; justify-content: center; height: auto; margin-bottom: 20px; animation: none; }
             .zodiac-card { position: relative; top: auto; left: auto; margin: 0 !important; transform: none !important; width: calc(33% - 10px); height: auto; padding: 10px 5px; }
             .crystal-ball { width: 100%; min-height: auto; border-radius: 20px; padding: 30px 15px; }
         }
@@ -268,4 +266,11 @@
         const groupZodiacs = [mainTravelerSign, ...Array.from(extras).map(s => s.value)];
         const personCountValue = document.getElementById('personCount').value;
 
-        const vibeVal = document.getElementById('vibeRange
+        const vibeVal = document.getElementById('vibeRange').value;
+        const budgetVal = document.getElementById('budgetRange').value;
+
+        window.location.href = `reise.html?signs=${groupZodiacs.join(',')}&p=${personCountValue}&v=${vibeVal}&b=${budgetVal}`;
+    }
+</script>
+</body>
+</html>
