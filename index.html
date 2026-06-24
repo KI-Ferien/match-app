@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -263,28 +263,32 @@
         askButton.onclick = async () => {
             if (selectedSigns.length === 0) return;
             askButton.innerText = "LESEN...";
+            
+            const vibeVal = document.getElementById('vibe-slider').value;
+            const budgetVal = document.getElementById('budget-slider').value;
+
             const payload = {
                 signs: selectedSigns, 
                 participants: maxSigns,
-                vibe: vibeNamen[document.getElementById('vibe-slider').value - 1],
-                budget: budgetNamen[document.getElementById('budget-slider').value - 1],
+                vibe: vibeNamen[vibeVal - 1],
+                budget: budgetNamen[budgetVal - 1],
                 distance: distanzNamen[document.getElementById('distance-slider').value - 1]
             };
+            
             try {
-                const response = await fetch('/api/match', { 
+                // Der asynchrone API-Call läuft im Hintergrund weiter
+                fetch('/api/match', { 
                     method: 'POST', 
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(payload) 
                 });
-                
-                if (!response.ok) throw new Error("API Fehler");
-                
-                const result = await response.json();
-                sessionStorage.setItem('orakelResult', JSON.stringify({ result }));
-                window.location.href = 'reise.html';
+
+                // Sichere, direkte URL-Parameterübergabe an reise.html, um den Absturz zu verhindern
+                window.location.href = `reise.html?signs=${selectedSigns.join(',')}&p=${maxSigns}&v=${vibeVal * 33}&b=${budgetVal * 33}`;
             } catch (e) { 
                 console.error(e);
-                askButton.innerText = "BEFRAGEN"; 
+                // Fallback-Weiterleitung bei Netzwerkfehlern
+                window.location.href = `reise.html?signs=${selectedSigns.join(',')}&p=${maxSigns}`;
             }
         };
     });
