@@ -9,7 +9,7 @@
             --glow: #0096ff; 
             --gold: #ffcc00; 
             --bg: #02050a; 
-            --btn-bg: #d4af37; /* Echtes Gold für den Button */
+            --btn-bg: #d4af37; 
         }
         body { 
             background: var(--bg); color: white; font-family: 'Helvetica Neue', Arial, sans-serif; 
@@ -68,7 +68,7 @@
         .result-text { line-height: 1.75; font-size: 1.1rem; opacity: 0.95; margin: 0 auto 35px; max-width: 580px; }
 
         /* --- DYNAMISCHER HOCHGLANZ-BUTTON --- */
-        .action-area { margin: 30px 0; display: none; }
+        .action-area { margin: 30px 0; display: none; border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 30px; }
         .btn-klook { 
             background: var(--btn-bg); color: black; font-size: 1.1rem; font-weight: bold; 
             padding: 18px 45px; border: none; border-radius: 50px; cursor: pointer; 
@@ -78,8 +78,7 @@
         }
         .btn-klook:hover { transform: scale(1.03); box-shadow: 0 4px 25px var(--btn-bg); filter: brightness(1.1); }
 
-        .email-status { font-size: 0.9rem; color: #bbb; border-top: 1px solid rgba(255,255,255,0.12); padding-top: 30px; font-style: italic; line-height: 1.5; }
-        .back-link { margin-top: 35px; display: inline-block; color: var(--glow); text-decoration: none; font-weight: bold; font-size: 0.95rem; transition: 0.3s; }
+        .back-link { margin-top: 20px; display: inline-block; color: var(--glow); text-decoration: none; font-weight: bold; font-size: 0.95rem; transition: 0.3s; }
         .back-link:hover { color: var(--gold); text-shadow: 0 0 8px var(--gold); }
     </style>
 </head>
@@ -107,10 +106,6 @@
         <div class="action-area" id="klook-box">
             <a href="#" id="link-klook" target="_blank" rel="noopener noreferrer" class="btn-klook">Aktivitäten & Hotels entdecken</a>
         </div>
-
-        <p class="email-status">
-            Die detaillierte Analyse inklusive exklusiver Angebote wurde soeben an deine Email-Adresse versandt.
-        </p>
 
         <a href="index.html" class="back-link">← Neue Suche starten</a>
     </div>
@@ -161,17 +156,15 @@
                 choice = { t: "Queenstown", d: "Euer Vibe-Level steht auf Maximum! Dies ist der ultimative Ort für Adrenalin.", i: "https://images.unsplash.com/photo-1589802829985-817e51181b92?w=800" };
             }
 
-            // UI Texte & Bild setzen
             title.innerText = choice.t;
             text.innerText = choice.d;
             img.src = choice.i;
             img.onload = () => img.classList.add('visible');
 
-            // Klook-Link dynamisch mit dem exakten Suchbegriff und deiner Partner-ID generieren
             if (klookLink) {
                 const cleanDest = encodeURIComponent(choice.t.trim());
                 klookLink.href = `https://www.klook.com/de/search/?keyword=${cleanDest}&aid=492044`;
-                klookBox.style.display = 'block'; // Zeigt den Button an, sobald das Ziel geladen ist
+                klookBox.style.display = 'block'; 
             }
         }, 1600);
     </script>
