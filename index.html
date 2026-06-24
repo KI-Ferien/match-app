@@ -1,18 +1,9 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>KI-Ferien.de - Kosmisches Orakel</title>
-
-    <script nowprocket data-noptimize="1" data-cfasync="false" data-wpfc-render="false" seraph-accel-crit="1" data-no-defer="1">
-      (function () {
-          var script = document.createElement("script");
-          script.async = 1;
-          script.src = 'https://emrldtp.cc/NDkyMDQ0.js?t=492044';
-          document.head.appendChild(script);
-      })();
-    </script>
 
     <style>
         :root {
@@ -203,14 +194,17 @@
 
     function updateStatusText() {
         const status = document.getElementById('status');
+        if (!status) return;
         const diff = maxSigns - selectedSigns.length;
         status.innerText = diff > 0 ? `Wähle noch ${diff} Zeichen.` : "Schicksal bereit.";
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    function initOrakel() {
         initCosmos();
         const wrapper = document.getElementById('zodiac-wrapper');
         const askButton = document.getElementById('ask-oracle');
+
+        if (!wrapper) return;
 
         const signs = [
             { name: 'Widder', icon: '♈', date: '21.03.–19.04.' }, 
@@ -227,6 +221,7 @@
             { name: 'Fische', icon: '♓', date: '19.02.–20.03.' }
         ];
 
+        wrapper.innerHTML = '';
         signs.forEach((sign, index) => {
             const ball = document.createElement('div');
             ball.className = 'zodiac-ball';
@@ -260,37 +255,41 @@
         });
         updateStatusText();
 
-        askButton.onclick = async () => {
-            if (selectedSigns.length === 0) return;
-            askButton.innerText = "LESEN...";
-            const payload = {
-                signs: selectedSigns, 
-                participants: maxSigns,
-                vibe: vibeNamen[document.getElementById('vibe-slider').value - 1],
-                budget: budgetNamen[document.getElementById('budget-slider').value - 1],
-                distance: distanzNamen[document.getElementById('distance-slider').value - 1]
+        if (askButton) {
+            askButton.onclick = async () => {
+                if (selectedSigns.length === 0) return;
+                askButton.innerText = "LESEN...";
+                const payload = {
+                    signs: selectedSigns, 
+                    participants: maxSigns,
+                    vibe: vibeNamen[document.getElementById('vibe-slider').value - 1],
+                    budget: budgetNamen[document.getElementById('budget-slider').value - 1],
+                    distance: distanzNamen[document.getElementById('distance-slider').value - 1]
+                };
+                try {
+                    const response = await fetch('/api/match', { 
+                        method: 'POST', 
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(payload) 
+                    });
+                    
+                    if (!response.ok) throw new Error("API Fehler");
+                    
+                    const result = await response.json();
+                    sessionStorage.setItem('orakelResult', JSON.stringify({ result }));
+                    window.location.href = 'reise.html';
+                } catch (e) { 
+                    console.error(e);
+                    askButton.innerText = "BEFRAGEN"; 
+                }
             };
-            try {
-                const response = await fetch('/api/match', { 
-                    method: 'POST', 
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(payload) 
-                });
-                
-                if (!response.ok) throw new Error("API Fehler");
-                
-                const result = await response.json();
-                sessionStorage.setItem('orakelResult', JSON.stringify({ result }));
-                window.location.href = 'reise.html';
-            } catch (e) { 
-                console.error(e);
-                askButton.innerText = "BEFRAGEN"; 
-            }
-        };
-    });
+        }
+    }
 
     function initCosmos() {
         const canvas = document.getElementById('space-canvas');
+        if (!canvas) return;
+        canvas.innerHTML = '';
         for(let i=0; i<80; i++) {
             const star = document.createElement('div');
             star.className = 'star';
@@ -300,6 +299,22 @@
             canvas.appendChild(star);
         }
         const svg = document.getElementById('magic-threads');
+        if (!svg) return;
         let paths = '';
         for(let i=0; i<12; i++) {
-            const d = `M ${Math.random()*100} -10 C ${Math.random()*100} ${Math.random
+            const d = `M ${Math.random()*100} -10 C ${Math.random()*100} ${Math.random()*100}, ${Math.random()*100} ${Math.random()*100}, ${Math.random()*100} 110`;
+            paths += `<path class="snaking-thread" d="${d}" stroke="rgba(212,175,55,0.3)" stroke-width="0.1" style="animation-duration: ${40+Math.random()*30}s;" />`;
+        }
+        svg.innerHTML = paths;
+    }
+
+    // Führt die Initialisierung aus, sobald das DOM stabil bereitsteht
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initOrakel);
+    } else {
+        initOrakel();
+    }
+</script>
+
+<script nowprocket data-noptimize="1" data-cfasync="false" data-wpfc-render="false" seraph-accel-crit="1" data-no-defer="1">
+  (function () {
