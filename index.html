@@ -1,5 +1,4 @@
-
-     <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -26,7 +25,7 @@
             padding: 20px; overflow: hidden; position: relative;
         }
         
-        /* --- ATMOSPHÄRISCHER HINTERGRUND --- */
+        /* --- ATMOSPHÄRISCHER HINTERGRUND MIT STERNEN --- */
         .deep-space { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #0a1e3b 0%, #02040a 100%); z-index: -4; }
         
         .nebula {
@@ -46,9 +45,14 @@
                 radial-gradient(2px 2px at 65% 35%, #fff, transparent),
                 radial-gradient(1.2px 1.2px at 85% 75%, #fff, transparent);
             background-size: 320px 320px; opacity: 0.5; z-index: -2;
+            animation: twinkle 6s infinite alternate; /* Dynamisches Funkeln hinzugefügt */
+        }
+        @keyframes twinkle {
+          0% { opacity: 0.4; }
+          100% { opacity: 0.6; }
         }
         
-        /* --- KREISFÖRMIGES ASTRO-LAYOUT --- */
+        /* --- DYNAMISCHES KREISFÖRMIGES ASTRO-LAYOUT --- */
         .orbit-wrapper {
             position: relative;
             width: 850px;
@@ -77,6 +81,17 @@
             height: 100%;
             top: 0; left: 0;
             pointer-events: none;
+            animation: cosmicRotation 120s linear infinite; /* Optionale sehr langsame Rotation */
+        }
+        
+        /* Deaktiviere die Rotation beim Hovern über eine Karte */
+        .zodiac-orbit-container:hover {
+          animation-play-state: paused;
+        }
+        
+        @keyframes cosmicRotation {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
         
         .zodiac-card { 
@@ -101,6 +116,7 @@
         .zodiac-date { font-size: 0.6rem; color: #8a99ad; display: block; margin-top: 2px; font-weight: normal; }
 
         /* Perfekte mathematische Verteilung: 12 Kacheln alle 30° auf einem 380px Radius */
+        /* Die innere Rotation hebt die äußere auf, damit die Karten gerade bleiben */
         .zodiac-card:nth-child(1)  { transform: rotate(0deg) translate(380px) rotate(0deg); }
         .zodiac-card:nth-child(2)  { transform: rotate(30deg) translate(380px) rotate(-30deg); }
         .zodiac-card:nth-child(3)  { transform: rotate(60deg) translate(380px) rotate(-60deg); }
@@ -138,11 +154,12 @@
         .cta-btn:hover { background: #ee5253; transform: scale(1.02); box-shadow: 0 4px 20px rgba(255, 107, 107, 0.5); }
         .cta-btn:disabled { background: #444; color: #777; cursor: wait; box-shadow: none; }
 
+        /* Mobile-Optimierung bricht das Rad sauber in eine Liste auf */
         @media (max-width: 880px) { 
             .orbit-wrapper { width: 100%; height: auto; flex-direction: column; padding-top: 20px; }
-            .zodiac-orbit-container { display: flex; flex-wrap: wrap; position: relative; gap: 10px; justify-content: center; height: auto; margin-bottom: 20px; }
-            .zodiac-card { position: relative; top: auto; left: auto; margin: 0 !important; transform: none !important; width: calc(33% - 10px); }
-            .crystal-ball { width: 100%; min-height: auto; border-radius: 20px; }
+            .zodiac-orbit-container { display: flex; flex-wrap: wrap; position: relative; gap: 10px; justify-content: center; height: auto; margin-bottom: 20px; animation: none; /* Keine Rotation auf Mobile */ }
+            .zodiac-card { position: relative; top: auto; left: auto; margin: 0 !important; transform: none !important; width: calc(33% - 10px); height: auto; padding: 10px 5px; }
+            .crystal-ball { width: 100%; min-height: auto; border-radius: 20px; padding: 30px 15px; }
         }
     </style>
 </head>
@@ -204,3 +221,51 @@
 
         <button class="cta-btn" id="matchBtn" onclick="submitCosmicMatch()">Analyse starten</button>
     </div>
+</div>
+
+<script>
+    let mainTravelerSign = "";
+    const zodiacs = ["widder", "stier", "zwillinge", "krebs", "loewe", "jungfrau", "waage", "skorpion", "schuetze", "steinbock", "wassermann", "fische"];
+
+    function setMainZodiac(name, el) {
+        mainTravelerSign = name;
+        document.getElementById('ball-title').innerText = name.toUpperCase();
+        document.querySelectorAll('.zodiac-card').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    function renderParticipantFields() {
+        const count = parseInt(document.getElementById('personCount').value);
+        const list = document.getElementById('participants-list');
+        list.innerHTML = "";
+        
+        for(let i = 2; i <= count; i++) {
+            const row = document.createElement('div');
+            row.className = "participant-row";
+            row.innerHTML = `
+                <label>Pers. ${i}:</label>
+                <select class="extra-zodiac">
+                    ${zodiacs.map(z => `<option value="${z}">${z.charAt(0).toUpperCase() + z.slice(1)}</option>`).join('')}
+                </select>
+            `;
+            list.appendChild(row);
+        }
+    }
+
+    function submitCosmicMatch() {
+        const email = document.getElementById('userEmail').value;
+        const btn = document.getElementById('matchBtn');
+        
+        if (!mainTravelerSign || !email) {
+            alert("Bitte wähle dein Sternzeichen und gib deine Email ein.");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "KI analysiert...";
+
+        const extras = document.querySelectorAll('.extra-zodiac');
+        const groupZodiacs = [mainTravelerSign, ...Array.from(extras).map(s => s.value)];
+        const personCountValue = document.getElementById('personCount').value;
+
+        const vibeVal = document.getElementById('vibeRange
