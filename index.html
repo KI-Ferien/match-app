@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -141,7 +141,7 @@
         }
     }
 
-    async function submitCosmicMatch() {
+    function submitCosmicMatch() {
         const email = document.getElementById('userEmail').value;
         const btn = document.getElementById('matchBtn');
         
@@ -157,32 +157,4 @@
         const groupZodiacs = [mainTravelerSign, ...Array.from(extras).map(s => s.value)];
         const personCountValue = document.getElementById('personCount').value;
 
-        const analysisData = {
-            email: email,
-            zodiacs: groupZodiacs,
-            vibe: document.getElementById('vibeRange').value,
-            budget: document.getElementById('budgetRange').value,
-            hobbies: document.getElementById('hobbiesInput').value,
-            persons: personCountValue,
-            p: personCountValue, 
-            marker: "698672",
-            project: "492044"
-        };
-
-        // Weiterleitung direkt ausführen, um den blockierenden Netlify-Fehler komplett zu umgehen
-        window.location.href = `reise.html?signs=${groupZodiacs.join(',')}&p=${personCountValue}&v=${analysisData.vibe}&b=${analysisData.budget}`;
-        
-        try {
-            // Der API-Call läuft asynchron im Hintergrund weiter, stört aber das UI-Routing nicht mehr
-            fetch('/.netlify/functions/match', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(analysisData)
-            });
-        } catch (error) {
-            console.warn("Hintergrund-API-Logging fehlgeschlagen:", error);
-        }
-    }
-</script>
-</body>
-</html>
+        const vibeVal = document.getElementById('vibeRange').value;
