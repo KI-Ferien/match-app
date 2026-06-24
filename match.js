@@ -1,41 +1,42 @@
 /**
- * match.js - Hochglanz-Affiliate-Übergabe
- * Verarbeitet das Mistral-Ergebnis und öffnet Klook direkt mit dem Zielort
+ * match.js - Korrigierte Affiliate-Übergabe für Klook & Travelpayouts
  */
 
 const AffiliateConfig = {
     KLOOK: {
-        baseUrl: "https://www.klook.com/de/search/",
-        queryParam: "keyword=", // Klook benötigt 'keyword' für die interne Suche
+        // Die korrekte URL für externe Suchanfragen lautet /search-result/
+        baseUrl: "https://www.klook.com/de/search-result/",
+        queryParam: "query=", // Klook erwartet extern 'query' statt 'keyword'
         aid: "492044" // Deine Travelpayouts Projekt-ID
     }
 };
 
 /**
- * Erzeugt den dynamischen Deep-Link für die Partnerseite
- * @param {string} destination - Das von der KI gefundene Ziel (z.B. "Strassburg")
- * @returns {string} - Der fertige Affiliate-Link mit Suchbegriff
+ * Erzeugt den funktionierenden Such-Link für Klook
+ * @param {string} destination - Das von Mistral gefundene Ziel (z.B. "Strassburg")
+ * @returns {string} - Der fertige Affiliate-Link
  */
 function generatePartnerLink(destination) {
     if (!destination) return "#";
     
     const config = AffiliateConfig.KLOOK;
     
-    // encodeURIComponent sorgt dafür, dass Sonderzeichen/Leerzeichen die URL nicht zerschießen
-    const encodedDestination = encodeURIComponent(destination.trim());
+    // Wichtig: Klook benötigt für die Suche oft das reine Pluszeichen bei Leerzeichen
+    // Wir bereinigen den String und codieren ihn absolut URL-sicher
+    const cleanedDestination = destination.trim();
+    const encodedDestination = encodeURIComponent(cleanedDestination);
     
-    // Setzt die URL zusammen: Basis + Suche + Zielort + Deine Affiliate-ID
+    // Zusammensetzen der funktionierenden Struktur für Klook + Travelpayouts-Parameter
     return `${config.baseUrl}?${config.queryParam}${encodedDestination}&aid=${config.aid}`;
 }
 
 /**
- * Liest das Ergebnis aus dem sessionStorage und bringt die UI auf Hochglanz
+ * Liest das Ergebnis aus dem sessionStorage und befüllt die reise.html
  */
 function initMatchPage() {
-    const container = document.getElementById('match-container'); // Falls dein Container so heißt
+    const container = document.getElementById('match-container');
     
     try {
-        // Daten aus dem Orakel-SessionStorage holen
         const rawData = sessionStorage.getItem('orakelResult');
         if (!rawData) {
             console.warn("Keine Orakel-Daten im Speicher gefunden.");
@@ -43,18 +44,15 @@ function initMatchPage() {
         }
 
         const parsed = JSON.parse(rawData);
-        // Flexibler Zugriff, falls die Struktur verschachtelt ist (z.B. parsed.result)
         const data = parsed.result || parsed; 
 
         if (data && data.destination) {
             const destination = data.destination;
             const description = data.description || "";
             
-            // Generiere den exakten Klook-Suchlink für dieses Ziel
+            // Generiere den geprüften Klook-Suchlink
             const klookAffiliateUrl = generatePartnerLink(destination);
 
-            // Hier wird deine reise.html dynamisch befüllt
-            // Der Button leitet direkt auf die Klook-Suche weiter!
             if (container) {
                 container.innerHTML = `
                     <div class="result-card fade-in">
@@ -77,5 +75,4 @@ function initMatchPage() {
     }
 }
 
-// Startet die Logik, sobald die reise.html geladen ist
 document.addEventListener('DOMContentLoaded', initMatchPage);
