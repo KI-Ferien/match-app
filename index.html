@@ -5,15 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>KI-Ferien.de - Kosmisches Orakel</title>
 
-    <script nowprocket data-noptimize="1" data-cfasync="false" data-wpfc-render="false" seraph-accel-crit="1" data-no-defer="1">
-      (function () {
-          var script = document.createElement("script");
-          script.async = 1;
-          script.src = 'https://emrldtp.cc/NDkyMDQ0.js?t=492044';
-          document.head.appendChild(script);
-      })();
-    </script>
-
     <style>
         :root {
             --gold: #d4af37;
@@ -263,7 +254,7 @@
         askButton.onclick = async () => {
             if (selectedSigns.length === 0) return;
             askButton.innerText = "LESEN...";
-            askButton.disabled = true; // Klick-Spam verhindern
+            askButton.disabled = true;
             
             const vibeVal = document.getElementById('vibe-slider').value;
             const budgetVal = document.getElementById('budget-slider').value;
@@ -273,11 +264,11 @@
                 participants: maxSigns,
                 vibe: vibeNamen[vibeVal - 1],
                 budget: budgetNamen[budgetVal - 1],
-                distance: distanzNamen[document.getElementById('distance-slider').value - 1]
+                distance: distanzNamen[document.getElementById('distance-slider').value - 1],
+                transport: "Flug der Falken"
             };
             
             try {
-                // Hier wartet der Browser jetzt sauber, bis match.js fertig gerechnet hat
                 const response = await fetch('/.netlify/functions/match', { 
                     method: 'POST', 
                     headers: {'Content-Type': 'application/json'},
@@ -287,15 +278,10 @@
                 if (!response.ok) throw new Error("Netlify Function Fehler");
 
                 const resultData = await response.json();
-                
-                // Wir speichern das echte Mistral-Ergebnis im sessionStorage ab
                 sessionStorage.setItem('orakel_result', JSON.stringify(resultData));
-
-                // Jetzt erst wechseln wir die Seite
                 window.location.href = `reise.html`;
             } catch (e) { 
                 console.error("Fehler beim API-Call, nutze Fallback-Parameter", e);
-                // Fallback-Weiterleitung, falls Netlify offline ist
                 window.location.href = `reise.html?signs=${selectedSigns.join(',')}&p=${maxSigns}`;
             }
         };
