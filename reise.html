@@ -57,9 +57,9 @@
       <div class="mt-12 space-y-4">
         <h3 class="font-cinzel text-center text-sm uppercase text-amber-500/80 mb-6">Deine nächsten Schritte für diese Ferien</h3>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <a id="link-activity" href="https://tpk.lv/pXm2idkE" target="_blank" rel="noopener noreferrer" class="gold-gradient text-stone-950 font-bold py-4 px-6 rounded-xl text-center transition-transform hover:-translate-y-0.5">Erlebnisse entdecken</a>
-          <a id="link-tiqets" href="https://tiqets.tpk.lv/XxF1prij" target="_blank" rel="noopener noreferrer" class="bg-stone-900 border border-stone-700 text-stone-200 font-medium py-4 px-6 rounded-xl text-center transition-transform hover:-translate-y-0.5">Tickets sichern</a>
-          <a id="link-transfer" href="https://gettransfer.tpk.lv/mPE1eDIa" target="_blank" rel="noopener noreferrer" class="bg-stone-900 border border-stone-700 text-stone-200 font-medium py-4 px-6 rounded-xl text-center transition-transform hover:-translate-y-0.5">Transfer buchen</a>
+          <a id="link-activity" href="#" target="_blank" rel="noopener noreferrer" class="gold-gradient text-stone-950 font-bold py-4 px-6 rounded-xl text-center transition-transform hover:-translate-y-0.5">Erlebnisse entdecken</a>
+          <a id="link-tiqets" href="#" target="_blank" rel="noopener noreferrer" class="bg-stone-900 border border-stone-700 text-stone-200 font-medium py-4 px-6 rounded-xl text-center transition-transform hover:-translate-y-0.5">Tickets sichern</a>
+          <a id="link-transfer" href="#" target="_blank" rel="noopener noreferrer" class="bg-stone-900 border border-stone-700 text-stone-200 font-medium py-4 px-6 rounded-xl text-center transition-transform hover:-translate-y-0.5">Transfer buchen</a>
         </div>
       </div>
     </div>
@@ -73,37 +73,84 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
+      
+      // ==========================================
+      // 1. KONFIGURATIONS-ZENTRALE
+      // ==========================================
+      const marker = "698672";
+      
+      // Programm-IDs (p)
+      const pid_activity = "4223"; // Viator
+      const pid_tiqets   = "4083"; // Tiqets
+      const pid_transfer = "4124"; // GetTransfer
+
+      // Steuerung der Links: Auf dem echten Server (ki-ferien.de) können Sie DeepLinks nutzen.
+      const config = {
+        activity: { useDeepLink: true,  fallbackUrl: "https://www.viator.com/" },
+        tiqets:   { useDeepLink: true,  fallbackUrl: "https://www.tiqets.com/" },
+        transfer: { useDeepLink: true,  fallbackUrl: "https://gettransfer.com/" }
+      };
+      // ==========================================
+
+      // 2. DATEN ABRUFEN
       const orakelDataRaw = sessionStorage.getItem('orakel_result');
+      
+      let data = {
+        destination: "Elsass",
+        welcome_pickups_city: "Straßburg", 
+        explanation: "Die Sterne weisen den Weg in die malerischen Gassen des Elsass. Hier findet Deine Seele die perfekte Balance zwischen Kultur und kosmischer Entspannung.",
+        bestTimeTip: "Mai bis Oktober",
+        packliste: ["Kamera für Erinnerungen", "Bequeme Laufschuhe", "Kosmische Neugier"]
+      };
       
       if (orakelDataRaw) {
         try {
-          const data = JSON.parse(orakelDataRaw);
-          
-          // Wunschregion anzeigen (z. B. "Schwarzwald")
-          document.getElementById('destination-display').textContent = data.destination || "Salzburg";
-          document.getElementById('explanation-display').textContent = data.explanation || "";
-          document.getElementById('besttime-display').textContent = data.bestTimeTip || "Mai bis Oktober";
-          
-          const packlisteAsm = data.packliste || [];
-          const packDisplay = document.getElementById('packliste-display');
-          packDisplay.innerHTML = "";
-          packlisteAsm.forEach(item => {
-            const li = document.createElement('li');
-            li.textContent = item;
-            packDisplay.appendChild(li);
-          });
-
-          // Welcome Pickups Link dynamisch mit der reinen Flughafen-Stadt (z.B. stuttgart) befeuern
-          const wpCity = (data.welcome_pickups_city || "").toLowerCase().trim();
-          if (wpCity && wpCity !== "salzburg") {
-            document.getElementById('link-transfer').href = `https://www.welcomepickups.com/${wpCity}/`;
-          }
-
+          data = JSON.parse(orakelDataRaw);
         } catch (e) {
           console.error("Fehler beim Parsen der Orakel-Daten", e);
         }
       }
+      
+      // 3. UI-TEXTE SETZEN
+      const destination = data.destination || "Elsass";
+      document.getElementById('destination-display').textContent = destination;
+      document.getElementById('explanation-display').textContent = data.explanation || "";
+      document.getElementById('besttime-display').textContent = data.bestTimeTip || "Mai bis Oktober";
+      
+      const packlisteAsm = data.packliste || [];
+      const packDisplay = document.getElementById('packliste-display');
+      packDisplay.innerHTML = "";
+      packlisteAsm.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        packDisplay.appendChild(li);
+      });
 
+      // 4. FLUGHAFEN-STADT ENCODIEREN
+      const airportCity = (data.welcome_pickups_city || destination).trim();
+      const encodedCity = encodeURIComponent(airportCity);
+
+      // 5. INTELLIGENTE LINK-GENERIERUNG
+      
+      // Activity Link
+      let urlActivity = config.activity.useDeepLink 
+        ? `https://www.viator.com/en-US/search/${encodedCity}` 
+        : config.activity.fallbackUrl;
+      document.getElementById('link-activity').href = `https://tp.media/r?marker=${marker}&p=${pid_activity}&u=${encodeURIComponent(urlActivity)}`;
+
+      // Tiqets Link
+      let urlTiqets = config.tiqets.useDeepLink 
+        ? `https://www.tiqets.com/de/search/?q=${encodedCity}` 
+        : config.tiqets.fallbackUrl;
+      document.getElementById('link-tiqets').href = `https://tp.media/r?marker=${marker}&p=${pid_tiqets}&u=${encodeURIComponent(urlTiqets)}`;
+
+      // Transfer Link
+      let urlTransfer = config.transfer.useDeepLink 
+        ? `https://gettransfer.com/de?from=${encodedCity}` 
+        : config.transfer.fallbackUrl;
+      document.getElementById('link-transfer').href = `https://tp.media/r?marker=${marker}&p=${pid_transfer}&u=${encodeURIComponent(urlTransfer)}`;
+
+      // 6. LADE-ANSICHT UMSCHALTEN
       document.getElementById('loading-container').classList.add('hidden');
       document.getElementById('result-container').classList.remove('hidden');
     });
