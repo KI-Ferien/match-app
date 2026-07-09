@@ -263,6 +263,7 @@
         askButton.onclick = async () => {
             if (selectedSigns.length === 0) return;
             askButton.innerText = "LESEN...";
+            askButton.disabled = true; // Klick-Spam verhindern
             
             const vibeVal = document.getElementById('vibe-slider').value;
             const budgetVal = document.getElementById('budget-slider').value;
@@ -276,18 +277,25 @@
             };
             
             try {
-                // Der asynchrone API-Call läuft im Hintergrund weiter
-                fetch('/api/match', { 
+                // Hier wartet der Browser jetzt sauber, bis match.js fertig gerechnet hat
+                const response = await fetch('/.netlify/functions/match', { 
                     method: 'POST', 
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(payload) 
                 });
 
-                // Sichere, direkte URL-Parameterübergabe an reise.html, um den Absturz zu verhindern
-                window.location.href = `reise.html?signs=${selectedSigns.join(',')}&p=${maxSigns}&v=${vibeVal * 33}&b=${budgetVal * 33}`;
+                if (!response.ok) throw new Error("Netlify Function Fehler");
+
+                const resultData = await response.json();
+                
+                // Wir speichern das echte Mistral-Ergebnis im sessionStorage ab
+                sessionStorage.setItem('orakel_result', JSON.stringify(resultData));
+
+                // Jetzt erst wechseln wir die Seite
+                window.location.href = `reise.html`;
             } catch (e) { 
-                console.error(e);
-                // Fallback-Weiterleitung bei Netzwerkfehlern
+                console.error("Fehler beim API-Call, nutze Fallback-Parameter", e);
+                // Fallback-Weiterleitung, falls Netlify offline ist
                 window.location.href = `reise.html?signs=${selectedSigns.join(',')}&p=${maxSigns}`;
             }
         };
