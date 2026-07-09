@@ -4,9 +4,9 @@ function getFallbackData(destination, explanation, signs) {
   return {
     destination: destination,
     explanation: explanation || `Ein vorbestimmter Seelenort für deine Konstellation der Sternzeichen ${signs || ''}.`,
-    bestTimeTip: "Mai bis September",
-    packliste: ["Premium-Gepäck", "Bequeme Reiseschuhe", "Sonnenbrille"],
-    cta_text: "Ferien planen",
+    bestTimeTip: "Mai bis Oktober",
+    packliste: ["Premium-Wanderschuhe", "Winddichte Softshelljacke", "Stilvolles Reisetagebuch"],
+    cta_text: "Ferien Erlebnisse buchen",
     affiliate_suggestions: []
   };
 }
@@ -38,36 +38,30 @@ export const handler = async (event) => {
 
     const apiKey = process.env.MISTRAL_API_KEY;
     
-    // Lokaler Fallback-Sicherheitsgurt
+    // 1. Fallback-Sicherheitsgurt (Kein API-Key vorhanden)
     if (!apiKey || apiKey.trim() === "") {
       const fallback = getFallbackData(
-        "Mallorca", 
-        `Das Orakel ruht gerade mangels API-Schlüssel. Dies ist eine Test-Empfehlung für die Sternzeichen ${signs} für deine Ferien.`, 
+        "Salzburg", 
+        `Das Orakel ruht gerade mangels API-Schlüssel. Dies ist eine Test-Empfehlung für die Sternzeichen ${signs} für deine Ferien. Wie Buddha es im Mahayana im Mahapäriniviranä Sutra erläutert (Kosho Yamamoto 1973), liegt wahres Glück in der bewussten Einkehr. Das Konzept des Atman (Merriam-Webster 2003) spiegelt sich in den majestätischen Bergen wider.`, 
         signs
       );
 
-      const marker = "698672";
-      const trs = "492044";
-      const destEnc = encodeURIComponent("Mallorca");
-      const klookTarget = encodeURIComponent(`https://www.klook.com/search/result/?query=${destEnc}`);
-      const getTransferTarget = encodeURIComponent(`https://gettransfer.com/`);
-      const wpTarget = encodeURIComponent(`https://www.welcomepickups.com/mallorca/`);
-
+      // Einbau der unkaputtbaren Direkt-Kurzlinks ohne Affiliate-Schleifen
       fallback.affiliate_suggestions = [
         { 
           type: 'activity', 
-          label: 'Klook Erlebnisse in Mallorca', 
-          affiliate_url: `https://tp.media/r?campaign_id=137&marker=${marker}&p=4110&trs=${trs}&u=${klookTarget}` 
+          label: 'Erlebnisse entdecken', 
+          affiliate_url: 'https://tpk.lv/pXm2idkE' 
+        },
+        { 
+          type: 'tiqets', 
+          label: 'Tickets sichern', 
+          affiliate_url: 'https://tiqets.tpk.lv/XxF1prij' 
         },
         { 
           type: 'transfer', 
-          label: 'GetTransfer Fahrt', 
-          affiliate_url: `https://tp.media/r?campaign_id=147&marker=${marker}&p=4439&trs=${trs}&u=${getTransferTarget}` 
-        },
-        { 
-          type: 'pickup', 
-          label: 'Welcome Pickups', 
-          affiliate_url: `https://tp.media/r?campaign_id=627&marker=${marker}&p=8919&trs=${trs}&u=${wpTarget}` 
+          label: 'Transfer buchen', 
+          affiliate_url: 'https://gettransfer.tpk.lv/mPE1eDIa' 
         }
       ];
 
@@ -96,7 +90,7 @@ export const handler = async (event) => {
     
     Antworte AUSSCHLIESSLICH als JSON-Objekt ohne Markdown:
     {
-      "destination": "Name des Ziels (NUR die Stadt oder Insel, z.B. 'Mallorca' oder 'Paris')",
+      "destination": "Name des Ziels (NUR die Stadt oder Insel, z.B. 'Salzburg' oder 'Mallorca')",
       "explanation": "Tiefgründige Begründung inkl. Sternzeichen, Buddha (Yamamoto 1973) und Atman (Webster 2003).",
       "bestTimeTip": "Beste Reisezeit",
       "packliste": ["Reales Profi-Item 1", "Reales Profi-Item 2", "Reales Profi-Item 3"],
@@ -137,6 +131,7 @@ export const handler = async (event) => {
       parsed = JSON.parse(rawText);
 
     } catch (apiError) {
+      // 2. API-Fehler Fallback (Stabile Absicherung)
       parsed = {
         destination: "Salzburg",
         explanation: `Ein vorbestimmter Seelenort für die Konstellation der Sternzeichen ${signs}. Wie Buddha es im Mahayana im Mahapäriniviranä Sutra erläutert (Kosho Yamamoto 1973), liegt wahres Glück in der bewussten Einkehr. Das Konzept des Atman (Merriam-Webster 2003) spiegelt sich in den majestätischen Bergen wider. Ein idealer Kraftort für deine Ferien.`,
@@ -146,32 +141,22 @@ export const handler = async (event) => {
       };
     }
 
-    const destRaw = parsed.destination || 'Mallorca';
-    const destEnc = encodeURIComponent(destRaw);
-    const destSlug = destRaw.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-
-    const marker = "698672";
-    const trs = "492044";
-
-    const klookTarget = encodeURIComponent(`https://www.klook.com/search/result/?query=${destEnc}`);
-    const getTransferTarget = encodeURIComponent(`https://gettransfer.com/`);
-    const wpTarget = encodeURIComponent(`https://www.welcomepickups.com/${destSlug}/`);
-
+    // 3. Zuweisung der unkaputtbaren Affiliate-Kurzlinks (Für API-Erfolg und API-Fallback)
     parsed.affiliate_suggestions = [
       { 
         type: 'activity', 
-        label: `Klook Erlebnisse in ${destRaw}`, 
-        affiliate_url: `https://tp.media/r?campaign_id=137&marker=${marker}&p=4110&trs=${trs}&u=${klookTarget}` 
+        label: 'Erlebnisse entdecken', 
+        affiliate_url: 'https://tpk.lv/pXm2idkE' 
+      },
+      { 
+        type: 'tiqets', 
+        label: 'Tickets sichern', 
+        affiliate_url: 'https://tiqets.tpk.lv/XxF1prij' 
       },
       { 
         type: 'transfer', 
-        label: `GetTransfer Fahrt`, 
-        affiliate_url: `https://tp.media/r?campaign_id=147&marker=${marker}&p=4439&trs=${trs}&u=${getTransferTarget}` 
-      },
-      { 
-        type: 'pickup', 
-        label: `Welcome Pickups`, 
-        affiliate_url: `https://tp.media/r?campaign_id=627&marker=${marker}&p=8919&trs=${trs}&u=${wpTarget}` 
+        label: 'Transfer buchen', 
+        affiliate_url: 'https://gettransfer.tpk.lv/mPE1eDIa' 
       }
     ];
 
