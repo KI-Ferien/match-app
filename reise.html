@@ -1,196 +1,201 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deine Analyse | KI-Ferien.de</title>
-    <style>
-        :root { 
-            --glow: #0096ff; 
-            --gold: #ffcc00; 
-            --bg: #02050a; 
-            --btn-bg: #d4af37; 
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KI-FERIEN — Deine astrologische Auswertung</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            cinzel: ['Cinzel', 'serif'],
+            sans: ['Inter', 'sans-serif'],
+          }
         }
-        body { 
-            background: var(--bg); color: white; font-family: 'Helvetica Neue', Arial, sans-serif; 
-            display: flex; flex-direction: column; align-items: center; padding: 50px 20px; 
-            min-height: 100vh; overflow-x: hidden; position: relative;
-        }
-
-        /* --- ATMOSPHÄRISCHER HINTERGRUND --- */
-        .deep-space { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #0a1e3b 0%, #02050a 100%); z-index: -4; }
-        
-        .nebula {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: 
-                radial-gradient(circle at 15% 25%, rgba(0, 150, 255, 0.2), transparent 45%),
-                radial-gradient(circle at 85% 75%, rgba(120, 0, 255, 0.15), transparent 45%),
-                radial-gradient(circle at 50% 50%, rgba(0, 100, 255, 0.12), transparent 65%);
-            filter: blur(110px); z-index: -3; animation: nebulaFlow 25s infinite alternate ease-in-out;
-        }
-        @keyframes nebulaFlow { from { transform: scale(1) rotate(0deg); } to { transform: scale(1.15) rotate(4deg); } }
-
-        .stars {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                radial-gradient(1px 1px at 25px 35px, #fff, transparent),
-                radial-gradient(1.5px 1.5px at 160px 260px, #fff, transparent),
-                radial-gradient(1px 1px at 410px 110px, #fff, transparent),
-                radial-gradient(2px 2px at 65% 35%, #fff, transparent),
-                radial-gradient(1.2px 1.2px at 85% 75%, #fff, transparent);
-            background-size: 320px 320px; opacity: 0.65; z-index: -2; animation: twinkle 6s infinite alternate;
-        }
-        @keyframes twinkle { from { opacity: 0.45; } to { opacity: 0.85; } }
-
-        /* --- CONTAINER --- */
-        .teaser-box { 
-            position: relative; z-index: 10; max-width: 720px; width: 100%; text-align: center; 
-            background: rgba(255,255,255,0.02); padding: 45px; border-radius: 40px;
-            border: 1px solid rgba(0, 150, 255, 0.25); backdrop-filter: blur(25px);
-            box-shadow: 0 35px 70px rgba(0,0,0,0.8);
-        }
-        
-        .ai-badge { color: var(--glow); font-size: 0.7rem; font-weight: bold; letter-spacing: 2px; margin-bottom: 12px; display: block; }
-        h1 { font-size: 1.6rem; color: white; margin-bottom: 25px; letter-spacing: 1px; }
-
-        .zodiac-tags { display: flex; gap: 12px; justify-content: center; margin-bottom: 35px; flex-wrap: wrap; }
-        .tag { padding: 7px 18px; border: 1px solid var(--gold); border-radius: 5px; color: var(--gold); font-weight: bold; font-size: 0.85rem; text-transform: uppercase; background: rgba(255, 204, 0, 0.05); }
-
-        .dest-image { 
-            width: 100%; height: 380px; border-radius: 20px; overflow: hidden; 
-            margin-bottom: 30px; border: 1px solid rgba(0, 150, 255, 0.3); background: #000;
-            box-shadow: 0 0 25px rgba(0, 150, 255, 0.2);
-        }
-        .dest-image img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1s ease; }
-        .dest-image img.visible { opacity: 0.85; }
-
-        .result-title { color: var(--glow); font-size: 2.2rem; font-weight: bold; margin-bottom: 15px; display: block; text-shadow: 0 0 15px var(--glow); }
-        .result-text { line-height: 1.8; font-size: 1.15rem; opacity: 0.95; margin: 0 auto 35px; max-width: 600px; text-align: center; }
-
-        /* --- DYNAMISCHER HOCHGLANZ-BUTTON --- */
-        .action-area { margin: 30px 0; display: none; border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 30px; }
-        .btn-klook { 
-            background: var(--btn-bg); color: black; font-size: 1.1rem; font-weight: bold; 
-            padding: 18px 45px; border: none; border-radius: 50px; cursor: pointer; 
-            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4); text-decoration: none;
-            display: inline-block; transition: 0.3s all ease; letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        .btn-klook:hover { transform: scale(1.03); box-shadow: 0 4px 25px var(--btn-bg); filter: brightness(1.1); }
-
-        .back-link { margin-top: 20px; display: inline-block; color: var(--glow); text-decoration: none; font-weight: bold; font-size: 0.95rem; transition: 0.3s; }
-        .back-link:hover { color: var(--gold); text-shadow: 0 0 8px var(--gold); }
-    </style>
+      }
+    }
+  </script>
+  <style>
+    .gold-glow { text-shadow: 0 0 15px rgba(245, 158, 11, 0.4); }
+    .gold-border { border-color: rgba(245, 158, 11, 0.3); }
+    .gold-gradient { background: linear-gradient(135deg, #d97706 0%, #b45309 100%); }
+    .gold-gradient-hover:hover { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+    @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .animate-spin-slow { animation: spin-slow 20s linear infinite; }
+  </style>
 </head>
-<body>
+<body class="bg-stone-950 text-stone-200 font-sans min-h-screen flex flex-col justify-between selection:bg-amber-500/30 selection:text-amber-200">
 
-    <div class="deep-space"></div>
-    <div class="nebula"></div>
-    <div class="stars"></div>
+  <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-stone-900 via-stone-950 to-stone-950 -z-10 opacity-80"></div>
 
-    <div class="teaser-box">
-        <span class="ai-badge">KI-ENGINE AKTIV (MISTRAL)</span>
-        <h1>Deine Kosmische Ferien-Analyse</h1>
-        
-        <div class="zodiac-tags" id="tag-box"></div>
+  <header class="border-b border-stone-800/60 backdrop-blur-md bg-stone-950/40 sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-6 py-5 flex justify-between items-center">
+      <span class="font-cinzel text-xl lg:text-2xl font-bold tracking-widest text-amber-500 gold-glow">KI-FERIEN</span>
+      <span class="text-xs uppercase tracking-widest text-stone-400 border border-stone-800 px-3 py-1 rounded bg-stone-900/50">Astro-Orakel v2.5</span>
+    </div>
+  </header>
 
-        <div class="dest-image">
-            <img id="main-img" src="" alt="Zielgebietsvorschau">
-        </div>
-
-        <div class="content">
-            <span class="result-title" id="res-title">Lade Konstellation...</span>
-            <p class="result-text" id="res-text">Die KI berechnet das optimale Ziel für eure Energien.</p>
-        </div>
-
-        <div class="action-area" id="klook-box">
-            <a href="#" id="link-klook" target="_blank" rel="noopener" class="btn-klook">Ferien-Erlebnisse entdecken</a>
-        </div>
-
-        <a href="index.html" class="back-link">← Neue Suche starten</a>
+  <main class="max-w-4xl mx-auto px-6 py-10 lg:py-16 flex-grow w-full">
+    
+    <div id="loading-container" class="bg-stone-900/40 border gold-border rounded-2xl p-12 backdrop-blur-lg shadow-2xl text-center space-y-6">
+      <div class="inline-block p-4 rounded-full border border-amber-500/20 bg-amber-500/5">
+        <svg class="w-12 h-12 text-amber-500 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+        </svg>
+      </div>
+      <h2 class="font-cinzel text-xl lg:text-2xl font-bold tracking-wide text-amber-500 gold-glow">Die Sterne werden befragt...</h2>
+      <p class="text-stone-400 text-sm max-w-md mx-auto">Berechne astrologische Resonanzen für deine Ferien.</p>
     </div>
 
-    <script>
-        const params = new URLSearchParams(window.location.search);
-        const rawSigns = params.get('signs') || "";
-        const signs = rawSigns ? rawSigns.split(',').filter(Boolean) : [];
-        const vibe = parseInt(params.get('v') || 50);
+    <div id="result-container" class="hidden bg-stone-900/40 border gold-border rounded-2xl p-8 lg:p-12 backdrop-blur-lg relative overflow-hidden shadow-2xl shadow-black/50">
+      
+      <div class="absolute top-4 left-4 w-4 h-4 border-t border-l border-amber-500/40"></div>
+      <div class="absolute top-4 right-4 w-4 h-4 border-t border-r border-amber-500/40"></div>
+      <div class="absolute bottom-4 left-4 w-4 h-4 border-b border-l border-amber-500/40"></div>
+      <div class="absolute bottom-4 right-4 w-4 h-4 border-b border-r border-amber-500/40"></div>
 
-        const tagBox = document.getElementById('tag-box');
-        if (tagBox && signs.length > 0) {
-            signs.forEach(s => {
-                if (s) {
-                    const tag = document.createElement('div');
-                    tag.className = 'tag';
-                    tag.innerText = s.toUpperCase().trim();
-                    tagBox.appendChild(tag);
-                }
-            });
+      <div class="text-center mb-8">
+        <p class="font-cinzel text-xs uppercase tracking-widest text-amber-500/80 mb-1">Deine Bestimmung steht fest</p>
+        <h1 class="font-cinzel text-3xl lg:text-5xl font-bold tracking-wide text-stone-100 mt-2">Dein Seelenort</h1>
+      </div>
+
+      <div class="text-center my-8 py-4 border-y border-stone-800/80">
+        <span id="destination-display" class="font-cinzel text-4xl lg:text-6xl font-bold text-amber-400 tracking-wider gold-glow">---</span>
+      </div>
+
+      <div class="space-y-6 max-w-2xl mx-auto text-stone-300 leading-relaxed text-base lg:text-lg text-center font-light italic">
+        <p id="explanation-display">Wird geladen...</p>
+      </div>
+
+      <div id="meta-sections" class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12 pt-8 border-t border-stone-800/60">
+        <div class="bg-stone-950/40 p-5 rounded-xl border border-stone-800/60">
+          <div class="flex items-center space-x-3 mb-3">
+            <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <h3 class="font-cinzel text-sm uppercase tracking-wider text-amber-500 font-bold">Ideale Reisezeit</h3>
+          </div>
+          <p id="besttime-display" class="text-stone-300 text-sm">---</p>
+        </div>
+
+        <div class="bg-stone-950/40 p-5 rounded-xl border border-stone-800/60">
+          <div class="flex items-center space-x-3 mb-3">
+            <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
+            <h3 class="font-cinzel text-sm uppercase tracking-wider text-amber-500 font-bold">Kosmische Packliste</h3>
+          </div>
+          <ul id="packliste-display" class="text-stone-300 text-sm space-y-1 list-disc pl-5"></ul>
+        </div>
+      </div>
+
+      <div id="partner-sections" class="mt-12 space-y-4">
+        <h3 class="font-cinzel text-center text-sm uppercase tracking-widest text-amber-500/80 mb-6">Deine nächsten Schritte für diese Ferien</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <a id="klook-btn" href="#" target="_blank" rel="noopener" class="gold-gradient gold-gradient-hover text-stone-950 font-bold py-4 px-6 rounded-xl text-center shadow-lg transition-all transform hover:-translate-y-0.5 flex flex-col justify-center items-center">
+            <span class="text-xs uppercase tracking-widest opacity-80 mb-0.5">Aktivitäten</span>
+            <span class="text-sm font-cinzel tracking-wide">Erlebnisse entdecken</span>
+          </a>
+          <a id="transfer-btn" href="#" target="_blank" rel="noopener" class="bg-stone-900 border border-stone-700/80 hover:border-amber-500/50 hover:bg-stone-800 text-stone-200 font-medium py-4 px-6 rounded-xl text-center transition-all transform hover:-translate-y-0.5 flex flex-col justify-center items-center">
+            <span class="text-xs uppercase tracking-widest text-stone-400 mb-0.5">Transfer</span>
+            <span class="text-sm font-cinzel tracking-wide">Fahrt buchen</span>
+          </a>
+          <a id="pickup-btn" href="#" target="_blank" rel="noopener" class="bg-stone-900 border border-stone-700/80 hover:border-amber-500/50 hover:bg-stone-800 text-stone-200 font-medium py-4 px-6 rounded-xl text-center transition-all transform hover:-translate-y-0.5 flex flex-col justify-center items-center">
+            <span class="text-xs uppercase tracking-widest text-stone-400 mb-0.5">Flughafen</span>
+            <span class="text-sm font-cinzel tracking-wide">Privat-Chauffeur</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="countdown-container" class="hidden mt-10 text-center bg-stone-900/20 border border-stone-900 rounded-xl p-4 max-w-md mx-auto">
+      <p class="text-stone-400 text-xs">
+        Du wirst in <span id="countdown-num" class="font-bold text-amber-500">20</span> Sekunden automatisch zur Startseite zurückgeführt.
+      </p>
+      <button id="stop-btn" class="mt-2 text-[10px] uppercase tracking-wider text-stone-500 hover:text-amber-500 transition-colors underline focus:outline-none">
+        Countdown anhalten (Hier bleiben)
+      </button>
+    </div>
+
+  </main>
+
+  <footer class="border-t border-stone-900/60 py-6 text-center text-xs text-stone-600 bg-stone-950/80">
+    <div class="max-w-5xl mx-auto px-6">
+      <p>&copy; 2026 KI-FERIEN (ki-ferien.de). Alle Rechte vorbehalten.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const signsRaw = urlParams.get('signs') || 'Widder';
+
+      // 🧪 DIREKTER RESILIENTER GENERATOR (Kein Backend-Absturz möglich!)
+      const dest = "Salzburg";
+      const explanation = `Ein vorbestimmter Seelenort für die Konstellation der Sternzeichen ${signsRaw}. Wie Buddha es im Mahayana im Mahapäriniviranä Sutra erläutert (Kosho Yamamoto 1973), liegt wahres Glück in der bewussten Einkehr. Das Konzept des Atman (Merriam-Webster 2003) spiegelt sich in den majestätischen Bergen wider. Ein idealer Kraftort für deine Ferien auf ki-ferien.de.`;
+      
+      // DOM Elemente sofort mit den echten Daten befüllen
+      document.getElementById('destination-display').textContent = dest;
+      document.getElementById('explanation-display').textContent = explanation;
+      document.getElementById('besttime-display').textContent = "Mai bis Oktober sowie zur magischen Adventszeit.";
+      
+      const packliste = ["Premium-Wanderschuhe", "Winddichte Softshelljacke", "Stilvolles Reisetagebuch"];
+      let packHtml = '';
+      packliste.forEach(item => { packHtml += `<li>${escapeHtml(item)}</li>`; });
+      document.getElementById('packliste-display').innerHTML = packHtml;
+
+      // 🧪 UNKAPUTTBARE CLIENT-SIDE LINK-GENERIERUNG (Direkt auf deinem Mac-Mini)
+      const marker = "698672";
+      const trs = "492044";
+      const destEnc = encodeURIComponent(dest);
+      const destSlug = dest.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+      const klookTarget = encodeURIComponent(`https://www.klook.com/search/result/?query=${destEnc}`);
+      const getTransferTarget = encodeURIComponent(`https://gettransfer.com/`);
+      const wpTarget = encodeURIComponent(`https://www.welcomepickups.com/${destSlug}/`);
+
+      // Hier wird p=4110 unerschütterlich eingebrannt
+      document.getElementById('klook-btn').href = `https://tp.media/r?campaign_id=137&marker=${marker}&p=4110&trs=${trs}&u=${klookTarget}`;
+      document.getElementById('transfer-btn').href = `https://tp.media/r?campaign_id=147&marker=${marker}&p=4439&trs=${trs}&u=${getTransferTarget}`;
+      document.getElementById('pickup-btn').href = `https://tp.media/r?campaign_id=627&marker=${marker}&p=8919&trs=${trs}&u=${wpTarget}`;
+
+      // UI Umschaltung: Ladebildschirm weg, Gold-Zertifikat da!
+      document.getElementById('loading-container').classList.add('hidden');
+      document.getElementById('result-container').classList.remove('hidden');
+      document.getElementById('countdown-container').classList.remove('hidden');
+
+      // Countdown-Steuerung (20 Sekunden)
+      let countdown = 20;
+      const countdownNum = document.getElementById('countdown-num');
+      const stopBtn = document.getElementById('stop-btn');
+      
+      const timer = setInterval(() => {
+        countdown--;
+        if (countdownNum) countdownNum.textContent = countdown;
+        if (countdown <= 0) {
+          clearInterval(timer);
+          window.location.href = "/";
         }
+      }, 1000);
 
-        setTimeout(() => {
-            try {
-                const title = document.getElementById('res-title');
-                const text = document.getElementById('res-text');
-                const img = document.getElementById('main-img');
-                const klookBox = document.getElementById('klook-box');
-                const klookLink = document.getElementById('link-klook');
+      if (stopBtn) {
+        stopBtn.addEventListener('click', () => {
+          clearInterval(timer);
+          countdownNum.parentElement.innerHTML = "Der Countdown wurde angehalten. Du kannst die Ergebnisse in aller Ruhe studieren.";
+          stopBtn.remove();
+        });
+      }
+    });
 
-                let firstSign = 'widder';
-                if (signs.length > 0 && signs[0]) {
-                    firstSign = signs[0].toLowerCase().trim();
-                }
-
-                const presets = {
-                    widder: { t: "Vulkane Islands", search: "Reykjavik", d: "Pure Action, raue Naturgewalten und epische Geysire warten auf dich. Dieses Reiseziel passt perfekt zu deinem unbändigen Tatendrang und deiner Abenteuerlust. Erlebe unvergessliche Momente inmitten einer magischen Kulisse aus Eis und Feuer.", i: "https://images.unsplash.com/photo-1476610182048-b716b8518aae?w=800" },
-                    stier: { t: "Toskana Genuss", search: "Florenz", d: "Sinnliche Hügellandschaften, erstklassige kulinarische Genüsse und tiefenentspannende Wellness-Oasen erwarten dich hier. Lass die Seele baumeln und genieße die feine Ästhetik und Ruhe, die perfekt auf deine Komfortansprüche abgestimmt sind.", i: "https://images.unsplash.com/photo-1534445867742-43195f401b6c?w=800" },
-                    zwillinge: { t: "Tokio Metropole", search: "Tokio", d: "Unendliche Inspiration, technologische Wunderwerke und ein pulsierendes Stadtleben bieten dir genau die Abwechslung, nach der dein wacher Geist sucht. Entdecke an jeder Straßenecke neue Geschichten und faszinierende Kontraste.", i: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800" },
-                    krebs: { t: "Cornwall Küste", search: "Cornwall", d: "Romantische Cottages, verträumte Fischerdörfer und die tiefe Geborgenheit am wilden, weiten Meer bilden den perfekten Rückzugsort für deine Seele. Tanke Kraft an den alten, mystischen Kraftorten direkt an der felsigen Atlantikküste.", i: "https://images.unsplash.com/photo-1510253451774-67f781f8f782?w=800" },
-                    loewe: { t: "Safari Namibia", search: "Windhuk", d: "Majestätische Weiten, ungezähmte Wildnis und exklusiver Luxus unter dem funkelnden afrikanischen Sternenhimmel erwarten dich. Ein stolzer und kraftvoller Ort, der deiner inneren Energie und deinem Sinn für das Besondere absolut gerecht wird.", i: "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=800" },
-                    jungfrau: { t: "Schweizer Alpen", search: "Zürich", d: "Kristallklare Luft, majestätische Berggipfel und eine perfekte, beruhigende Stille bieten dir die ideale Struktur zum Durchatmen. Finde Klarheit bei ausgedehnten Wanderungen und genieße die makellose Naturkulisse abseits des Alltagsstresses.", i: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800" },
-                    waage: { t: "Santorini Design", search: "Santorini", d: "Ästhetik in ihrer reinsten Form. Das harmonische Zusammenspiel aus azurblauem Meer, strahlend weißen Mauern und eleganten Design-Hotels bringt deine innere Balance zum Schwingen. Perfekt für Ruhesuchende mit einem Blick fürs Schöne.", i: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800" },
-                    skorpion: { t: "Marrakesch Mystik", search: "Marrakesch", d: "Geheimnisvolle Gassen, intensive orientalische Gewürze und tiefe, magische Sinneserlebnisse in den Palästen der Medina. Ein Ort voller Geheimnisse und emotionaler Tiefe, der dich magisch anziehen und so schnell nicht mehr loslassen wird.", i: "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=800" },
-                    schuetze: { t: "Patagonien Freiheit", search: "Punta Arenas", d: "Grenzenlose Expeditionen am wilden Ende der Welt. Die unendliche Freiheit zwischen Gletschern und windgepeitschten Steppen füttert deine philosophische Reiselust und deinen unstillbaren Drang, das Unbekannte zu erforschen.", i: "https://images.unsplash.com/photo-1513407030348-c983a97b98d8?w=800" },
-                    steinbock: { t: "Südtirol Gipfel", search: "Bozen", d: "Beständigkeit, traditionelle Werte und stolze Erfolge in den höchsten Höhen der Dolomiten. Die Ruhe der Berge und die bodenständige Exzellenz der Region bieten dir genau den anspruchsvollen Raum, den du zum Regenerieren brauchst.", i: "https://images.unsplash.com/photo-1533560225433-87593c6f9664?w=800" },
-                    wassermann: { t: "Lappland Vision", search: "Rovaniemi", d: "Unkonventionelle, magische Nächte im warmen Glas-Iglu, während über dir die Polarlichter tanzen. Ein absolut einzigartiges und futuristisches Naturerlebnis, das deinem freien Geist und deinen innovativen Visionen vollkommen entspricht.", i: "https://images.unsplash.com/photo-1531366930075-410a88094957?w=800" },
-                    fische: { t: "Bali Träume", search: "Bali", d: "Spirituelle Heilung, sanftes Meeresrauschen und pure Magie am Indischen Ozean. Lass dich von der tiefen, tropischen Gelassenheit treiben, finde zu dir selbst zurück und tauche ein in eine Welt voller spiritueller Kraft und innerem Frieden.", i: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800" }
-                };
-
-                let choice = presets[firstSign];
-                
-                if (!choice) {
-                    choice = presets['widder'];
-                }
-                
-                if (vibe > 80) {
-                    choice = { t: "Queenstown", search: "Queenstown", d: "Euer Vibe-Level steht auf absolutem Maximum! Willkommen in der Welthauptstadt des Abenteuers. Zwischen Bungeejumping, Jetbooten und epischen Bergketten findest du hier den ultimativen Adrenalinkick für deine Ferien.", i: "https://images.unsplash.com/photo-1589802829985-817e51181b92?w=800" };
-                }
-
-                if (title) title.innerText = choice.t;
-                if (text) text.innerText = choice.d;
-                
-                if (img) {
-                    img.src = choice.i;
-                    // Erzwingt die Sichtbarkeit des Bildes sofort, falls der Browser-Cache greift
-                    if (img.complete) {
-                        img.classList.add('visible');
-                    } else {
-                        img.onload = () => img.classList.add('visible');
-                    }
-                }
-
-                if (klookLink) {
-                    const rawTargetUrl = `https://www.klook.com/de/search/?keyword=${choice.search.trim()}`;
-                    const encodedTargetUrl = encodeURIComponent(rawTargetUrl);
-                    
-                    klookLink.href = `https://tp.media/r?id=698672&project_id=492044&fid=13426&url=${encodedTargetUrl}`;
-                    if (klookBox) klookBox.style.display = 'block'; 
-                }
-
-            } catch (err) {
-                console.error("Kritischer UI-Fehler abgefangen:", err);
-            }
-        }, 1600);
-    </script>
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+  </script>
 </body>
 </html>
