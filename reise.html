@@ -36,7 +36,7 @@
       </div>
 
       <div class="text-center my-8 py-4 border-y border-stone-800/80">
-        <span id="destination-display" class="font-cinzel text-4xl lg:text-6xl font-bold text-amber-400 tracking-wider gold-glow">---</span>
+        <span id="destination-display" class="font-cinzel text-4xl lg:text-6xl font-bold text-amber-400 tracking-wider gold-glow uppercase">---</span>
       </div>
 
       <div class="space-y-6 text-stone-300 leading-relaxed text-center font-light italic">
@@ -57,9 +57,9 @@
       <div class="mt-12 space-y-4">
         <h3 class="font-cinzel text-center text-sm uppercase text-amber-500/80 mb-6">Deine nächsten Schritte für diese Ferien</h3>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <a id="link-activity" href="#" target="_blank" rel="noopener noreferrer" class="gold-gradient text-stone-950 font-bold py-4 px-6 rounded-xl text-center transition-transform hover:-translate-y-0.5">Erlebnisse entdecken</a>
-          <a id="link-tiqets" href="#" target="_blank" rel="noopener noreferrer" class="bg-stone-900 border border-stone-700 text-stone-200 font-medium py-4 px-6 rounded-xl text-center transition-transform hover:-translate-y-0.5">Tickets sichern</a>
-          <a id="link-transfer" href="#" target="_blank" rel="noopener noreferrer" class="bg-stone-900 border border-stone-700 text-stone-200 font-medium py-4 px-6 rounded-xl text-center transition-transform hover:-translate-y-0.5">Transfer buchen</a>
+          <a id="link-activity" href="https://tpk.lv/pXm2idkE" target="_blank" rel="noopener noreferrer" class="gold-gradient text-stone-950 font-bold py-4 px-6 rounded-xl text-center transition-transform hover:-translate-y-0.5">Erlebnisse entdecken</a>
+          <a id="link-tiqets" href="https://tiqets.tpk.lv/XxF1prij" target="_blank" rel="noopener noreferrer" class="bg-stone-900 border border-stone-700 text-stone-200 font-medium py-4 px-6 rounded-xl text-center transition-transform hover:-translate-y-0.5">Tickets sichern</a>
+          <a id="link-transfer" href="https://gettransfer.tpk.lv/mPE1eDIa" target="_blank" rel="noopener noreferrer" class="bg-stone-900 border border-stone-700 text-stone-200 font-medium py-4 px-6 rounded-xl text-center transition-transform hover:-translate-y-0.5">Transfer buchen</a>
         </div>
       </div>
     </div>
@@ -73,19 +73,17 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      // Wir holen die vom Vordersystem (index.html/match.js) im sessionStorage abgelegten Daten
       const orakelDataRaw = sessionStorage.getItem('orakel_result');
       
       if (orakelDataRaw) {
         try {
           const data = JSON.parse(orakelDataRaw);
           
-          // Texte befüllen
+          // Wunschregion anzeigen (z. B. "Schwarzwald")
           document.getElementById('destination-display').textContent = data.destination || "Salzburg";
           document.getElementById('explanation-display').textContent = data.explanation || "";
           document.getElementById('besttime-display').textContent = data.bestTimeTip || "Mai bis Oktober";
           
-          // Packliste befüllen
           const packlisteAsm = data.packliste || [];
           const packDisplay = document.getElementById('packliste-display');
           packDisplay.innerHTML = "";
@@ -95,30 +93,17 @@
             packDisplay.appendChild(li);
           });
 
-          // Partner-Links aus den affiliate_suggestions der match.js zuordnen
-          if (data.affiliate_suggestions && data.affiliate_suggestions.length > 0) {
-            data.affiliate_suggestions.forEach(sugg => {
-              if (sugg.type === 'activity') document.getElementById('link-activity').href = sugg.affiliate_url;
-              if (sugg.type === 'tiqets') document.getElementById('link-tiqets').href = sugg.affiliate_url;
-              if (sugg.type === 'transfer') document.getElementById('link-transfer').href = sugg.affiliate_url;
-            });
+          // Welcome Pickups Link dynamisch mit der reinen Flughafen-Stadt (z.B. stuttgart) befeuern
+          const wpCity = (data.welcome_pickups_city || "").toLowerCase().trim();
+          if (wpCity && wpCity !== "salzburg") {
+            document.getElementById('link-transfer').href = `https://www.welcomepickups.com/${wpCity}/`;
           }
 
         } catch (e) {
           console.error("Fehler beim Parsen der Orakel-Daten", e);
         }
-      } else {
-        // Absolute Sicherheits-Fallback-Anzeige, falls die Seite direkt aufgerufen wird
-        document.getElementById('destination-display').textContent = "Salzburg";
-        document.getElementById('explanation-display').textContent = "Ein magischer Kraftort für deine Ferien.";
-        document.getElementById('besttime-display').textContent = "Mai bis Oktober";
-        document.getElementById('packliste-display').innerHTML = "<li>Premium-Wanderschuhe</li><li>Winddichte Softshelljacke</li>";
-        document.getElementById('link-activity').href = "https://tpk.lv/pXm2idkE";
-        document.getElementById('link-tiqets').href = "https://tiqets.tpk.lv/XxF1prij";
-        document.getElementById('link-transfer').href = "https://gettransfer.tpk.lv/mPE1eDIa";
       }
 
-      // UI umschalten
       document.getElementById('loading-container').classList.add('hidden');
       document.getElementById('result-container').classList.remove('hidden');
     });
