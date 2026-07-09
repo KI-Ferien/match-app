@@ -6,25 +6,11 @@
   <title>KI-FERIEN — Deine astrologische Auswertung</title>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            cinzel: ['Cinzel', 'serif'],
-            sans: ['Inter', 'sans-serif'],
-          }
-        }
-      }
-    }
-  </script>
   <style>
     .gold-glow { text-shadow: 0 0 15px rgba(245, 158, 11, 0.4); }
     .gold-border { border-color: rgba(245, 158, 11, 0.3); }
     .gold-gradient { background: linear-gradient(135deg, #d97706 0%, #b45309 100%); }
     .gold-gradient-hover:hover { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
-    @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-    .animate-spin-slow { animation: spin-slow 20s linear infinite; }
   </style>
 </head>
 <body class="bg-stone-950 text-stone-200 font-sans min-h-screen flex flex-col justify-between selection:bg-amber-500/30 selection:text-amber-200">
@@ -40,87 +26,43 @@
 
   <main class="max-w-4xl mx-auto px-6 py-10 lg:py-16 flex-grow w-full">
     
-    <div id="loading-container" class="bg-stone-900/40 border gold-border rounded-2xl p-12 backdrop-blur-lg shadow-2xl text-center space-y-6">
-      <div class="inline-block p-4 rounded-full border border-amber-500/20 bg-amber-500/5">
-        <svg class="w-12 h-12 text-amber-500 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
-        </svg>
-      </div>
+    <div id="loading-container" class="bg-stone-900/40 border gold-border rounded-2xl p-12 backdrop-blur-lg shadow-2xl text-center">
       <h2 class="font-cinzel text-xl lg:text-2xl font-bold tracking-wide text-amber-500 gold-glow">Die Sterne werden befragt...</h2>
-      <p class="text-stone-400 text-sm max-w-md mx-auto">Berechne astrologische Resonanzen für deine Ferien.</p>
     </div>
 
-    <div id="result-container" class="hidden bg-stone-900/40 border gold-border rounded-2xl p-8 lg:p-12 backdrop-blur-lg relative overflow-hidden shadow-2xl shadow-black/50">
-      
-      <div class="absolute top-4 left-4 w-4 h-4 border-t border-l border-amber-500/40"></div>
-      <div class="absolute top-4 right-4 w-4 h-4 border-t border-r border-amber-500/40"></div>
-      <div class="absolute bottom-4 left-4 w-4 h-4 border-b border-l border-amber-500/40"></div>
-      <div class="absolute bottom-4 right-4 w-4 h-4 border-b border-r border-amber-500/40"></div>
-
+    <div id="result-container" class="hidden bg-stone-900/40 border gold-border rounded-2xl p-8 lg:p-12 backdrop-blur-lg shadow-2xl">
       <div class="text-center mb-8">
-        <p class="font-cinzel text-xs uppercase tracking-widest text-amber-500/80 mb-1">Deine Bestimmung steht fest</p>
-        <h1 class="font-cinzel text-3xl lg:text-5xl font-bold tracking-wide text-stone-100 mt-2">Dein Seelenort</h1>
+        <h1 class="font-cinzel text-3xl lg:text-5xl font-bold text-stone-100 mt-2">Dein Seelenort</h1>
       </div>
 
       <div class="text-center my-8 py-4 border-y border-stone-800/80">
         <span id="destination-display" class="font-cinzel text-4xl lg:text-6xl font-bold text-amber-400 tracking-wider gold-glow">---</span>
       </div>
 
-      <div class="space-y-6 max-w-2xl mx-auto text-stone-300 leading-relaxed text-base lg:text-lg text-center font-light italic">
+      <div class="space-y-6 text-stone-300 leading-relaxed text-center font-light italic">
         <p id="explanation-display">Wird geladen...</p>
       </div>
 
-      <div id="meta-sections" class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12 pt-8 border-t border-stone-800/60">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12 pt-8 border-t border-stone-800/60">
         <div class="bg-stone-950/40 p-5 rounded-xl border border-stone-800/60">
-          <div class="flex items-center space-x-3 mb-3">
-            <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <h3 class="font-cinzel text-sm uppercase tracking-wider text-amber-500 font-bold">Ideale Reisezeit</h3>
-          </div>
+          <h3 class="font-cinzel text-sm uppercase text-amber-500 font-bold mb-3">Ideale Reisezeit</h3>
           <p id="besttime-display" class="text-stone-300 text-sm">---</p>
         </div>
-
         <div class="bg-stone-950/40 p-5 rounded-xl border border-stone-800/60">
-          <div class="flex items-center space-x-3 mb-3">
-            <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-            </svg>
-            <h3 class="font-cinzel text-sm uppercase tracking-wider text-amber-500 font-bold">Kosmische Packliste</h3>
-          </div>
-          <ul id="packliste-display" class="text-stone-300 text-sm space-y-1 list-disc pl-5"></ul>
+          <h3 class="font-cinzel text-sm uppercase text-amber-500 font-bold mb-3">Kosmische Packliste</h3>
+          <ul id="packliste-display" class="text-stone-300 text-sm list-disc pl-5 space-y-1"></ul>
         </div>
       </div>
 
-      <div id="partner-sections" class="mt-12 space-y-4">
-        <h3 class="font-cinzel text-center text-sm uppercase tracking-widest text-amber-500/80 mb-6">Deine nächsten Schritte für diese Ferien</h3>
+      <div class="mt-12 space-y-4">
+        <h3 class="font-cinzel text-center text-sm uppercase text-amber-500/80 mb-6">Deine nächsten Schritte für diese Ferien</h3>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <a id="klook-btn" href="#" target="_blank" rel="noopener" class="gold-gradient gold-gradient-hover text-stone-950 font-bold py-4 px-6 rounded-xl text-center shadow-lg transition-all transform hover:-translate-y-0.5 flex flex-col justify-center items-center">
-            <span class="text-xs uppercase tracking-widest opacity-80 mb-0.5">Aktivitäten</span>
-            <span class="text-sm font-cinzel tracking-wide">Erlebnisse entdecken</span>
-          </a>
-          <a id="transfer-btn" href="#" target="_blank" rel="noopener" class="bg-stone-900 border border-stone-700/80 hover:border-amber-500/50 hover:bg-stone-800 text-stone-200 font-medium py-4 px-6 rounded-xl text-center transition-all transform hover:-translate-y-0.5 flex flex-col justify-center items-center">
-            <span class="text-xs uppercase tracking-widest text-stone-400 mb-0.5">Transfer</span>
-            <span class="text-sm font-cinzel tracking-wide">Fahrt buchen</span>
-          </a>
-          <a id="pickup-btn" href="#" target="_blank" rel="noopener" class="bg-stone-900 border border-stone-700/80 hover:border-amber-500/50 hover:bg-stone-800 text-stone-200 font-medium py-4 px-6 rounded-xl text-center transition-all transform hover:-translate-y-0.5 flex flex-col justify-center items-center">
-            <span class="text-xs uppercase tracking-widest text-stone-400 mb-0.5">Flughafen</span>
-            <span class="text-sm font-cinzel tracking-wide">Privat-Chauffeur</span>
-          </a>
+          <a id="link-activity" href="#" target="_blank" rel="noopener noreferrer" class="gold-gradient text-stone-950 font-bold py-4 px-6 rounded-xl text-center transition-transform hover:-translate-y-0.5">Erlebnisse entdecken</a>
+          <a id="link-tiqets" href="#" target="_blank" rel="noopener noreferrer" class="bg-stone-900 border border-stone-700 text-stone-200 font-medium py-4 px-6 rounded-xl text-center transition-transform hover:-translate-y-0.5">Tickets sichern</a>
+          <a id="link-transfer" href="#" target="_blank" rel="noopener noreferrer" class="bg-stone-900 border border-stone-700 text-stone-200 font-medium py-4 px-6 rounded-xl text-center transition-transform hover:-translate-y-0.5">Transfer buchen</a>
         </div>
       </div>
-
     </div>
-
-    <div id="countdown-container" class="hidden mt-10 text-center bg-stone-900/20 border border-stone-900 rounded-xl p-4 max-w-md mx-auto">
-      <p class="text-stone-400 text-xs">
-        Du wirst in <span id="countdown-num" class="font-bold text-amber-500">20</span> Sekunden automatisch zur Startseite zurückgeführt.
-      </p>
-      <button id="stop-btn" class="mt-2 text-[10px] uppercase tracking-wider text-stone-500 hover:text-amber-500 transition-colors underline focus:outline-none">
-        Countdown anhalten (Hier bleiben)
-      </button>
-    </div>
-
   </main>
 
   <footer class="border-t border-stone-900/60 py-6 text-center text-xs text-stone-600 bg-stone-950/80">
@@ -130,72 +72,56 @@
   </footer>
 
   <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const signsRaw = urlParams.get('signs') || 'Widder';
-
-      // 🧪 DIREKTER RESILIENTER GENERATOR (Kein Backend-Absturz möglich!)
-      const dest = "Salzburg";
-      const explanation = `Ein vorbestimmter Seelenort für die Konstellation der Sternzeichen ${signsRaw}. Wie Buddha es im Mahayana im Mahapäriniviranä Sutra erläutert (Kosho Yamamoto 1973), liegt wahres Glück in der bewussten Einkehr. Das Konzept des Atman (Merriam-Webster 2003) spiegelt sich in den majestätischen Bergen wider. Ein idealer Kraftort für deine Ferien auf ki-ferien.de.`;
+    document.addEventListener("DOMContentLoaded", () => {
+      // Wir holen die vom Vordersystem (index.html/match.js) im sessionStorage abgelegten Daten
+      const orakelDataRaw = sessionStorage.getItem('orakel_result');
       
-      // DOM Elemente sofort mit den echten Daten befüllen
-      document.getElementById('destination-display').textContent = dest;
-      document.getElementById('explanation-display').textContent = explanation;
-      document.getElementById('besttime-display').textContent = "Mai bis Oktober sowie zur magischen Adventszeit.";
-      
-      const packliste = ["Premium-Wanderschuhe", "Winddichte Softshelljacke", "Stilvolles Reisetagebuch"];
-      let packHtml = '';
-      packliste.forEach(item => { packHtml += `<li>${escapeHtml(item)}</li>`; });
-      document.getElementById('packliste-display').innerHTML = packHtml;
+      if (orakelDataRaw) {
+        try {
+          const data = JSON.parse(orakelDataRaw);
+          
+          // Texte befüllen
+          document.getElementById('destination-display').textContent = data.destination || "Salzburg";
+          document.getElementById('explanation-display').textContent = data.explanation || "";
+          document.getElementById('besttime-display').textContent = data.bestTimeTip || "Mai bis Oktober";
+          
+          // Packliste befüllen
+          const packlisteAsm = data.packliste || [];
+          const packDisplay = document.getElementById('packliste-display');
+          packDisplay.innerHTML = "";
+          packlisteAsm.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = item;
+            packDisplay.appendChild(li);
+          });
 
-      // 🧪 UNKAPUTTBARE CLIENT-SIDE LINK-GENERIERUNG (Direkt auf deinem Mac-Mini)
-      const marker = "698672";
-      const trs = "492044";
-      const destEnc = encodeURIComponent(dest);
-      const destSlug = dest.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+          // Partner-Links aus den affiliate_suggestions der match.js zuordnen
+          if (data.affiliate_suggestions && data.affiliate_suggestions.length > 0) {
+            data.affiliate_suggestions.forEach(sugg => {
+              if (sugg.type === 'activity') document.getElementById('link-activity').href = sugg.affiliate_url;
+              if (sugg.type === 'tiqets') document.getElementById('link-tiqets').href = sugg.affiliate_url;
+              if (sugg.type === 'transfer') document.getElementById('link-transfer').href = sugg.affiliate_url;
+            });
+          }
 
-      const klookTarget = encodeURIComponent(`https://www.klook.com/search/result/?query=${destEnc}`);
-      const getTransferTarget = encodeURIComponent(`https://gettransfer.com/`);
-      const wpTarget = encodeURIComponent(`https://www.welcomepickups.com/${destSlug}/`);
+        } catch (e) {
+          console.error("Fehler beim Parsen der Orakel-Daten", e);
+        }
+      } else {
+        // Absolute Sicherheits-Fallback-Anzeige, falls die Seite direkt aufgerufen wird
+        document.getElementById('destination-display').textContent = "Salzburg";
+        document.getElementById('explanation-display').textContent = "Ein magischer Kraftort für deine Ferien.";
+        document.getElementById('besttime-display').textContent = "Mai bis Oktober";
+        document.getElementById('packliste-display').innerHTML = "<li>Premium-Wanderschuhe</li><li>Winddichte Softshelljacke</li>";
+        document.getElementById('link-activity').href = "https://tpk.lv/pXm2idkE";
+        document.getElementById('link-tiqets').href = "https://tiqets.tpk.lv/XxF1prij";
+        document.getElementById('link-transfer').href = "https://gettransfer.tpk.lv/mPE1eDIa";
+      }
 
-      // Hier wird p=4110 unerschütterlich eingebrannt
-      document.getElementById('klook-btn').href = `https://tp.media/r?campaign_id=137&marker=${marker}&p=4110&trs=${trs}&u=${klookTarget}`;
-      document.getElementById('transfer-btn').href = `https://tp.media/r?campaign_id=147&marker=${marker}&p=4439&trs=${trs}&u=${getTransferTarget}`;
-      document.getElementById('pickup-btn').href = `https://tp.media/r?campaign_id=627&marker=${marker}&p=8919&trs=${trs}&u=${wpTarget}`;
-
-      // UI Umschaltung: Ladebildschirm weg, Gold-Zertifikat da!
+      // UI umschalten
       document.getElementById('loading-container').classList.add('hidden');
       document.getElementById('result-container').classList.remove('hidden');
-      document.getElementById('countdown-container').classList.remove('hidden');
-
-      // Countdown-Steuerung (20 Sekunden)
-      let countdown = 20;
-      const countdownNum = document.getElementById('countdown-num');
-      const stopBtn = document.getElementById('stop-btn');
-      
-      const timer = setInterval(() => {
-        countdown--;
-        if (countdownNum) countdownNum.textContent = countdown;
-        if (countdown <= 0) {
-          clearInterval(timer);
-          window.location.href = "/";
-        }
-      }, 1000);
-
-      if (stopBtn) {
-        stopBtn.addEventListener('click', () => {
-          clearInterval(timer);
-          countdownNum.parentElement.innerHTML = "Der Countdown wurde angehalten. Du kannst die Ergebnisse in aller Ruhe studieren.";
-          stopBtn.remove();
-        });
-      }
     });
-
-    function escapeHtml(text) {
-      return text
-        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-    }
   </script>
 </body>
 </html>
