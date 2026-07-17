@@ -96,7 +96,7 @@
 
       // Steuerung der Links: Auf dem echten Server (ki-ferien.de) können Sie DeepLinks nutzen.
       const config = {
-        activity: { useDeepLink: true,  fallbackUrl: "https://www.klook.com/" },
+        activity: { useDeepLink: true,  fallbackUrl: "https://www.klook.com/de/" },
         tiqets:   { useDeepLink: true,  fallbackUrl: "https://www.tiqets.com/en/" },
         welcome:  { useDeepLink: false, fallbackUrl: "https://www.welcomepickups.com/de/" },
         transfer: { useDeepLink: false, fallbackUrl: "https://gettransfer.com/de/" }
@@ -150,7 +150,7 @@
       
       // Klook Link
       let urlActivity = config.activity.useDeepLink 
-        ? `https://www.klook.com/search/result/?query=${encodedCity}` 
+        ? `https://www.klook.com/de/search/result/?query=${encodedCity}` 
         : config.activity.fallbackUrl;
       document.getElementById('link-activity').href = buildTpLink(campaign_activity, pid_activity, urlActivity);
 
