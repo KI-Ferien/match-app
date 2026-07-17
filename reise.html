@@ -97,9 +97,9 @@
       // Steuerung der Links: Auf dem echten Server (ki-ferien.de) können Sie DeepLinks nutzen.
       const config = {
         activity: { useDeepLink: true,  fallbackUrl: "https://www.klook.com/" },
-        tiqets:   { useDeepLink: true,  fallbackUrl: "https://www.tiqets.com/" },
-        welcome:  { useDeepLink: false, fallbackUrl: "https://www.welcomepickups.com/" },
-        transfer: { useDeepLink: true,  fallbackUrl: "https://gettransfer.com/" }
+        tiqets:   { useDeepLink: true,  fallbackUrl: "https://www.tiqets.com/en/" },
+        welcome:  { useDeepLink: false, fallbackUrl: "https://www.welcomepickups.com/de/" },
+        transfer: { useDeepLink: false, fallbackUrl: "https://gettransfer.com/de/" }
       };
 
       // Baut einen korrekten Travelpayouts-Tracking-Link inkl. campaign_id, marker und trs
@@ -156,15 +156,17 @@
 
       // Tiqets Link
       let urlTiqets = config.tiqets.useDeepLink 
-        ? `https://www.tiqets.com/de/search/?q=${encodedCity}` 
+        ? `https://www.tiqets.com/en/search?q=${encodedCity}` 
         : config.tiqets.fallbackUrl;
       document.getElementById('link-tiqets').href = buildTpLink(campaign_tiqets, pid_tiqets, urlTiqets);
 
-      // Welcome Pickups Link (aktuell Startseite, da genaue Such-URL-Struktur noch nicht verifiziert)
+      // Welcome Pickups Link (deutsche Startseite - Städte-Suche wird bewusst nicht verlinkt,
+      // da nicht jede Ferienregion bei Welcome Pickups verfügbar ist, siehe z.B. Mannheim)
       let urlWelcome = config.welcome.fallbackUrl;
       document.getElementById('link-welcome').href = buildTpLink(campaign_welcome, pid_welcome, urlWelcome);
 
-      // GetTransfer Link
+      // GetTransfer Link (deutsche Startseite - Von/Nach-Adressen werden vom Nutzer selbst eingegeben,
+      // da eine reine Städte-Übergabe nicht funktioniert)
       let urlTransfer = config.transfer.useDeepLink 
         ? `https://gettransfer.com/de?from=${encodedCity}` 
         : config.transfer.fallbackUrl;
