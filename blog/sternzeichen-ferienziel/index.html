@@ -1,1 +1,151 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welches Ferienziel passt zu deinem Sternzeichen? | KI-Ferien Blog</title>
+    <meta name="description" content="Welches Ferienziel passt zu deinem Sternzeichen? Entdecke für alle 12 Tierkreiszeichen die perfekte Feriendestination – inklusive kostenlosem Astro-Orakel.">
 
+    <style>
+        :root {
+            --gold: #d4af37;
+            --cosmic-blue: #0a192f;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            background: #05060f;
+            color: white; font-family: 'Optima', 'Segoe UI', serif;
+            min-height: 100vh; display: flex; flex-direction: column;
+            align-items: center;
+        }
+
+        .hero { text-align: center; padding: 40px 20px 10px; }
+        h1 { font-size: clamp(1.4rem, 4.5vw, 2.4rem); color: var(--gold); margin: 5px 0; text-shadow: 0 0 20px rgba(212,175,55,0.4); letter-spacing: 1px; line-height: 1.3; }
+
+        article {
+            width: 100%; max-width: 720px; padding: 10px 20px 60px;
+            line-height: 1.7; font-size: 1rem; color: rgba(255,255,255,0.85);
+        }
+
+        h2 { color: var(--gold); font-size: clamp(1.1rem, 3vw, 1.4rem); margin-top: 40px; letter-spacing: 0.5px; }
+        h3 { color: var(--gold); font-size: clamp(1rem, 2.5vw, 1.15rem); margin-top: 25px; }
+
+        .intro-box {
+            background: rgba(10, 25, 47, 0.6);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 16px;
+            padding: 22px;
+            margin: 20px 0 30px;
+            font-style: italic;
+            color: rgba(255,255,255,0.9);
+        }
+
+        table {
+            width: 100%; border-collapse: collapse; margin: 20px 0;
+            font-size: 0.9rem;
+        }
+        th, td {
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            padding: 10px 12px; text-align: left;
+        }
+        th { color: var(--gold); background: rgba(212, 175, 55, 0.08); }
+        tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+
+        .faq-item { margin-bottom: 20px; }
+        .faq-q { color: var(--gold); font-weight: bold; margin-bottom: 5px; }
+
+        .cta-box {
+            text-align: center; margin: 40px 0 20px; padding: 30px 20px;
+            background: rgba(212, 175, 55, 0.08);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 16px;
+        }
+        .cta-btn {
+            display: inline-block; background: var(--gold); color: black; font-weight: bold;
+            padding: 12px 28px; border-radius: 30px; text-decoration: none; margin-top: 10px;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); transition: 0.3s;
+        }
+        .cta-btn:hover { transform: translateY(-2px); }
+
+        .updated-note { text-align: center; font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 30px; }
+
+        footer { margin-top: auto; padding: 15px; width: 100%; text-align: center; background: rgba(0,0,0,0.4); border-top: 1px solid rgba(255,255,255,0.05); }
+        footer a { color: rgba(255,255,255,0.5); text-decoration: none; margin: 0 10px; font-size: 0.75rem; }
+    </style>
+</head>
+<body>
+
+<div class="hero"><h1>Welches Ferienziel passt zu deinem Sternzeichen?</h1></div>
+
+<article>
+
+    <div class="intro-box">
+        Jedes Sternzeichen hat typische Charaktereigenschaften, die sich in bestimmten Reisestilen widerspiegeln: Feuerzeichen (Widder, Löwe, Schütze) lieben Action und neue Abenteuer, Erdzeichen (Stier, Jungfrau, Steinbock) schätzen Komfort und Natur, Luftzeichen (Zwillinge, Waage, Wassermann) suchen Kultur und Austausch, und Wasserzeichen (Krebs, Skorpion, Fische) bevorzugen Ruhe und emotionale Tiefe. Die passende Feriendestination richtet sich also nach dem Element deines Sternzeichens.
+    </div>
+
+    <h2>Ferienziele für alle 12 Sternzeichen im Überblick</h2>
+
+    <table>
+        <tr><th>Sternzeichen</th><th>Element</th><th>Ideales Ferienziel</th><th>Warum es passt</th></tr>
+        <tr><td>Widder ♈</td><td>Feuer</td><td>Costa Brava, Spanien</td><td>Action, Wassersport, spontane Energie</td></tr>
+        <tr><td>Stier ♉</td><td>Erde</td><td>Toskana, Italien</td><td>Genuss, gutes Essen, sinnliche Landschaften</td></tr>
+        <tr><td>Zwillinge ♊</td><td>Luft</td><td>Lissabon, Portugal</td><td>Vielfalt, Kultur, quirlige Stadtviertel</td></tr>
+        <tr><td>Krebs ♋</td><td>Wasser</td><td>Bodensee, Deutschland</td><td>Geborgenheit, Nähe zum Wasser, Familienidylle</td></tr>
+        <tr><td>Löwe ♌</td><td>Feuer</td><td>Côte d'Azur, Frankreich</td><td>Glamour, Bühne, Sonne im Mittelpunkt</td></tr>
+        <tr><td>Jungfrau ♍</td><td>Erde</td><td>Schwarzwald, Deutschland</td><td>Ordnung in der Natur, Wanderwege, Ruhe</td></tr>
+        <tr><td>Waage ♎</td><td>Luft</td><td>Wien, Österreich</td><td>Ästhetik, Kunst, harmonisches Stadtbild</td></tr>
+        <tr><td>Skorpion ♏</td><td>Wasser</td><td>Amalfiküste, Italien</td><td>Intensität, dramatische Steilküsten, Tiefgang</td></tr>
+        <tr><td>Schütze ♐</td><td>Feuer</td><td>Marokko</td><td>Fernweh, Abenteuer, neue Horizonte</td></tr>
+        <tr><td>Steinbock ♑</td><td>Erde</td><td>Schweizer Alpen</td><td>Struktur, Gipfelziele, bodenständiger Luxus</td></tr>
+        <tr><td>Wassermann ♒</td><td>Luft</td><td>Berlin, Deutschland</td><td>Individualität, Subkultur, Freigeist</td></tr>
+        <tr><td>Fische ♓</td><td>Wasser</td><td>Griechische Inseln</td><td>Träumerei, Meer, spirituelle Auszeit</td></tr>
+    </table>
+
+    <h2>Die vier Elemente und ihr Reisestil</h2>
+
+    <h3>Feuerzeichen: Widder, Löwe, Schütze</h3>
+    <p>Feuerzeichen brauchen Bewegung und neue Reize für ihre Ferien. Lange Strandferien ohne Programm langweilen sie schnell – sie blühen bei Aktivität auf: Wandern, Wassersport, Städtetrips mit vollem Programm. Auch spontane Kurzreisen ohne viel Planung passen gut zu ihrem Naturell.</p>
+
+    <h3>Erdzeichen: Stier, Jungfrau, Steinbock</h3>
+    <p>Erdzeichen schätzen Verlässlichkeit und Genuss. Ein gut organisierter Ferienort mit guter Küche, Naturnähe und einem gewissen Komfort-Niveau ist ihnen wichtiger als Nervenkitzel. Landhäuser, Weinregionen und ruhige Berglandschaften passen gut.</p>
+
+    <h3>Luftzeichen: Zwillinge, Waage, Wassermann</h3>
+    <p>Luftzeichen wollen Austausch, Kultur und Abwechslung. Städtereisen mit Museen, Cafés und interessanten Gesprächen sind ihr Element. Reine Erholungsferien ohne intellektuelle Anregung fühlen sich für sie schnell wie Stillstand an.</p>
+
+    <h3>Wasserzeichen: Krebs, Skorpion, Fische</h3>
+    <p>Wasserzeichen suchen emotionale Tiefe und Nähe zum Element Wasser. Ferien am Meer oder See, mit Raum für Rückzug und Reflexion, entsprechen ihrem Bedürfnis nach Geborgenheit und innerer Ruhe.</p>
+
+    <h2>Häufig gestellte Fragen</h2>
+
+    <div class="faq-item">
+        <div class="faq-q">Welches Sternzeichen reist am liebsten spontan?</div>
+        <div>Widder und Schütze planen ihre Ferien am wenigsten im Voraus – sie lieben Spontanität und Abenteuer.</div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-q">Welches Sternzeichen bevorzugt Luxus im Urlaub?</div>
+        <div>Löwe und Stier legen besonderen Wert auf Komfort, gutes Essen und einen gewissen Grad an Verwöhnung während der Ferien.</div>
+    </div>
+    <div class="faq-item">
+        <div class="faq-q">Gibt es ein Sternzeichen, das lieber zuhause bleibt?</div>
+        <div>Krebs verbindet oft die schönsten Ferien mit vertrauter Umgebung oder Nähe zur Familie – große Fernreisen sind für dieses Zeichen seltener erste Wahl.</div>
+    </div>
+
+    <div class="cta-box">
+        <p>Diese Übersicht gibt eine erste Orientierung – doch dein wirkliches Ferienziel hängt von mehr ab als nur deinem Sonnenzeichen.</p>
+        <a class="cta-btn" href="../../index.html">Jetzt das Orakel befragen</a>
+    </div>
+
+    <div class="updated-note">Dieser Artikel wird regelmäßig aktualisiert. Letzte Aktualisierung: Juli 2026.</div>
+
+</article>
+
+<footer>
+    <a href="../index.html">Zurück zum Blog</a>
+    <a href="../../index.html">Zurück zum Orakel</a>
+    <a href="../../impressum.html">Impressum</a>
+    <a href="../../datenschutz.html">Datenschutz</a>
+</footer>
+
+</body>
+</html>
