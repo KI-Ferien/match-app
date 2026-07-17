@@ -97,7 +97,7 @@
       // Steuerung der Links: Auf dem echten Server (ki-ferien.de) können Sie DeepLinks nutzen.
       const config = {
         activity: { useDeepLink: true,  fallbackUrl: "https://www.klook.com/de/" },
-        tiqets:   { useDeepLink: true,  fallbackUrl: "https://www.tiqets.com/en/" },
+        tiqets:   { useDeepLink: true,  fallbackUrl: "https://www.tiqets.com/de/" },
         welcome:  { useDeepLink: false, fallbackUrl: "https://www.welcomepickups.com/de/" },
         transfer: { useDeepLink: false, fallbackUrl: "https://gettransfer.com/de/" }
       };
@@ -156,7 +156,7 @@
 
       // Tiqets Link
       let urlTiqets = config.tiqets.useDeepLink 
-        ? `https://www.tiqets.com/en/search?q=${encodedCity}` 
+        ? `https://www.tiqets.com/de/search?q=${encodedCity}` 
         : config.tiqets.fallbackUrl;
       document.getElementById('link-tiqets').href = buildTpLink(campaign_tiqets, pid_tiqets, urlTiqets);
 
