@@ -1,1 +1,89 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KI-Ferien Blog - Astrologische Ferien-Inspiration</title>
+    <meta name="description" content="Entdecke astrologische Ferien-Inspiration: Welches Ferienziel passt zu deinem Sternzeichen? Tipps und Artikel von KI-Ferien.de">
 
+    <style>
+        :root {
+            --gold: #d4af37;
+            --cosmic-blue: #0a192f;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            background: #05060f;
+            color: white; font-family: 'Optima', 'Segoe UI', serif;
+            min-height: 100vh; display: flex; flex-direction: column;
+            align-items: center;
+        }
+
+        .hero { text-align: center; padding: 40px 20px 20px; }
+        h1 { font-size: clamp(1.6rem, 5vw, 2.6rem); color: var(--gold); margin: 5px 0; text-shadow: 0 0 20px rgba(212,175,55,0.4); letter-spacing: 2px; }
+
+        .subtitle {
+            max-width: 500px; text-align: center; font-style: italic;
+            color: rgba(255, 255, 255, 0.6); font-size: clamp(0.8rem, 1.8vw, 0.95rem);
+            margin-bottom: 30px; padding: 0 20px; line-height: 1.4;
+        }
+
+        .article-list {
+            width: 100%; max-width: 700px; padding: 0 20px 60px;
+            display: flex; flex-direction: column; gap: 20px;
+        }
+
+        .article-card {
+            background: rgba(10, 25, 47, 0.6);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 16px;
+            padding: 25px;
+            text-decoration: none;
+            color: white;
+            display: block;
+            transition: 0.3s;
+        }
+        .article-card:hover {
+            border-color: var(--gold);
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .article-title {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            color: var(--gold);
+            margin: 0 0 8px 0;
+        }
+
+        .article-excerpt {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        footer { margin-top: auto; padding: 15px; width: 100%; text-align: center; background: rgba(0,0,0,0.4); border-top: 1px solid rgba(255,255,255,0.05); }
+        footer a { color: rgba(255,255,255,0.5); text-decoration: none; margin: 0 10px; font-size: 0.75rem; }
+    </style>
+</head>
+<body>
+
+<div class="hero"><h1>KI-FERIEN BLOG</h1></div>
+<div class="subtitle">Astrologische Inspiration für deine nächsten Ferien.</div>
+
+<div class="article-list">
+    <a class="article-card" href="sternzeichen-ferienziel/index.html">
+        <h2 class="article-title">Welches Ferienziel passt zu deinem Sternzeichen?</h2>
+        <p class="article-excerpt">Von feurigen Abenteuern für Widder und Löwe bis zu ruhigen Rückzugsorten für Fische und Krebs — entdecke, welche Feriendestination zu deinem Element passt.</p>
+    </a>
+</div>
+
+<footer>
+    <a href="../index.html">Zurück zum Orakel</a>
+    <a href="../impressum.html">Impressum</a>
+    <a href="../datenschutz.html">Datenschutz</a>
+</footer>
+
+</body>
+</html>
