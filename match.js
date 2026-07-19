@@ -36,7 +36,7 @@ export const handler = async (event) => {
     const distance = payload.distance || 'Nachbarreiche';
     const transport = payload.transport || 'Flug der Falken';
 
-    const apiKey = process.env.MISTRAL_API_KEY;
+    const apiKey = process.env.ANTHROPIC_API_KEY;
     
     if (!apiKey || apiKey.trim() === "") {
       const fallback = getFallbackData(signs);
@@ -47,32 +47,68 @@ export const handler = async (event) => {
 
     const prompt = `Du bist ein hochentwickeltes astrologisches Orakel für Ferien. /astro
     Heutiges Datum: ${today}.
-    Parameter: ${participants} Personen, Sternzeichen ${signs}, Vibe: ${vibe}, Budget: ${budget}, Entfernung: ${distance}, Fortbewegung: ${transport}.
+    Analysiere folgende Parameter für ${participants} Personen der Sternzeichen ${signs}:
+    Erlebnis-Wunsch: ${vibe}
+    Budget-Pfad: ${budget}
+    Gewünschte Entfernung: ${distance}
+    Art der Fortbewegung: ${transport}
+    
+    WICHTIGE REGELN FÜR DEINE EMPFEHLUNG:
 
-    REGELN:
+    1. ASTROLOGISCHE TIEFE: Verknüpfe die typischen Charaktereigenschaften der genannten Sternzeichen inhaltlich und konkret mit dem gewählten Ferienziel. Keine oberflächliche Erwähnung des Sternzeichens - die Verbindung muss nachvollziehbar und stimmig sein.
 
-    1. GEOGRAFIE & ZIELWAHL: "Heimatliche Gefilde"/"Nachbarreiche" = DACH + direkt angrenzend, bevorzugt aus: Schwarzwald, Bodensee, Allgäu, Bayerischer Wald, Sauerland, Mosel, Rheingau, Spreewald, Harz, Ostseeküste, Nordseeküste, Nibelungensteig (Odenwald), Burgensteig Bergstraße, Straßburg, Salzburg.
-    "Kontinentale Weite" = Europa, bevorzugt aus: Toskana, Lissabon, Wien, Amalfiküste, Griechische Inseln, Côte d'Azur, italienische Thermenregionen.
-    "Ans Ende der Welt" = weltweit, z.B. Kanada für Abenteuer-Anfragen.
-    Wähle abwechslungsreich aus dem Pool - nicht wiederholt dasselbe Ziel bei unterschiedlichen Sternzeichen.
+    2. GRUPPENDYNAMIK: Berücksichtige die Anzahl von ${participants} Personen sowohl bei der Zielwahl (manche Ziele passen besser für Paare/Alleinreisende, andere für größere Gruppen) als auch explizit in der Packliste (z.B. "${participants}x Reiserucksäcke" bei ${participants} Personen, oder gemeinsame Ausrüstung für die Gruppe).
 
-    2. ASTRO + GRUPPE: Verknüpfe die Charaktereigenschaften von ${signs} konkret und stimmig mit dem Ziel. Berücksichtige ${participants} Personen bei der Zielwahl UND skaliere die Packliste entsprechend (z.B. "${participants}x Regenmäntel" statt nur "Regenmantel").
+    3. GEOGRAFISCHE BINDUNG: "Heimatliche Gefilde" und "Nachbarreiche" bedeuten ZWINGEND DACH-Region bzw. direkt angrenzende Länder. "Kontinentale Weite" bedeutet ZWINGEND Europa. "Ans Ende der Welt" bedeutet weltweit.
 
-    3. BUDGET "${budget}": spiegelt sich in Ziel-Charakter und Packliste wider (einfach/ausgewogen/exklusiv je nach Stufe).
+    4. REGIONEN-POOL, aus dem du bevorzugt wählen sollst (statt frei zu improvisieren), abweichen erlaubt wenn Sternzeichen/Vibe eindeutig besser zu einem anderen Ziel passen:
 
-    4. SAISON: "bestTimeTip" muss zum heutigen Datum (${today}) passen.
+    Für "Heimatliche Gefilde" und "Nachbarreiche" (DACH + direkt angrenzend), wähle bevorzugt aus:
+    Schwarzwald, Bodensee, Allgäu, Allgäuer Seenland, Bayerischer Wald, Sauerland, Mosel, Rheingau,
+    Fränkische Schweiz, Spreewald, Harz, Ostseeküste (Rügen/Usedom), Nordseeküste (Sylt/Ostfriesland),
+    Lüneburger Heide, Eifel, Vulkaneifel, Chiemgau, Fichtelgebirge, Schwäbische Alb, Teutoburger Wald,
+    Berchtesgadener Land, Elbsandsteingebirge/Sächsische Schweiz, Weserbergland, Ruhrgebiet, Insel Amrum/Föhr,
+    Nibelungensteig (Odenwald), Alemannenweg (Odenwald/Bergstraße), Burgensteig Bergstraße (Darmstadt-Heidelberg),
+    Straßburg (Frankreich), Salzburg (Österreich).
 
-    5. PFLICHT: Packliste = 3 reale Profi-Items (skaliert nach Personenzahl), KEINE Kameras. Explanation MUSS enthalten: Buddha/Mahapäriniviranä Sutra (Kosho Yamamoto 1973) UND Atman-Konzept (Merriam-Webster 2003). Nutze immer "Ferien" statt "Urlaub".
+    Für "Kontinentale Weite" (Europa), wähle bevorzugt aus:
+    Toskana, Lissabon, Wien, Amalfiküste, Griechische Inseln, Côte d'Azur,
+    sowie italienische Wellness-/Thermenregionen für ruhige, entspannungsorientierte Anfragen.
 
-    WICHTIG VOR DER AUSGABE: Prüfe nochmal, dass die Packliste die ${participants} Personen widerspiegelt (nicht nur Singular-Items).
+    Für "Ans Ende der Welt" (weltweit), erwäge auch:
+    Kanada (Rocky Mountains, Nationalparks, Wildnis) für abenteuerlustige, naturverbundene Anfragen.
 
-    Antworte AUSSCHLIESSLICH als JSON ohne Markdown:
+    5. BUDGET-REALISMUS: Die Budget-Stufe "${budget}" MUSS sich glaubwürdig sowohl in der Art des Ziels/der Aktivitäten als auch in der Packliste widerspiegeln:
+    - "Bescheidene Genügsamkeit": einfache, zweckmäßige Ausrüstung, unprätentiöse Ziele/Regionen
+    - "Goldene Mitte": gute Qualität, ausgewogener Komfort
+    - "Königlicher Luxus": hochwertige, exklusive Ausrüstung, gehobene Ziele/Regionen
+
+    6. SAISONALITÄT: Der "bestTimeTip" muss zum tatsächlichen heutigen Datum (${today}) passen - empfehle keine Jahreszeiten-Aktivitäten, die zur aktuellen Jahreszeit nicht sinnvoll sind.
+
+    7. VARIANZ: Vermeide es, bei ähnlichen Eingaben immer exakt dasselbe Ziel zu nennen - nutze die Bandbreite des Regionen-Pools.
+
+    8. Die Packliste MUSS GENAU 3 REALE, hochprofessionelle Ausrüstungsgegenstände enthalten (skaliert nach Personenzahl, siehe Punkt 2). NENNE KEINE KAMERAS UNTER KEINEN UMSTÄNDEN. Nenne stattdessen exklusives Premium-Gepäck, High-Tech Kleidung oder Gadgets. ERFINDE KEINE esoterischen Gegenstände.
+
+    9. Die Begründung ('explanation') MUSS ZWINGEND diese Quellen einbinden: 
+       - Wie Buddha es im Mahayana im Mahapäriniviranä Sutra erläutert (Übersetzer Kosho Yamamoto 1973).
+       - Das Konzept des Atman (Hinduismus, Merriam-Webster 2003).
+
+    10. Nutze immer das Wort "Ferien".
+    11. Beachte simulierte Reise- und Sicherheitswarnungen.
+
+    PRÜFE VOR DER AUSGABE: Enthält die Packliste genau 3 Items, skaliert nach ${participants} Personen? Ist keine Kamera dabei? Ist das Ziel nicht das zuletzt naheliegendste (z.B. nicht immer Straßburg)?
+    
+    UNBEDINGTE JSON-STRUKTUR:
+    - destination: Der klangvolle Ferienort oder Name der Ferienregion auf Deutsch für das Display (z.B. "Schwarzwald", "Istrien", "Toskana").
+    - welcome_pickups_city: AUSSCHLIESSLICH die für diese Region optimale Flughafen- oder Ankunftsstadt von Welcome Pickups komplett in Kleinbuchstaben, ohne Sonderzeichen (z.B. statt "Schwarzwald" nimmst du "stuttgart", statt "Istrien" nimmst du "pula", statt "Toskana" nimmst du "pisa").
+    
+    Antworte AUSSCHLIESSLICH als JSON-Objekt ohne Markdown, ohne Präambel, ohne Erklärung:
     {
       "destination": "Schwarzwald",
       "welcome_pickups_city": "stuttgart",
-      "explanation": "Begründung inkl. Sternzeichen, Gruppengröße, Buddha (Yamamoto 1973), Atman (Webster 2003).",
+      "explanation": "Tiefgründige Begründung auf Deutsch inkl. Sternzeichen, Gruppendynamik, Buddha (Yamamoto 1973) und Atman (Webster 2003).",
       "bestTimeTip": "Beste Reisezeit passend zum aktuellen Datum",
-      "packliste": ["Item 1 skaliert", "Item 2 skaliert", "Item 3 skaliert"],
+      "packliste": ["Reales Profi-Item 1", "Reales Profi-Item 2", "Reales Profi-Item 3"],
       "cta_text": "Ferien Erlebnisse buchen"
     }`;
 
@@ -80,23 +116,29 @@ export const handler = async (event) => {
       return { statusCode: 200, headers, body: JSON.stringify(getFallbackData(signs)) };
     }
 
-    const mistralRes = await globalThis.fetch('https://api.mistral.ai/v1/chat/completions', {
+    const claudeRes = await globalThis.fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json', 
-        'Authorization': `Bearer ${apiKey.trim()}` 
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey.trim(),
+        'anthropic-version': '2023-06-01'
       },
-      body: JSON.stringify({ 
-        model: "mistral-small-latest", 
-        messages: [{ role: "user", content: prompt }], 
-        temperature: 0.8 
+      body: JSON.stringify({
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 1024,
+        messages: [{ role: "user", content: prompt }]
       })
     });
 
-    if (!mistralRes.ok) throw new Error(`API error ${mistralRes.status}`);
+    if (!claudeRes.ok) throw new Error(`API error ${claudeRes.status}`);
 
-    const mistralData = await mistralRes.json();
-    let rawText = mistralData.choices[0].message.content.trim();
+    const claudeData = await claudeRes.json();
+
+    let rawText = claudeData.content
+      .filter(block => block.type === 'text')
+      .map(block => block.text)
+      .join('')
+      .trim();
     
     const backtickPattern = '\\x60\\x60\\x60';
     const fenceRegex = new RegExp(`${backtickPattern}(?:json)?\\s*([\\s\\S]*?)\\s*${backtickPattern}`, 'i');
