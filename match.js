@@ -43,7 +43,10 @@ export const handler = async (event) => {
       return { statusCode: 200, headers, body: JSON.stringify(fallback) };
     }
 
+    const today = new Date().toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' });
+
     const prompt = `Du bist ein hochentwickeltes astrologisches Orakel für Ferien. /astro
+    Heutiges Datum: ${today}.
     Analysiere folgende Parameter für ${participants} Personen der Sternzeichen ${signs}:
     Erlebnis-Wunsch: ${vibe}
     Budget-Pfad: ${budget}
@@ -51,32 +54,47 @@ export const handler = async (event) => {
     Art der Fortbewegung: ${transport}
     
     WICHTIGE REGELN FÜR DEINE EMPFEHLUNG:
-    1. Geografische Bindung: "Heimatliche Gefilde" und "Nachbarreiche" bedeuten ZWINGEND DACH-Region. "Kontinentale Weite" bedeutet ZWINGEND Europa. Alles andere ist weltweit.
 
-    2. REGIONEN-POOL, aus dem du bevorzugt wählen sollst (statt frei zu improvisieren):
+    1. ASTROLOGISCHE TIEFE: Verknüpfe die typischen Charaktereigenschaften der genannten Sternzeichen inhaltlich und konkret mit dem gewählten Ferienziel. Keine oberflächliche Erwähnung des Sternzeichens - die Verbindung muss nachvollziehbar und stimmig sein.
 
-    Für "Heimatliche Gefilde" und "Nachbarreiche" (DACH-Region), wähle bevorzugt aus:
+    2. GRUPPENDYNAMIK: Berücksichtige die Anzahl von ${participants} Personen sowohl bei der Zielwahl (manche Ziele passen besser für Paare/Alleinreisende, andere für größere Gruppen) als auch explizit in der Packliste (z.B. "3x Reiserucksäcke" bei 3 Personen, oder gemeinsame Ausrüstung für die Gruppe).
+
+    3. GEOGRAFISCHE BINDUNG: "Heimatliche Gefilde" und "Nachbarreiche" bedeuten ZWINGEND DACH-Region bzw. direkt angrenzende Länder. "Kontinentale Weite" bedeutet ZWINGEND Europa. "Ans Ende der Welt" bedeutet weltweit.
+
+    4. REGIONEN-POOL, aus dem du bevorzugt wählen sollst (statt frei zu improvisieren), abweichen erlaubt wenn Sternzeichen/Vibe eindeutig besser zu einem anderen Ziel passen:
+
+    Für "Heimatliche Gefilde" und "Nachbarreiche" (DACH + direkt angrenzend), wähle bevorzugt aus:
     Schwarzwald, Bodensee, Allgäu, Allgäuer Seenland, Bayerischer Wald, Sauerland, Mosel, Rheingau,
     Fränkische Schweiz, Spreewald, Harz, Ostseeküste (Rügen/Usedom), Nordseeküste (Sylt/Ostfriesland),
     Lüneburger Heide, Eifel, Vulkaneifel, Chiemgau, Fichtelgebirge, Schwäbische Alb, Teutoburger Wald,
     Berchtesgadener Land, Elbsandsteingebirge/Sächsische Schweiz, Weserbergland, Ruhrgebiet, Insel Amrum/Föhr,
-    Nibelungensteig (Odenwald), Alemannenweg (Odenwald/Bergstraße), Burgensteig Bergstraße (Darmstadt-Heidelberg).
+    Nibelungensteig (Odenwald), Alemannenweg (Odenwald/Bergstraße), Burgensteig Bergstraße (Darmstadt-Heidelberg),
+    Straßburg (Frankreich), Salzburg (Österreich).
 
     Für "Kontinentale Weite" (Europa), wähle bevorzugt aus:
-    Toskana, Lissabon, Wien, Amalfiküste, Marokko (falls noch Europa-nah gewertet), Griechische Inseln,
-    Côte d'Azur, sowie italienische Wellness-/Thermenregionen (z.B. Toskana-Thermen) für ruhige, entspannungsorientierte Anfragen.
+    Toskana, Lissabon, Wien, Amalfiküste, Griechische Inseln, Côte d'Azur,
+    sowie italienische Wellness-/Thermenregionen für ruhige, entspannungsorientierte Anfragen.
 
     Für "Ans Ende der Welt" (weltweit), erwäge auch:
     Kanada (Rocky Mountains, Nationalparks, Wildnis) für abenteuerlustige, naturverbundene Anfragen.
 
-    Weiche von diesem Pool ab, wenn die Sternzeichen-Kombination oder der Vibe eindeutig besser zu einem anderen, thematisch passenderen Ziel führt - der Pool ist eine bevorzugte Auswahl, keine starre Pflichtliste.
+    5. BUDGET-REALISMUS: Die Budget-Stufe "${budget}" MUSS sich glaubwürdig sowohl in der Art des Ziels/der Aktivitäten als auch in der Packliste widerspiegeln:
+    - "Bescheidene Genügsamkeit": einfache, zweckmäßige Ausrüstung, unprätentiöse Ziele/Regionen
+    - "Goldene Mitte": gute Qualität, ausgewogener Komfort
+    - "Königlicher Luxus": hochwertige, exklusive Ausrüstung, gehobene Ziele/Regionen
 
-    3. Die Packliste MUSS 3 REALE, hochprofessionelle Ausrüstungsgegenstände enthalten. NENNE KEINE KAMERAS. Nenne stattdessen exklusives Premium-Gepäck, High-Tech Kleidung oder Gadgets. ERFINDE KEINE esoterischen Gegenstände.
-    4. Die Begründung ('explanation') MUSS ZWINGEND diese Quellen einbinden: 
+    6. SAISONALITÄT: Der "bestTimeTip" muss zum tatsächlichen heutigen Datum (${today}) passen - empfehle keine Jahreszeiten-Aktivitäten, die zur aktuellen Jahreszeit nicht sinnvoll sind.
+
+    7. VARIANZ: Vermeide es, bei ähnlichen Eingaben immer exakt dasselbe Ziel zu nennen - nutze die Bandbreite des Regionen-Pools.
+
+    8. Die Packliste MUSS 3 REALE, hochprofessionelle Ausrüstungsgegenstände enthalten (skaliert nach Personenzahl, siehe Punkt 2). NENNE KEINE KAMERAS. Nenne stattdessen exklusives Premium-Gepäck, High-Tech Kleidung oder Gadgets. ERFINDE KEINE esoterischen Gegenstände.
+
+    9. Die Begründung ('explanation') MUSS ZWINGEND diese Quellen einbinden: 
        - Wie Buddha es im Mahayana im Mahapäriniviranä Sutra erläutert (Übersetzer Kosho Yamamoto 1973).
        - Das Konzept des Atman (Hinduismus, Merriam-Webster 2003).
-    5. Nutze immer das Wort "Ferien".
-    6. Beachte simulierte Reise- und Sicherheitswarnungen.
+
+    10. Nutze immer das Wort "Ferien".
+    11. Beachte simulierte Reise- und Sicherheitswarnungen.
     
     UNBEDINGTE JSON-STRUKTUR:
     - destination: Der klangvolle Ferienort oder Name der Ferienregion auf Deutsch für das Display (z.B. "Schwarzwald", "Istrien", "Toskana").
@@ -86,8 +104,8 @@ export const handler = async (event) => {
     {
       "destination": "Schwarzwald",
       "welcome_pickups_city": "stuttgart",
-      "explanation": "Tiefgründige Begründung auf Deutsch inkl. Sternzeichen, Buddha (Yamamoto 1973) und Atman (Webster 2003).",
-      "bestTimeTip": "Beste Reisezeit",
+      "explanation": "Tiefgründige Begründung auf Deutsch inkl. Sternzeichen, Gruppendynamik, Buddha (Yamamoto 1973) und Atman (Webster 2003).",
+      "bestTimeTip": "Beste Reisezeit passend zum aktuellen Datum",
       "packliste": ["Reales Profi-Item 1", "Reales Profi-Item 2", "Reales Profi-Item 3"],
       "cta_text": "Ferien Erlebnisse buchen"
     }`;
