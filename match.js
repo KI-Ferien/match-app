@@ -59,17 +59,19 @@ export const handler = async (event) => {
 
     2. GRUPPENDYNAMIK: Berücksichtige die Anzahl von ${participants} Personen sowohl bei der Zielwahl (manche Ziele passen besser für Paare/Alleinreisende, andere für größere Gruppen) als auch explizit in der Packliste (z.B. "${participants}x Reiserucksäcke" bei ${participants} Personen, oder gemeinsame Ausrüstung für die Gruppe).
 
-    3. GEOGRAFISCHE BINDUNG: "Heimatliche Gefilde" und "Nachbarreiche" bedeuten ZWINGEND DACH-Region bzw. direkt angrenzende Länder. "Kontinentale Weite" bedeutet ZWINGEND Europa. "Ans Ende der Welt" bedeutet weltweit.
+    3. GEOGRAFISCHE BINDUNG: "Heimatliche Gefilde" bedeutet ZWINGEND Deutschland, mit Schwerpunkt auf Regionen nahe Hessen/Rheinland-Pfalz/Odenwald. "Nachbarreiche" bedeutet ZWINGEND DACH-Region plus direkt angrenzende Länder (auch weiter entfernte deutsche Regionen sind hier erlaubt). "Kontinentale Weite" bedeutet ZWINGEND Europa. "Ans Ende der Welt" bedeutet weltweit.
 
     4. REGIONEN-POOL, aus dem du bevorzugt wählen sollst (statt frei zu improvisieren), abweichen erlaubt wenn Sternzeichen/Vibe eindeutig besser zu einem anderen Ziel passen:
 
-    Für "Heimatliche Gefilde" und "Nachbarreiche" (DACH + direkt angrenzend), wähle bevorzugt aus:
-    Schwarzwald, Bodensee, Allgäu, Allgäuer Seenland, Bayerischer Wald, Sauerland, Mosel, Rheingau,
-    Fränkische Schweiz, Spreewald, Harz, Ostseeküste (Rügen/Usedom), Nordseeküste (Sylt/Ostfriesland),
-    Lüneburger Heide, Eifel, Vulkaneifel, Chiemgau, Fichtelgebirge, Schwäbische Alb, Teutoburger Wald,
-    Berchtesgadener Land, Elbsandsteingebirge/Sächsische Schweiz, Weserbergland, Ruhrgebiet, Insel Amrum/Föhr,
+    Für "Heimatliche Gefilde" (Deutschland, Schwerpunkt Hessen/Rheinland-Pfalz/Odenwald-Nähe), wähle bevorzugt aus:
     Nibelungensteig (Odenwald), Alemannenweg (Odenwald/Bergstraße), Burgensteig Bergstraße (Darmstadt-Heidelberg),
-    Straßburg (Frankreich), Salzburg (Österreich).
+    Rheingau, Mosel, Eifel, Vulkaneifel, Schwarzwald, Fränkische Schweiz, Bergstraße-Odenwald allgemein.
+
+    Für "Nachbarreiche" (DACH gesamt + direkt angrenzende Länder), wähle bevorzugt aus:
+    Bodensee, Allgäu, Allgäuer Seenland, Bayerischer Wald, Sauerland, Spreewald, Harz,
+    Ostseeküste (Rügen/Usedom), Nordseeküste (Sylt/Ostfriesland), Lüneburger Heide, Chiemgau,
+    Fichtelgebirge, Schwäbische Alb, Teutoburger Wald, Berchtesgadener Land, Elbsandsteingebirge/Sächsische Schweiz,
+    Weserbergland, Ruhrgebiet, Insel Amrum/Föhr, Straßburg (Frankreich), Salzburg (Österreich).
 
     Für "Kontinentale Weite" (Europa), wähle bevorzugt aus:
     Toskana, Lissabon, Wien, Amalfiküste, Griechische Inseln, Côte d'Azur,
