@@ -51,13 +51,32 @@ export const handler = async (event) => {
     Art der Fortbewegung: ${transport}
     
     WICHTIGE REGELN FÜR DEINE EMPFEHLUNG:
-    1. Geografische Bindung: "Heimatliche Gefilde" und "Nachbarreiche" bedeuten ZWINGEND DACH-Region. "Kontinentale Weite" bedeutet ZWINGEND Europa. Alles andere ist weltweit. 
-    2. Die Packliste MUSS 3 REALE, hochprofessionelle Ausrüstungsgegenstände enthalten. NENNE KEINE KAMERAS. Nenne stattdessen exklusives Premium-Gepäck, High-Tech Kleidung oder Gadgets. ERFINDE KEINE esoterischen Gegenstände.
-    3. Die Begründung ('explanation') MUSS ZWINGEND diese Quellen einbinden: 
+    1. Geografische Bindung: "Heimatliche Gefilde" und "Nachbarreiche" bedeuten ZWINGEND DACH-Region. "Kontinentale Weite" bedeutet ZWINGEND Europa. Alles andere ist weltweit.
+
+    2. REGIONEN-POOL, aus dem du bevorzugt wählen sollst (statt frei zu improvisieren):
+
+    Für "Heimatliche Gefilde" und "Nachbarreiche" (DACH-Region), wähle bevorzugt aus:
+    Schwarzwald, Bodensee, Allgäu, Allgäuer Seenland, Bayerischer Wald, Sauerland, Mosel, Rheingau,
+    Fränkische Schweiz, Spreewald, Harz, Ostseeküste (Rügen/Usedom), Nordseeküste (Sylt/Ostfriesland),
+    Lüneburger Heide, Eifel, Vulkaneifel, Chiemgau, Fichtelgebirge, Schwäbische Alb, Teutoburger Wald,
+    Berchtesgadener Land, Elbsandsteingebirge/Sächsische Schweiz, Weserbergland, Ruhrgebiet, Insel Amrum/Föhr,
+    Nibelungensteig (Odenwald), Alemannenweg (Odenwald/Bergstraße), Burgensteig Bergstraße (Darmstadt-Heidelberg).
+
+    Für "Kontinentale Weite" (Europa), wähle bevorzugt aus:
+    Toskana, Lissabon, Wien, Amalfiküste, Marokko (falls noch Europa-nah gewertet), Griechische Inseln,
+    Côte d'Azur, sowie italienische Wellness-/Thermenregionen (z.B. Toskana-Thermen) für ruhige, entspannungsorientierte Anfragen.
+
+    Für "Ans Ende der Welt" (weltweit), erwäge auch:
+    Kanada (Rocky Mountains, Nationalparks, Wildnis) für abenteuerlustige, naturverbundene Anfragen.
+
+    Weiche von diesem Pool ab, wenn die Sternzeichen-Kombination oder der Vibe eindeutig besser zu einem anderen, thematisch passenderen Ziel führt - der Pool ist eine bevorzugte Auswahl, keine starre Pflichtliste.
+
+    3. Die Packliste MUSS 3 REALE, hochprofessionelle Ausrüstungsgegenstände enthalten. NENNE KEINE KAMERAS. Nenne stattdessen exklusives Premium-Gepäck, High-Tech Kleidung oder Gadgets. ERFINDE KEINE esoterischen Gegenstände.
+    4. Die Begründung ('explanation') MUSS ZWINGEND diese Quellen einbinden: 
        - Wie Buddha es im Mahayana im Mahapäriniviranä Sutra erläutert (Übersetzer Kosho Yamamoto 1973).
        - Das Konzept des Atman (Hinduismus, Merriam-Webster 2003).
-    4. Nutze immer das Wort "Ferien".
-    5. Beachte simulierte Reise- und Sicherheitswarnungen.
+    5. Nutze immer das Wort "Ferien".
+    6. Beachte simulierte Reise- und Sicherheitswarnungen.
     
     UNBEDINGTE JSON-STRUKTUR:
     - destination: Der klangvolle Ferienort oder Name der Ferienregion auf Deutsch für das Display (z.B. "Schwarzwald", "Istrien", "Toskana").
