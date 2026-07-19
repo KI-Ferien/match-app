@@ -61,7 +61,7 @@ export const handler = async (event) => {
 
     3. GEOGRAFISCHE BINDUNG: "Heimatliche Gefilde" bedeutet ZWINGEND Deutschland, mit Schwerpunkt auf Regionen nahe Hessen/Rheinland-Pfalz/Odenwald. "Nachbarreiche" bedeutet ZWINGEND DACH-Region plus direkt angrenzende Länder (auch weiter entfernte deutsche Regionen sind hier erlaubt). "Kontinentale Weite" bedeutet ZWINGEND Europa. "Ans Ende der Welt" bedeutet weltweit.
 
-    4. REGIONEN-POOL: Du MUSST dein Ziel AUSSCHLIESSLICH aus der folgenden Liste wählen, passend zur gewählten Distanz-Stufe. KEINE Ausnahmen, KEINE eigenen Ziele außerhalb dieser Listen, auch wenn dir ein anderes Ziel passender erscheint - wähle in dem Fall das nächstbeste aus der Liste:
+    4. REGIONEN-POOL: Du MUSST dein Ziel AUSSCHLIESSLICH aus der folgenden Liste wählen, passend zur gewählten Distanz-Stufe. KEINE Ausnahmen, KEINE eigenen Ziele außerhalb dieser Listen - auch wenn ein Sternzeichen (z.B. Schütze) thematisch zu Fernweh/Abenteuer/Bergen neigt, wähle in diesem Fall das abenteuerlichste/sportlichste Ziel AUS DER LISTE (z.B. Nibelungensteig oder Schwarzwald für "Heimatliche Gefilde"), NIEMALS ein Ziel außerhalb Deutschlands bei "Heimatliche Gefilde". KONKRETES BEISPIEL FÜR EINEN FEHLER, DEN DU VERMEIDEN MUSST: "Annecy" ist NICHT in der Liste für "Heimatliche Gefilde" und darf dafür NIEMALS gewählt werden, selbst wenn es thematisch zu passen scheint.
 
     Für "Heimatliche Gefilde" (Deutschland, Schwerpunkt Hessen/Rheinland-Pfalz/Odenwald-Nähe), wähle bevorzugt aus:
     Nibelungensteig (Odenwald), Alemannenweg (Odenwald/Bergstraße), Burgensteig Bergstraße (Darmstadt-Heidelberg),
