@@ -57,11 +57,11 @@ export const handler = async (event) => {
 
     1. ASTROLOGISCHE TIEFE: Verknüpfe die typischen Charaktereigenschaften der genannten Sternzeichen inhaltlich und konkret mit dem gewählten Ferienziel. Keine oberflächliche Erwähnung des Sternzeichens - die Verbindung muss nachvollziehbar und stimmig sein.
 
-    2. GRUPPENDYNAMIK: Berücksichtige die Anzahl von ${participants} Personen sowohl bei der Zielwahl (manche Ziele passen besser für Paare/Alleinreisende, andere für größere Gruppen) als auch explizit in der Packliste (z.B. "${participants}x Reiserucksäcke" bei ${participants} Personen, oder gemeinsame Ausrüstung für die Gruppe).
+    2. GRUPPENDYNAMIK (PFLICHT, NICHT OPTIONAL): Mindestens EINES der 3 Packliste-Items MUSS die Personenzahl explizit im Namen tragen, z.B. bei ${participants} Personen: "${participants}x Wanderschuhe (individuell)" oder "${participants}x leichte Regenjacken" oder "Gemeinsames Picknick-Set für ${participants} Personen". Prüfe das aktiv, bevor du antwortest - ein Item ganz ohne Personenbezug ist ein Fehler.
 
     3. GEOGRAFISCHE BINDUNG: "Heimatliche Gefilde" bedeutet ZWINGEND Deutschland, mit Schwerpunkt auf Regionen nahe Hessen/Rheinland-Pfalz/Odenwald. "Nachbarreiche" bedeutet ZWINGEND DACH-Region plus direkt angrenzende Länder (auch weiter entfernte deutsche Regionen sind hier erlaubt). "Kontinentale Weite" bedeutet ZWINGEND Europa. "Ans Ende der Welt" bedeutet weltweit.
 
-    4. REGIONEN-POOL, aus dem du bevorzugt wählen sollst (statt frei zu improvisieren), abweichen erlaubt wenn Sternzeichen/Vibe eindeutig besser zu einem anderen Ziel passen:
+    4. REGIONEN-POOL: Du MUSST dein Ziel AUSSCHLIESSLICH aus der folgenden Liste wählen, passend zur gewählten Distanz-Stufe. KEINE Ausnahmen, KEINE eigenen Ziele außerhalb dieser Listen, auch wenn dir ein anderes Ziel passender erscheint - wähle in dem Fall das nächstbeste aus der Liste:
 
     Für "Heimatliche Gefilde" (Deutschland, Schwerpunkt Hessen/Rheinland-Pfalz/Odenwald-Nähe), wähle bevorzugt aus:
     Nibelungensteig (Odenwald), Alemannenweg (Odenwald/Bergstraße), Burgensteig Bergstraße (Darmstadt-Heidelberg),
