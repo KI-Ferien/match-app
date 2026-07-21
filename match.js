@@ -1,4 +1,4 @@
- // netlify/functions/match.js
+// netlify/functions/match.js
 
 function getFallbackData(signs) {
   return {
@@ -35,6 +35,8 @@ export const handler = async (event) => {
     const budget = payload.budget || 'Goldene Mitte';
     const distance = payload.distance || 'Nachbarreiche';
     const transport = payload.transport || 'Flug der Falken';
+
+    console.log('DEBUG - Empfangene Parameter:', JSON.stringify({ signs, participants, vibe, budget, distance, transport }));
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
     
@@ -188,6 +190,8 @@ export const handler = async (event) => {
 
     const issues = [];
     let forcedDestination = null;
+
+    console.log('DEBUG - Ziel von KI:', parsed.destination, '| Distanz normalisiert:', distanceNormalized, '| Pool gültig?', !!relevantPool);
 
     if (relevantPool) {
       const destLower = (parsed.destination || '').toLowerCase();
