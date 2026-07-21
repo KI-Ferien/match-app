@@ -156,6 +156,75 @@ export const handler = async (event) => {
     }
 
     const parsed = JSON.parse(rawText);
+
+    // SERVERSEITIGE VALIDIERUNG: Prüfen, ob das Ziel wirklich im erlaubten Pool steht
+    // (nur für Heimatliche Gefilde / Nachbarreiche, da dort die Bindung strikt sein muss)
+    const heimatlichPool = ["Nibelungensteig", "Alemannenweg", "Burgensteig Bergstraße", "Rheingau", "Mosel", "Eifel", "Vulkaneifel", "Schwarzwald", "Fränkische Schweiz", "Bergstraße-Odenwald"];
+    const nachbarreichePool = ["Bodensee", "Allgäu", "Bayerischer Wald", "Sauerland", "Spreewald", "Harz", "Ostseeküste", "Rügen", "Usedom", "Nordseeküste", "Sylt", "Ostfriesland", "Lüneburger Heide", "Chiemgau", "Fichtelgebirge", "Schwäbische Alb", "Teutoburger Wald", "Berchtesgadener Land", "Elbsandsteingebirge", "Sächsische Schweiz", "Weserbergland", "Ruhrgebiet", "Amrum", "Föhr", "Straßburg", "Elsass", "Salzburg", "Salzkammergut", "Tirol", "Berner Oberland", "Luzern", "Vierwaldstättersee", "Zürichsee", "Appenzell", "Graubünden", "Engadin"];
+
+    const relevantPool = distance === "Heimatliche Gefilde" ? heimatlichPool
+                        : distance === "Nachbarreiche" ? [...heimatlichPool, ...nachbarreichePool]
+                        : null;
+
+    if (relevantPool) {
+      const destLower = (parsed.destination || '').toLowerCase();
+      const isValid = relevantPool.some(place => destLower.includes(place.toLowerCase()) || place.toLowerCase().includes(destLower));
+
+      if (!isValid) {
+        // Korrektur-Aufruf: dynamisch, ohne fest einprogrammierten Ortsnamen
+        const invalidDestination = parsed.destination;
+        const correctionPrompt = `Deine vorherige Antwort "${invalidDestination}" ist NICHT im erlaubten Regionen-Pool für "${distance}" enthalten und daher ungültig.
+        Erlaubte Ziele sind AUSSCHLIESSLICH: ${relevantPool.join(', ')}.
+        Wähle jetzt zwingend eines dieser Ziele (NICHT "${invalidDestination}") und liefere die komplette JSON-Antwort erneut, im selben Ton und Stil wie zuvor, für ${participants} Personen der Sternzeichen ${signs}, Vibe "${vibe}", Budget "${budget}".
+        Antworte AUSSCHLIESSLICH als JSON-Objekt ohne Markdown, exakt in der Struktur:
+        {
+          "destination": "...",
+          "welcome_pickups_city": "...",
+          "explanation": "...",
+          "bestTimeTip": "...",
+          "packliste": ["...", "...", "..."],
+          "cta_text": "Ferien Erlebnisse buchen"
+        }`;
+
+        const correctionRes = await globalThis.fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey.trim(),
+            'anthropic-version': '2023-06-01'
+          },
+          body: JSON.stringify({
+            model: "claude-haiku-4-5-20251001",
+            max_tokens: 1024,
+            messages: [{ role: "user", content: correctionPrompt }]
+          })
+        });
+
+        if (correctionRes.ok) {
+          const correctionData = await correctionRes.json();
+          let correctionText = correctionData.content
+            .filter(block => block.type === 'text')
+            .map(block => block.text)
+            .join('')
+            .trim();
+
+          const correctionFenceMatch = correctionText.match(fenceRegex);
+          if (correctionFenceMatch && correctionFenceMatch[1]) correctionText = correctionFenceMatch[1].trim();
+          if (!correctionText.startsWith('{')) {
+            const firstJson = correctionText.match(/\{[\s\S]*?\}/);
+            if (firstJson) correctionText = firstJson[0];
+          }
+
+          try {
+            const correctedParsed = JSON.parse(correctionText);
+            return { statusCode: 200, headers, body: JSON.stringify(correctedParsed) };
+          } catch (correctionParseError) {
+            // Falls Korrektur-Parsing fehlschlägt, ursprüngliche (ungültige) Antwort trotzdem ausliefern statt Fehler zu werfen
+          }
+        }
+      }
+    }
+
     return { statusCode: 200, headers, body: JSON.stringify(parsed) };
     
   } catch (apiError) {
