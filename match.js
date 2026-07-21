@@ -1,4 +1,4 @@
-// netlify/functions/match.js
+ // netlify/functions/match.js
 
 function getFallbackData(signs) {
   return {
@@ -178,10 +178,12 @@ export const handler = async (event) => {
       "griechische inseln": "athen", "côte d'azur": "nizza", "kanada": "toronto"
     };
 
-    const relevantPool = distance === "Heimatliche Gefilde" ? heimatlichPool
-                        : distance === "Nachbarreiche" ? [...heimatlichPool, ...nachbarreichePool]
-                        : distance === "Kontinentale Weite" ? kontinentaleWeitePool
-                        : distance === "Ans Ende der Welt" ? ansEndeDerWeltPool
+    const distanceNormalized = (distance || '').trim().toLowerCase();
+
+    const relevantPool = distanceNormalized === "heimatliche gefilde" ? heimatlichPool
+                        : distanceNormalized === "nachbarreiche" ? [...heimatlichPool, ...nachbarreichePool]
+                        : distanceNormalized === "kontinentale weite" ? kontinentaleWeitePool
+                        : distanceNormalized === "ans ende der welt" ? ansEndeDerWeltPool
                         : null;
 
     const issues = [];
