@@ -158,10 +158,25 @@ export const handler = async (event) => {
     const parsed = JSON.parse(rawText);
 
     // SERVERSEITIGE VALIDIERUNG: mehrere Pflicht-Kriterien gleichzeitig prüfen
-    const heimatlichPool = ["Nibelungensteig", "Alemannenweg", "Burgensteig Bergstraße", "Rheingau", "Mosel", "Eifel", "Vulkaneifel", "Schwarzwald", "Fränkische Schweiz", "Bergstraße-Odenwald"];
-    const nachbarreichePool = ["Bodensee", "Allgäu", "Bayerischer Wald", "Sauerland", "Spreewald", "Harz", "Ostseeküste", "Rügen", "Usedom", "Nordseeküste", "Sylt", "Ostfriesland", "Lüneburger Heide", "Chiemgau", "Fichtelgebirge", "Schwäbische Alb", "Teutoburger Wald", "Berchtesgadener Land", "Elbsandsteingebirge", "Sächsische Schweiz", "Weserbergland", "Ruhrgebiet", "Amrum", "Föhr", "Straßburg", "Elsass", "Salzburg", "Salzkammergut", "Tirol", "Berner Oberland", "Luzern", "Vierwaldstättersee", "Zürichsee", "Appenzell", "Graubünden", "Engadin"];
-    const kontinentaleWeitePool = ["Toskana", "Lissabon", "Wien", "Amalfiküste", "Griechische Inseln", "Côte d'Azur", "Therme", "Thermen"];
+    const heimatlichPool = ["Nibelungensteig", "Alemannenweg", "Burgensteig Bergstraße", "Rheingau", "Mosel", "Eifel", "Vulkaneifel", "Schwarzwald", "Fränkische Schweiz"];
+    const nachbarreichePool = ["Bodensee", "Allgäu", "Bayerischer Wald", "Sauerland", "Spreewald", "Harz", "Ostseeküste", "Nordseeküste", "Lüneburger Heide", "Chiemgau", "Fichtelgebirge", "Schwäbische Alb", "Teutoburger Wald", "Berchtesgadener Land", "Sächsische Schweiz", "Weserbergland", "Ruhrgebiet", "Straßburg", "Salzburg", "Salzkammergut", "Tirol", "Berner Oberland", "Luzern", "Zürichsee", "Appenzell", "Graubünden"];
+    const kontinentaleWeitePool = ["Toskana", "Lissabon", "Wien", "Amalfiküste", "Griechische Inseln", "Côte d'Azur"];
     const ansEndeDerWeltPool = ["Kanada"];
+
+    const cityMap = {
+      "nibelungensteig": "frankfurt", "alemannenweg": "frankfurt", "burgensteig bergstraße": "frankfurt",
+      "rheingau": "frankfurt", "mosel": "frankfurt-hahn", "eifel": "frankfurt-hahn", "vulkaneifel": "frankfurt-hahn",
+      "schwarzwald": "stuttgart", "fränkische schweiz": "nuernberg",
+      "bodensee": "friedrichshafen", "allgäu": "memmingen", "bayerischer wald": "muenchen", "sauerland": "dortmund",
+      "spreewald": "berlin", "harz": "hannover", "ostseeküste": "rostock", "nordseeküste": "hamburg",
+      "lüneburger heide": "hamburg", "chiemgau": "muenchen", "fichtelgebirge": "nuernberg", "schwäbische alb": "stuttgart",
+      "teutoburger wald": "paderborn", "berchtesgadener land": "salzburg", "sächsische schweiz": "dresden",
+      "weserbergland": "hannover", "ruhrgebiet": "dortmund", "straßburg": "strasbourg", "salzburg": "salzburg",
+      "salzkammergut": "salzburg", "tirol": "innsbruck", "berner oberland": "bern", "luzern": "zuerich",
+      "zürichsee": "zuerich", "appenzell": "zuerich", "graubünden": "zuerich",
+      "toskana": "pisa", "lissabon": "lissabon", "wien": "wien", "amalfiküste": "neapel",
+      "griechische inseln": "athen", "côte d'azur": "nizza", "kanada": "toronto"
+    };
 
     const relevantPool = distance === "Heimatliche Gefilde" ? heimatlichPool
                         : distance === "Nachbarreiche" ? [...heimatlichPool, ...nachbarreichePool]
@@ -170,32 +185,35 @@ export const handler = async (event) => {
                         : null;
 
     const issues = [];
+    let forcedDestination = null;
 
     if (relevantPool) {
       const destLower = (parsed.destination || '').toLowerCase();
       const isValidDestination = relevantPool.some(place => destLower.includes(place.toLowerCase()) || place.toLowerCase().includes(destLower));
       if (!isValidDestination) {
-        issues.push(`Das Ziel "${parsed.destination}" ist NICHT im erlaubten Pool. Erlaubt sind AUSSCHLIESSLICH: ${relevantPool.join(', ')}. Wähle stattdessen zwingend eines davon.`);
+        // Ziel wird NICHT mehr der KI überlassen, sondern deterministisch aus dem Pool gewählt (Garantie statt Bitte)
+        forcedDestination = relevantPool[Math.floor(Math.random() * relevantPool.length)];
+        issues.push(`Das Ziel ist jetzt fest vorgegeben: "${forcedDestination}". Schreibe die Begründung und Packliste passend zu genau diesem Ziel neu.`);
       }
     }
 
     const explanationText = (parsed.explanation || '').toLowerCase();
     if (!explanationText.includes('yamamoto')) {
-      issues.push(`Die Begründung enthält NICHT das Pflicht-Zitat "Wie Buddha es im Mahayana im Mahapäriniviranä Sutra erläutert (Übersetzer Kosho Yamamoto 1973)". Füge es zwingend ein.`);
+      issues.push(`Die Begründung muss das Pflicht-Zitat "Wie Buddha es im Mahayana im Mahapäriniviranä Sutra erläutert (Übersetzer Kosho Yamamoto 1973)" enthalten.`);
     }
     if (!explanationText.includes('atman') || !explanationText.includes('webster')) {
-      issues.push(`Die Begründung enthält NICHT die Pflicht-Referenz zum Konzept des Atman (Hinduismus, Merriam-Webster 2003). Füge sie zwingend ein.`);
+      issues.push(`Die Begründung muss die Pflicht-Referenz zum Konzept des Atman (Hinduismus, Merriam-Webster 2003) enthalten.`);
     }
 
     if (issues.length > 0) {
-      const correctionPrompt = `Deine vorherige Antwort hatte folgende Mängel, die du jetzt beheben musst:
+      const correctionPrompt = `Überarbeite die folgende Ferien-Empfehlung, um diese Punkte zu beheben:
       ${issues.map((issue, i) => `${i + 1}. ${issue}`).join('\n      ')}
 
-      Erstelle die komplette JSON-Antwort erneut, im selben Ton und Stil wie zuvor (weltgewandter Weltenbummler, Menschenkenner, Reiseexperte, spiritueller Erleuchtender), für ${participants} Personen der Sternzeichen ${signs}, Vibe "${vibe}", Budget "${budget}", Distanz "${distance}".
-      Behebe ALLE genannten Mängel gleichzeitig.
+      ${forcedDestination ? `WICHTIG: Das Ziel "${forcedDestination}" ist FEST und darf nicht geändert werden.` : ''}
+      Behalte Ton und Stil bei (weltgewandter Weltenbummler, Menschenkenner, Reiseexperte, spiritueller Erleuchtender), für ${participants} Personen der Sternzeichen ${signs}, Vibe "${vibe}", Budget "${budget}".
       Antworte AUSSCHLIESSLICH als JSON-Objekt ohne Markdown, exakt in der Struktur:
       {
-        "destination": "...",
+        "destination": "${forcedDestination || '...'}",
         "welcome_pickups_city": "...",
         "explanation": "...",
         "bestTimeTip": "...",
@@ -234,10 +252,21 @@ export const handler = async (event) => {
 
         try {
           const correctedParsed = JSON.parse(correctionText);
+          // Zusätzliche Absicherung: Ziel und Stadt notfalls hart überschreiben, unabhängig von der KI-Antwort
+          if (forcedDestination) {
+            correctedParsed.destination = forcedDestination;
+            correctedParsed.welcome_pickups_city = cityMap[forcedDestination.toLowerCase()] || correctedParsed.welcome_pickups_city;
+          }
           return { statusCode: 200, headers, body: JSON.stringify(correctedParsed) };
         } catch (correctionParseError) {
-          // Falls Korrektur-Parsing fehlschlägt, ursprüngliche Antwort trotzdem ausliefern statt Fehler zu werfen
+          if (forcedDestination) {
+            parsed.destination = forcedDestination;
+            parsed.welcome_pickups_city = cityMap[forcedDestination.toLowerCase()] || parsed.welcome_pickups_city;
+          }
         }
+      } else if (forcedDestination) {
+        parsed.destination = forcedDestination;
+        parsed.welcome_pickups_city = cityMap[forcedDestination.toLowerCase()] || parsed.welcome_pickups_city;
       }
     }
 
