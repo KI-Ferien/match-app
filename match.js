@@ -160,9 +160,13 @@ export const handler = async (event) => {
     // SERVERSEITIGE VALIDIERUNG: mehrere Pflicht-Kriterien gleichzeitig prüfen
     const heimatlichPool = ["Nibelungensteig", "Alemannenweg", "Burgensteig Bergstraße", "Rheingau", "Mosel", "Eifel", "Vulkaneifel", "Schwarzwald", "Fränkische Schweiz", "Bergstraße-Odenwald"];
     const nachbarreichePool = ["Bodensee", "Allgäu", "Bayerischer Wald", "Sauerland", "Spreewald", "Harz", "Ostseeküste", "Rügen", "Usedom", "Nordseeküste", "Sylt", "Ostfriesland", "Lüneburger Heide", "Chiemgau", "Fichtelgebirge", "Schwäbische Alb", "Teutoburger Wald", "Berchtesgadener Land", "Elbsandsteingebirge", "Sächsische Schweiz", "Weserbergland", "Ruhrgebiet", "Amrum", "Föhr", "Straßburg", "Elsass", "Salzburg", "Salzkammergut", "Tirol", "Berner Oberland", "Luzern", "Vierwaldstättersee", "Zürichsee", "Appenzell", "Graubünden", "Engadin"];
+    const kontinentaleWeitePool = ["Toskana", "Lissabon", "Wien", "Amalfiküste", "Griechische Inseln", "Côte d'Azur", "Therme", "Thermen"];
+    const ansEndeDerWeltPool = ["Kanada"];
 
     const relevantPool = distance === "Heimatliche Gefilde" ? heimatlichPool
                         : distance === "Nachbarreiche" ? [...heimatlichPool, ...nachbarreichePool]
+                        : distance === "Kontinentale Weite" ? kontinentaleWeitePool
+                        : distance === "Ans Ende der Welt" ? ansEndeDerWeltPool
                         : null;
 
     const issues = [];
