@@ -122,12 +122,15 @@
 
         .oracle-spinner {
             display: none;
+            box-sizing: border-box;
             width: clamp(28px, 6vw, 38px); height: clamp(28px, 6vw, 38px);
             margin-top: clamp(8px, 2vh, 15px);
             border-radius: 50%;
-            border: 3px solid rgba(212, 175, 55, 0.2);
-            border-top-color: var(--gold);
-            animation: spin-oracle 0.9s linear infinite;
+            background: conic-gradient(var(--gold) 0deg, rgba(212, 175, 55, 0.12) 300deg, rgba(212, 175, 55, 0.12) 360deg);
+            -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px));
+                    mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px));
+            animation: spin-oracle 1s linear infinite;
+            will-change: transform;
         }
         .oracle-spinner.active { display: block; }
         @keyframes spin-oracle { to { transform: rotate(360deg); } }
