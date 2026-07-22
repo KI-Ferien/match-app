@@ -9,7 +9,8 @@ function getFallbackData(signs) {
   };
 }
 
-const MODEL = "claude-sonnet-5";
+const FAST_MODEL = "claude-haiku-4-5-20251001"; // Erstversuch: schnell
+const CORRECTION_MODEL = "claude-sonnet-5"; // Korrekturversuch: sorgfältig
 const MAX_ATTEMPTS = 2; // 1 Erstversuch + 1 geprüfte Korrekturrunde (Kompromiss Geschwindigkeit/Zuverlässigkeit)
 
 const HEIMATLICH_POOL = ["Nibelungensteig", "Alemannenweg", "Burgensteig Bergstraße", "Rheingau", "Mosel", "Eifel", "Vulkaneifel", "Schwarzwald", "Fränkische Schweiz"];
@@ -65,7 +66,7 @@ function extractJson(rawText) {
   return JSON.parse(text);
 }
 
-async function callClaude(apiKey, promptText) {
+async function callClaude(apiKey, promptText, model) {
   const res = await globalThis.fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -74,7 +75,7 @@ async function callClaude(apiKey, promptText) {
       'anthropic-version': '2023-06-01'
     },
     body: JSON.stringify({
-      model: MODEL,
+      model,
       max_tokens: 1300,
       messages: [{ role: "user", content: promptText }]
     })
@@ -270,9 +271,11 @@ export const handler = async (event) => {
     let currentPromptText = initialPrompt;
 
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      // Erstversuch: schnelles Haiku. Korrekturversuch(e): sorgfältigeres Sonnet.
+      const modelForThisAttempt = attempt === 1 ? FAST_MODEL : CORRECTION_MODEL;
       let parsed;
       try {
-        parsed = await callClaude(apiKey, currentPromptText);
+        parsed = await callClaude(apiKey, currentPromptText, modelForThisAttempt);
       } catch (callError) {
         console.log(`DEBUG - Versuch ${attempt}: Claude-Aufruf oder JSON-Parsing fehlgeschlagen:`, callError.message);
         if (attempt < MAX_ATTEMPTS) {
