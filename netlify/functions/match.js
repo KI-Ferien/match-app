@@ -10,7 +10,7 @@ function getFallbackData(signs) {
 }
 
 const MODEL = "claude-sonnet-5";
-const MAX_ATTEMPTS = 3; // 1 Erstversuch + bis zu 2 geprüfte Korrekturrunden
+const MAX_ATTEMPTS = 2; // 1 Erstversuch + 1 geprüfte Korrekturrunde (Kompromiss Geschwindigkeit/Zuverlässigkeit)
 
 const HEIMATLICH_POOL = ["Nibelungensteig", "Alemannenweg", "Burgensteig Bergstraße", "Rheingau", "Mosel", "Eifel", "Vulkaneifel", "Schwarzwald", "Fränkische Schweiz"];
 const NACHBARREICHE_POOL = ["Bodensee", "Allgäu", "Bayerischer Wald", "Sauerland", "Spreewald", "Harz", "Ostseeküste", "Nordseeküste", "Lüneburger Heide", "Chiemgau", "Fichtelgebirge", "Schwäbische Alb", "Teutoburger Wald", "Berchtesgadener Land", "Sächsische Schweiz", "Weserbergland", "Ruhrgebiet", "Straßburg", "Salzburg", "Salzkammergut", "Tirol", "Berner Oberland", "Luzern", "Zürichsee", "Appenzell", "Graubünden"];
