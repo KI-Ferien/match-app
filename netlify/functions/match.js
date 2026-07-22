@@ -75,7 +75,7 @@ async function callClaude(apiKey, promptText) {
     },
     body: JSON.stringify({
       model: MODEL,
-      max_tokens: 2000,
+      max_tokens: 1300,
       messages: [{ role: "user", content: promptText }]
     })
   });
@@ -245,7 +245,12 @@ export const handler = async (event) => {
     10. Nutze immer das Wort "Ferien".
     11. Beachte simulierte Reise- und Sicherheitswarnungen.
 
-    PRÜFE VOR DER AUSGABE: Enthält die Packliste genau 3 Items, skaliert nach ${participants} Personen? Ist keine Kamera dabei? Ist das Ziel nicht das zuletzt naheliegendste (z.B. nicht immer Straßburg)?
+    12. KÜRZE (WICHTIG): Fasse dich knapp und kraftvoll statt ausschweifend.
+        - "explanation": MAXIMAL 3-4 kurze, prägnante Sätze. Trotzdem alle Pflichtelemente (Sternzeichen-Verknüpfung, Gruppendynamik, beide Zitate) enthalten - aber knackig formuliert, keine langen Schachtelsätze.
+        - "bestTimeTip": genau EIN Satz.
+        - Insgesamt: lieber dicht und auf den Punkt als episch und weitschweifig.
+
+    PRÜFE VOR DER AUSGABE: Enthält die Packliste genau 3 Items, skaliert nach ${participants} Personen? Ist keine Kamera dabei? Ist das Ziel nicht das zuletzt naheliegendste (z.B. nicht immer Straßburg)? Ist "explanation" wirklich kurz (max. 3-4 Sätze)?
 
     UNBEDINGTE JSON-STRUKTUR:
     - destination: Der klangvolle Ferienort oder Name der Ferienregion auf Deutsch für das Display (z.B. "Schwarzwald", "Istrien", "Toskana").
@@ -255,8 +260,8 @@ export const handler = async (event) => {
     {
       "destination": "Schwarzwald",
       "welcome_pickups_city": "stuttgart",
-      "explanation": "Tiefgründige, persönliche Begründung im Ton eines weltgewandten, spirituellen Reiseexperten, inkl. Sternzeichen, Gruppendynamik, Buddha (Yamamoto 1973) und Atman (Webster 2003).",
-      "bestTimeTip": "Beste Reisezeit passend zum aktuellen Datum",
+      "explanation": "Kurze, prägnante Begründung (max. 3-4 Sätze) im Ton eines weltgewandten, spirituellen Reiseexperten, inkl. Sternzeichen, Gruppendynamik, Buddha (Yamamoto 1973) und Atman (Webster 2003).",
+      "bestTimeTip": "Beste Reisezeit in einem Satz",
       "packliste": ["Reales Profi-Item 1", "Reales Profi-Item 2", "Reales Profi-Item 3"],
       "cta_text": "Ferien Erlebnisse buchen"
     }`;
