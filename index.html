@@ -119,6 +119,18 @@
 
         footer { margin-top: auto; padding: 15px; width: 100%; text-align: center; background: rgba(0,0,0,0.4); border-top: 1px solid rgba(255,255,255,0.05); }
         footer a { color: rgba(255,255,255,0.5); text-decoration: none; margin: 0 10px; font-size: 0.75rem; }
+
+        .oracle-spinner {
+            display: none;
+            width: clamp(28px, 6vw, 38px); height: clamp(28px, 6vw, 38px);
+            margin-top: clamp(8px, 2vh, 15px);
+            border-radius: 50%;
+            border: 3px solid rgba(212, 175, 55, 0.2);
+            border-top-color: var(--gold);
+            animation: spin-oracle 0.9s linear infinite;
+        }
+        .oracle-spinner.active { display: block; }
+        @keyframes spin-oracle { to { transform: rotate(360deg); } }
     </style>
     <script nowprocket data-noptimize="1" data-cfasync="false" data-wpfc-render="false" seraph-accel-crit="1" data-no-defer="1">
   (function () {
@@ -165,6 +177,7 @@
             </div>
         </div>
         <button class="oracle-btn" id="ask-oracle">BEFRAGEN</button>
+        <div class="oracle-spinner" id="oracle-spinner"></div>
     </div>
 </div>
 
@@ -258,28 +271,46 @@
         });
         updateStatusText();
 
+        const statusMessages = [
+            "Das Orakel liest in den Sternen...",
+            "Kosmische Muster werden entschlüsselt...",
+            "Planetenkonstellationen werden abgeglichen...",
+            "Die Weisheit der Ferienregionen wird befragt...",
+            "Fast fertig – die Seele findet ihren Ort..."
+        ];
+
         askButton.onclick = async () => {
             if (selectedSigns.length === 0) return;
             askButton.innerText = "LESEN...";
             askButton.disabled = true;
-            
+
+            const spinner = document.getElementById('oracle-spinner');
+            spinner.classList.add('active');
+
+            let msgIndex = 0;
+            status.innerText = statusMessages[msgIndex];
+            const statusInterval = setInterval(() => {
+                msgIndex = (msgIndex + 1) % statusMessages.length;
+                status.innerText = statusMessages[msgIndex];
+            }, 2800);
+
             const vibeVal = document.getElementById('vibe-slider').value;
             const budgetVal = document.getElementById('budget-slider').value;
 
             const payload = {
-                signs: selectedSigns, 
+                signs: selectedSigns,
                 participants: maxSigns,
                 vibe: vibeNamen[vibeVal - 1],
                 budget: budgetNamen[budgetVal - 1],
                 distance: distanzNamen[document.getElementById('distance-slider').value - 1],
                 transport: "Flug der Falken"
             };
-            
+
             try {
-                const response = await fetch('/.netlify/functions/match', { 
-                    method: 'POST', 
+                const response = await fetch('/.netlify/functions/match', {
+                    method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(payload) 
+                    body: JSON.stringify(payload)
                 });
 
                 if (!response.ok) throw new Error("Netlify Function Fehler");
@@ -287,9 +318,11 @@
                 const resultData = await response.json();
                 sessionStorage.setItem('orakel_result', JSON.stringify(resultData));
                 window.location.href = `reise.html`;
-            } catch (e) { 
+            } catch (e) {
                 console.error("Fehler beim API-Call, nutze Fallback-Parameter", e);
                 window.location.href = `reise.html?signs=${selectedSigns.join(',')}&p=${maxSigns}`;
+            } finally {
+                clearInterval(statusInterval);
             }
         };
     });
