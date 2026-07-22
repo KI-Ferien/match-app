@@ -56,11 +56,12 @@
 
       <div class="mt-12 space-y-4">
         <h3 class="font-cinzel text-center text-sm uppercase text-amber-500/80 mb-6">Deine nächsten Schritte für diese Ferien</h3>
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
           <a id="link-activity" href="#" target="_blank" rel="noopener noreferrer" class="gold-gradient text-stone-950 font-bold py-4 px-4 rounded-xl text-center text-sm transition-transform hover:-translate-y-0.5">Erlebnisse entdecken</a>
           <a id="link-tiqets" href="#" target="_blank" rel="noopener noreferrer" class="bg-stone-900 border border-stone-700 text-stone-200 font-medium py-4 px-4 rounded-xl text-center text-sm transition-transform hover:-translate-y-0.5">Tickets sichern</a>
           <a id="link-welcome" href="#" target="_blank" rel="noopener noreferrer" class="bg-stone-900 border border-stone-700 text-stone-200 font-medium py-4 px-4 rounded-xl text-center text-sm transition-transform hover:-translate-y-0.5">Abholung buchen</a>
           <a id="link-transfer" href="#" target="_blank" rel="noopener noreferrer" class="bg-stone-900 border border-stone-700 text-stone-200 font-medium py-4 px-4 rounded-xl text-center text-sm transition-transform hover:-translate-y-0.5">Transfer buchen</a>
+          <a id="link-tui" href="#" target="_blank" rel="noopener noreferrer" class="bg-stone-900 border border-stone-700 text-stone-200 font-medium py-4 px-4 rounded-xl text-center text-sm transition-transform hover:-translate-y-0.5">Pauschalreise ansehen</a>
         </div>
       </div>
 
@@ -98,88 +99,14 @@
       const pid_transfer = "4439";  // GetTransfer
       const campaign_transfer = "147";
 
+      // Awin-Zugangsdaten (Publisher-ID + Advertiser-ID)
+      const awinAffId = "2734466";   // Publisher-ID (Awin-Konto)
+      const awinTuiMid = "10102";    // Advertiser-ID: Tui.com DE
+
       // Steuerung der Links: Auf dem echten Server (ki-ferien.de) können Sie DeepLinks nutzen.
       const config = {
         activity: { useDeepLink: true,  fallbackUrl: "https://www.klook.com/de/" },
         tiqets:   { useDeepLink: true,  fallbackUrl: "https://www.tiqets.com/de/" },
         welcome:  { useDeepLink: false, fallbackUrl: "https://www.welcomepickups.com/de/" },
-        transfer: { useDeepLink: false, fallbackUrl: "https://gettransfer.com/de/" }
-      };
-
-      // Baut einen korrekten Travelpayouts-Tracking-Link inkl. campaign_id, marker und trs
-      function buildTpLink(campaignId, pid, targetUrl) {
-        return `https://tp.media/r?campaign_id=${campaignId}&marker=${marker}&p=${pid}&trs=${trs}&u=${encodeURIComponent(targetUrl)}`;
-      }
-      // ==========================================
-
-      // 2. DATEN ABRUFEN
-      const orakelDataRaw = sessionStorage.getItem('orakel_result');
-      
-      let data = {
-        destination: "Elsass",
-        welcome_pickups_city: "Straßburg", 
-        explanation: "Die Sterne weisen den Weg in die malerischen Gassen des Elsass. Hier findet Deine Seele die perfekte Balance zwischen Kultur und kosmischer Entspannung.",
-        bestTimeTip: "Mai bis Oktober",
-        packliste: ["Kamera für Erinnerungen", "Bequeme Laufschuhe", "Kosmische Neugier"]
-      };
-      
-      if (orakelDataRaw) {
-        try {
-          data = JSON.parse(orakelDataRaw);
-        } catch (e) {
-          console.error("Fehler beim Parsen der Orakel-Daten", e);
-        }
-      }
-      
-      // 3. UI-TEXTE SETZEN
-      const destination = data.destination || "Elsass";
-      document.getElementById('destination-display').textContent = destination;
-      document.getElementById('explanation-display').textContent = data.explanation || "";
-      document.getElementById('besttime-display').textContent = data.bestTimeTip || "Mai bis Oktober";
-      
-      const packlisteAsm = data.packliste || [];
-      const packDisplay = document.getElementById('packliste-display');
-      packDisplay.innerHTML = "";
-      packlisteAsm.forEach(item => {
-        const li = document.createElement('li');
-        li.textContent = item;
-        packDisplay.appendChild(li);
-      });
-
-      // 4. FLUGHAFEN-STADT ENCODIEREN
-      const airportCity = (data.welcome_pickups_city || destination).trim();
-      const encodedCity = encodeURIComponent(airportCity);
-
-      // 5. INTELLIGENTE LINK-GENERIERUNG
-      
-      // Klook Link
-      let urlActivity = config.activity.useDeepLink 
-        ? `https://www.klook.com/de/search/result/?query=${encodedCity}` 
-        : config.activity.fallbackUrl;
-      document.getElementById('link-activity').href = buildTpLink(campaign_activity, pid_activity, urlActivity);
-
-      // Tiqets Link
-      let urlTiqets = config.tiqets.useDeepLink 
-        ? `https://www.tiqets.com/de/search?q=${encodedCity}` 
-        : config.tiqets.fallbackUrl;
-      document.getElementById('link-tiqets').href = buildTpLink(campaign_tiqets, pid_tiqets, urlTiqets);
-
-      // Welcome Pickups Link (deutsche Startseite - Städte-Suche wird bewusst nicht verlinkt,
-      // da nicht jede Ferienregion bei Welcome Pickups verfügbar ist, siehe z.B. Mannheim)
-      let urlWelcome = config.welcome.fallbackUrl;
-      document.getElementById('link-welcome').href = buildTpLink(campaign_welcome, pid_welcome, urlWelcome);
-
-      // GetTransfer Link (deutsche Startseite - Von/Nach-Adressen werden vom Nutzer selbst eingegeben,
-      // da eine reine Städte-Übergabe nicht funktioniert)
-      let urlTransfer = config.transfer.useDeepLink 
-        ? `https://gettransfer.com/de?from=${encodedCity}` 
-        : config.transfer.fallbackUrl;
-      document.getElementById('link-transfer').href = buildTpLink(campaign_transfer, pid_transfer, urlTransfer);
-
-      // 6. LADE-ANSICHT UMSCHALTEN
-      document.getElementById('loading-container').classList.add('hidden');
-      document.getElementById('result-container').classList.remove('hidden');
-    });
-  </script>
-</body>
-</html>
+        transfer: { useDeepLink: false, fallbackUrl: "https://gettransfer.com/de/" },
+        tui:      { useDeepLink:
