@@ -99,27 +99,20 @@
       const pid_transfer = "4439";  // GetTransfer
       const campaign_transfer = "147";
 
-      // Awin-Zugangsdaten (Publisher-ID + Advertiser-ID)
-      const awinAffId = "2734466";   // Publisher-ID (Awin-Konto)
-      const awinTuiMid = "10102";    // Advertiser-ID: Tui.com DE
+      // Awin-Tracking-Link für TUI.com DE (aus dem Awin Link Builder generiert, Publisher 2734466 / Advertiser 10102)
+      const awinTuiLink = "https://www.awin1.com/cread.php?awinmid=10102&awinaffid=2734466";
 
       // Steuerung der Links: Auf dem echten Server (ki-ferien.de) können Sie DeepLinks nutzen.
       const config = {
         activity: { useDeepLink: true,  fallbackUrl: "https://www.klook.com/de/" },
         tiqets:   { useDeepLink: true,  fallbackUrl: "https://www.tiqets.com/de/" },
         welcome:  { useDeepLink: false, fallbackUrl: "https://www.welcomepickups.com/de/" },
-        transfer: { useDeepLink: false, fallbackUrl: "https://gettransfer.com/de/" },
-        tui:      { useDeepLink: false, fallbackUrl: "https://www.tui.com/de/" }
+        transfer: { useDeepLink: false, fallbackUrl: "https://gettransfer.com/de/" }
       };
 
       // Baut einen korrekten Travelpayouts-Tracking-Link inkl. campaign_id, marker und trs
       function buildTpLink(campaignId, pid, targetUrl) {
         return `https://tp.media/r?campaign_id=${campaignId}&marker=${marker}&p=${pid}&trs=${trs}&u=${encodeURIComponent(targetUrl)}`;
-      }
-
-      // Baut einen korrekten Awin-Tracking-Link (cread.php) inkl. Advertiser- und Publisher-ID
-      function buildAwinLink(merchantId, targetUrl) {
-        return `https://www.awin1.com/cread.php?awinmid=${merchantId}&awinaffid=${awinAffId}&clickref=ki-ferien&p=${encodeURIComponent(targetUrl)}`;
       }
       // ==========================================
 
@@ -187,10 +180,8 @@
         : config.transfer.fallbackUrl;
       document.getElementById('link-transfer').href = buildTpLink(campaign_transfer, pid_transfer, urlTransfer);
 
-      // TUI Link (Awin) - Startseite als Ziel, da die TUI-Such-URL-Struktur
-      // pro Zielort nicht zuverlässig vorhersagbar ist
-      let urlTui = config.tui.fallbackUrl;
-      document.getElementById('link-tui').href = buildAwinLink(awinTuiMid, urlTui);
+      // TUI Link (Awin) - fester, im Awin Link Builder generierter Tracking-Link
+      document.getElementById('link-tui').href = awinTuiLink;
 
       // 6. LADE-ANSICHT UMSCHALTEN
       document.getElementById('loading-container').classList.add('hidden');
